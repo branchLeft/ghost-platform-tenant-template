@@ -60,6 +60,19 @@
       "typescript"
     ],
     "4": [
+      "claude_md",
+      "ghost_tenant_component",
+      "package_dependencies",
+      "package_dependencies_branchleft_ghost_platform_tenant",
+      "package_dependencies_pulumi_gcp",
+      "package_dependencies_pulumi_pulumi",
+      "pulumi_gcp",
+      "pulumi_pulumi",
+      "pulumi_yaml",
+      "readme_md",
+      "readme_tenant_md"
+    ],
+    "5": [
       "package",
       "package_main",
       "package_name",
@@ -70,7 +83,7 @@
       "package_scripts_format_check",
       "package_scripts_typecheck"
     ],
-    "5": [
+    "6": [
       "config",
       "config_config",
       "config_deployerserviceaccountemail",
@@ -80,20 +93,18 @@
       "config_platformtenantimagerepositorydockerpath",
       "config_projectid"
     ],
-    "6": [
-      "branchleft_ghost_platform_tenant",
-      "package_dependencies",
-      "package_dependencies_branchleft_ghost_platform_tenant",
-      "package_dependencies_pulumi_gcp",
-      "package_dependencies_pulumi_pulumi",
-      "pulumi_gcp",
-      "pulumi_pulumi"
-    ],
     "7": [
       "path",
       "scripts_assert_placeholders_substituted",
       "scripts_assert_placeholders_substituted_find_placeholders",
       "scripts_assert_placeholders_substituted_main"
+    ],
+    "8": [
+      "github_workflows_infra_ci_yml",
+      "runbook_bootstrap_md"
+    ],
+    "9": [
+      "pre_commit_config_yaml"
     ]
   },
   "cohesion": {
@@ -101,12 +112,19 @@
     "1": 0.2564102564102564,
     "2": 0.15384615384615385,
     "3": 0.18181818181818182,
-    "4": 0.2222222222222222,
-    "5": 0.25,
-    "6": 0.2857142857142857,
-    "7": 0.8333333333333334
+    "4": 0.2,
+    "5": 0.2222222222222222,
+    "6": 0.25,
+    "7": 0.8333333333333334,
+    "8": 1.0,
+    "9": 1.0
   },
   "gods": [
+    {
+      "id": "tsconfig_exclude",
+      "label": "exclude",
+      "degree": 5
+    },
     {
       "id": "scripts_assert_no_tenant_deletes_self_test",
       "label": "self_test()",
@@ -118,9 +136,14 @@
       "degree": 5
     },
     {
-      "id": "tsconfig_exclude",
-      "label": "exclude",
+      "id": "ghost_tenant_component",
+      "label": "@branchleft/ghost-platform-tenant",
       "degree": 5
+    },
+    {
+      "id": "package_scripts",
+      "label": "scripts",
+      "degree": 4
     },
     {
       "id": "scripts_assert_no_tenant_deletes_declaration_pattern_tenant_suffix",
@@ -143,24 +166,14 @@
       "degree": 4
     },
     {
-      "id": "package_scripts",
-      "label": "scripts",
-      "degree": 4
-    },
-    {
       "id": "scripts_assert_placeholders_substituted_find_placeholders",
       "label": "find_placeholders()",
-      "degree": 3
-    },
-    {
-      "id": "scripts_assert_placeholders_substituted_main",
-      "label": "main()",
       "degree": 3
     }
   ],
   "surprises": [],
   "tokens": {
-    "input": 0,
-    "output": 0
+    "input": 9883,
+    "output": 1062
   }
 }

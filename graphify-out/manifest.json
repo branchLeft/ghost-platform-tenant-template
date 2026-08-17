@@ -1,32 +1,67 @@
 {
   "config.ts": {
-    "mtime": 1786920662.2555432,
+    "mtime": 1786975999.586702,
     "ast_hash": "55001846c0f3b02efce634e4094eca1b",
     "semantic_hash": "55001846c0f3b02efce634e4094eca1b"
   },
   "index.ts": {
-    "mtime": 1786920662.2565594,
+    "mtime": 1786975999.5878391,
     "ast_hash": "d3c22a1ac01f212c1f8435eb678fdace",
     "semantic_hash": "d3c22a1ac01f212c1f8435eb678fdace"
   },
   "package.json": {
-    "mtime": 1786920662.257543,
+    "mtime": 1786975999.5887022,
     "ast_hash": "a14dba4a2c91321c2a78c5b13fdaddf7",
     "semantic_hash": "a14dba4a2c91321c2a78c5b13fdaddf7"
   },
   "scripts/assert-no-tenant-deletes.py": {
-    "mtime": 1786920662.257543,
-    "ast_hash": "a912c69b44cb312797391105323842fa",
-    "semantic_hash": "a912c69b44cb312797391105323842fa"
+    "mtime": 1786975999.5887022,
+    "ast_hash": "1da89c51c698cdcf71c69e216cd64d42",
+    "semantic_hash": "1da89c51c698cdcf71c69e216cd64d42"
   },
   "scripts/assert-placeholders-substituted.py": {
-    "mtime": 1786920662.2581348,
+    "mtime": 1786975999.5894039,
     "ast_hash": "dd2dfccba76d2c1668d1a5b1c7121f6b",
     "semantic_hash": "dd2dfccba76d2c1668d1a5b1c7121f6b"
   },
   "tsconfig.json": {
-    "mtime": 1786920662.2581348,
+    "mtime": 1786975999.5894039,
     "ast_hash": "cc33d6b917e44286b3d29b2e92c8f3c9",
     "semantic_hash": "cc33d6b917e44286b3d29b2e92c8f3c9"
+  },
+  ".github/workflows/infra-ci.yml": {
+    "mtime": 1786975999.5866601,
+    "ast_hash": "ece5ecc83e4050df31a19bbcbe207c0f",
+    "semantic_hash": "ece5ecc83e4050df31a19bbcbe207c0f"
+  },
+  ".pre-commit-config.yaml": {
+    "mtime": 1786975999.5866601,
+    "ast_hash": "067c2a7bfeaf29a13a414e029ff5af93",
+    "semantic_hash": "067c2a7bfeaf29a13a414e029ff5af93"
+  },
+  "CLAUDE.md": {
+    "mtime": 1786975999.5866601,
+    "ast_hash": "d6e1e77b103de8b3df80d0e06e5a7efd",
+    "semantic_hash": "d6e1e77b103de8b3df80d0e06e5a7efd"
+  },
+  "Pulumi.yaml": {
+    "mtime": 1786975999.586702,
+    "ast_hash": "7268dfe6bdcedc00f553e9773849f22a",
+    "semantic_hash": "7268dfe6bdcedc00f553e9773849f22a"
+  },
+  "README.md": {
+    "mtime": 1786975999.586702,
+    "ast_hash": "59166df5d2f5ab290e98967f5cbc8d86",
+    "semantic_hash": "59166df5d2f5ab290e98967f5cbc8d86"
+  },
+  "README.tenant.md": {
+    "mtime": 1786975999.586702,
+    "ast_hash": "070d321a615df6876d6bbbdb03c57fbe",
+    "semantic_hash": "070d321a615df6876d6bbbdb03c57fbe"
+  },
+  "RUNBOOK-bootstrap.md": {
+    "mtime": 1786975999.586702,
+    "ast_hash": "68bd94777612eea21a92ec7a8af21b56",
+    "semantic_hash": "68bd94777612eea21a92ec7a8af21b56"
   }
 }

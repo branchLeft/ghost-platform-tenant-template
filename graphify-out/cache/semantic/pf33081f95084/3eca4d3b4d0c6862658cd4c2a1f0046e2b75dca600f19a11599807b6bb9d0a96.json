@@ -1,0 +1,1 @@
+{"nodes": [{"id": "pulumi_yaml", "label": "Pulumi.yaml", "file_type": "code", "source_file": "Pulumi.yaml"}], "edges": [{"source": "pulumi_yaml", "target": "ghost_tenant_component", "relation": "references", "confidence": "EXTRACTED", "confidence_score": 1.0, "source_file": "Pulumi.yaml"}], "hyperedges": []}
