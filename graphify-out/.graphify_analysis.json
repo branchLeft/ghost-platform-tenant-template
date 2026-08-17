@@ -1,0 +1,166 @@
+{
+  "communities": {
+    "0": [
+      "index",
+      "index_bulkemailbaseurl",
+      "index_cloudrunservicename",
+      "index_cloudrunserviceuri",
+      "index_config",
+      "index_databasename",
+      "index_deployercanactastenantsa",
+      "index_imagedigestortag",
+      "index_mailhost",
+      "index_maxuserconnectionsstatement",
+      "index_siteurl",
+      "index_tenant",
+      "index_tenantname",
+      "index_tenantserviceaccountemail"
+    ],
+    "1": [
+      "pattern",
+      "scripts_assert_no_tenant_deletes",
+      "scripts_assert_no_tenant_deletes_coverage_self_test",
+      "scripts_assert_no_tenant_deletes_declaration_pattern_tenant_suffix",
+      "scripts_assert_no_tenant_deletes_destructive_steps",
+      "scripts_assert_no_tenant_deletes_main",
+      "scripts_assert_no_tenant_deletes_plan",
+      "scripts_assert_no_tenant_deletes_rationale_118",
+      "scripts_assert_no_tenant_deletes_rationale_145",
+      "scripts_assert_no_tenant_deletes_rationale_268",
+      "scripts_assert_no_tenant_deletes_rationale_317",
+      "scripts_assert_no_tenant_deletes_self_test",
+      "scripts_assert_no_tenant_deletes_verify_coverage"
+    ],
+    "2": [
+      "ref_branchleft_tsconfig_pulumi_json",
+      "ref_branchleft_tsconfig_strict_1_json",
+      "ref_claude",
+      "ref_node_modules",
+      "ref_ts",
+      "ref_vendor",
+      "ref_worktrees",
+      "tsconfig",
+      "tsconfig_compileroptions",
+      "tsconfig_compileroptions_pretty",
+      "tsconfig_exclude",
+      "tsconfig_extends",
+      "tsconfig_include"
+    ],
+    "3": [
+      "branchleft_prettier_config",
+      "branchleft_tsconfig",
+      "package_devdependencies",
+      "package_devdependencies_branchleft_prettier_config",
+      "package_devdependencies_branchleft_tsconfig",
+      "package_devdependencies_prettier",
+      "package_devdependencies_types_node",
+      "package_devdependencies_typescript",
+      "prettier",
+      "types_node",
+      "typescript"
+    ],
+    "4": [
+      "package",
+      "package_main",
+      "package_name",
+      "package_prettier",
+      "package_private",
+      "package_scripts",
+      "package_scripts_format",
+      "package_scripts_format_check",
+      "package_scripts_typecheck"
+    ],
+    "5": [
+      "config",
+      "config_config",
+      "config_deployerserviceaccountemail",
+      "config_gcpconfig",
+      "config_platformdbinstanceconnectionname",
+      "config_platformmediabucketurl",
+      "config_platformtenantimagerepositorydockerpath",
+      "config_projectid"
+    ],
+    "6": [
+      "branchleft_ghost_platform_tenant",
+      "package_dependencies",
+      "package_dependencies_branchleft_ghost_platform_tenant",
+      "package_dependencies_pulumi_gcp",
+      "package_dependencies_pulumi_pulumi",
+      "pulumi_gcp",
+      "pulumi_pulumi"
+    ],
+    "7": [
+      "path",
+      "scripts_assert_placeholders_substituted",
+      "scripts_assert_placeholders_substituted_find_placeholders",
+      "scripts_assert_placeholders_substituted_main"
+    ]
+  },
+  "cohesion": {
+    "0": 0.14285714285714285,
+    "1": 0.2564102564102564,
+    "2": 0.15384615384615385,
+    "3": 0.18181818181818182,
+    "4": 0.2222222222222222,
+    "5": 0.25,
+    "6": 0.2857142857142857,
+    "7": 0.8333333333333334
+  },
+  "gods": [
+    {
+      "id": "scripts_assert_no_tenant_deletes_self_test",
+      "label": "self_test()",
+      "degree": 5
+    },
+    {
+      "id": "scripts_assert_no_tenant_deletes_verify_coverage",
+      "label": "verify_coverage()",
+      "degree": 5
+    },
+    {
+      "id": "tsconfig_exclude",
+      "label": "exclude",
+      "degree": 5
+    },
+    {
+      "id": "scripts_assert_no_tenant_deletes_declaration_pattern_tenant_suffix",
+      "label": "_declaration_pattern_tenant_suffix()",
+      "degree": 4
+    },
+    {
+      "id": "scripts_assert_no_tenant_deletes_destructive_steps",
+      "label": "destructive_steps()",
+      "degree": 4
+    },
+    {
+      "id": "scripts_assert_no_tenant_deletes_coverage_self_test",
+      "label": "_coverage_self_test()",
+      "degree": 4
+    },
+    {
+      "id": "scripts_assert_no_tenant_deletes_main",
+      "label": "main()",
+      "degree": 4
+    },
+    {
+      "id": "package_scripts",
+      "label": "scripts",
+      "degree": 4
+    },
+    {
+      "id": "scripts_assert_placeholders_substituted_find_placeholders",
+      "label": "find_placeholders()",
+      "degree": 3
+    },
+    {
+      "id": "scripts_assert_placeholders_substituted_main",
+      "label": "main()",
+      "degree": 3
+    }
+  ],
+  "surprises": [],
+  "tokens": {
+    "input": 0,
+    "output": 0
+  }
+}

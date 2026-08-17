@@ -1,0 +1,10 @@
+# Substituted by the provisioning script when this repo is generated from
+# the template -- must be unique per tenant. Each tenant's Pulumi state
+# lives in its own bucket, configured via the PULUMI_STATE_BUCKET CI
+# variable, with the state object path derived from this project name.
+name: __TENANT_PULUMI_PROJECT__
+runtime: nodejs
+description: >-
+  Per-tenant Pulumi stack for the branchLeft Ghost hosting platform, generated
+  from ghost-platform-tenant-template. Consumes the reusable GhostTenant
+  component published as @branchleft/ghost-platform-tenant.

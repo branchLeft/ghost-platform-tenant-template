@@ -1,0 +1,23 @@
+{
+  "name": "ghost-platform-tenant",
+  "private": true,
+  "main": "index.ts",
+  "prettier": "@branchleft/prettier-config",
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "format": "prettier --write . --ignore-path .gitignore --ignore-path .prettierignore --ignore-path node_modules/@branchleft/prettier-config/prettierignore",
+    "format:check": "prettier --check . --ignore-path .gitignore --ignore-path .prettierignore --ignore-path node_modules/@branchleft/prettier-config/prettierignore"
+  },
+  "dependencies": {
+    "@branchleft/ghost-platform-tenant": "0.4.0",
+    "@pulumi/gcp": "^9.32.1",
+    "@pulumi/pulumi": "^3.255.0"
+  },
+  "devDependencies": {
+    "@branchleft/prettier-config": "^0.3.1",
+    "@branchleft/tsconfig": "^0.3.1",
+    "@types/node": "^26",
+    "prettier": "^3.9.6",
+    "typescript": "^5.9.0"
+  }
+}

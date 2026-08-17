@@ -1,0 +1,12 @@
+{
+  "extends": ["@branchleft/tsconfig/strict-1.json", "@branchleft/tsconfig/pulumi.json"],
+  "compilerOptions": {
+    "pretty": true
+  },
+  // `vendor` holds a checkout of ghost-platform and the dot-directories hold
+  // agent worktrees — full copies of a tree this project does not own and whose
+  // dependencies are not installed here. tsc excludes neither by default, and
+  // being untracked does not keep them out of a recursive glob.
+  "include": ["**/*.ts"],
+  "exclude": ["node_modules", "vendor", ".claude", ".worktrees"]
+}

@@ -1,0 +1,32 @@
+{
+  "config.ts": {
+    "mtime": 1786920662.2555432,
+    "ast_hash": "55001846c0f3b02efce634e4094eca1b",
+    "semantic_hash": "55001846c0f3b02efce634e4094eca1b"
+  },
+  "index.ts": {
+    "mtime": 1786920662.2565594,
+    "ast_hash": "d3c22a1ac01f212c1f8435eb678fdace",
+    "semantic_hash": "d3c22a1ac01f212c1f8435eb678fdace"
+  },
+  "package.json": {
+    "mtime": 1786920662.257543,
+    "ast_hash": "a14dba4a2c91321c2a78c5b13fdaddf7",
+    "semantic_hash": "a14dba4a2c91321c2a78c5b13fdaddf7"
+  },
+  "scripts/assert-no-tenant-deletes.py": {
+    "mtime": 1786920662.257543,
+    "ast_hash": "a912c69b44cb312797391105323842fa",
+    "semantic_hash": "a912c69b44cb312797391105323842fa"
+  },
+  "scripts/assert-placeholders-substituted.py": {
+    "mtime": 1786920662.2581348,
+    "ast_hash": "dd2dfccba76d2c1668d1a5b1c7121f6b",
+    "semantic_hash": "dd2dfccba76d2c1668d1a5b1c7121f6b"
+  },
+  "tsconfig.json": {
+    "mtime": 1786920662.2581348,
+    "ast_hash": "cc33d6b917e44286b3d29b2e92c8f3c9",
+    "semantic_hash": "cc33d6b917e44286b3d29b2e92c8f3c9"
+  }
+}
