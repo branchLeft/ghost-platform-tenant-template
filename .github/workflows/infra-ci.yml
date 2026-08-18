@@ -42,8 +42,10 @@ name: Infra CI
 #
 # `PULUMI_CONFIG_PASSPHRASE`: this tenant's own secrets passphrase, written as
 # a repo secret by the provisioning flow at onboarding time and never shared
-# with any other tenant or with the platform repo that created it. Read by
-# every `pulumi` command in the deploy job below -- without it Pulumi cannot
+# with any other tenant or with the platform repo that created it. Bound in
+# each deploy-job step's own `env:` rather than at job level -- a job-level
+# binding sits in the environment of every step in the job, including
+# `npm ci` and its transitive postinstall scripts. Without it Pulumi cannot
 # unwrap this stack's data key, and an unset repository secret expands to an
 # empty string here rather than an absent variable, which the guard step below
 # exists to catch.
@@ -186,9 +188,6 @@ jobs:
       group: pulumi-deploy-__TENANT_NAME__
       cancel-in-progress: false
 
-    env:
-      PULUMI_CONFIG_PASSPHRASE: ${{ secrets.PULUMI_CONFIG_PASSPHRASE }}
-
     steps:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -235,6 +234,8 @@ jobs:
       # runs before anything that would act on the stack under that empty
       # value.
       - name: Confirm this stack's secrets passphrase is set
+        env:
+          PULUMI_CONFIG_PASSPHRASE: ${{ secrets.PULUMI_CONFIG_PASSPHRASE }}
         run: |
           if [ -z "$PULUMI_CONFIG_PASSPHRASE" ]; then
             echo "::error::PULUMI_CONFIG_PASSPHRASE is empty or unset. Refusing to continue: Pulumi would treat an empty value as a valid passphrase rather than failing closed."
@@ -326,6 +327,8 @@ jobs:
           printf '\nencryptionsalt: %s\n' "$PULUMI_ENCRYPTION_SALT" >> "$config"
 
       - name: Preview the plan
+        env:
+          PULUMI_CONFIG_PASSPHRASE: ${{ secrets.PULUMI_CONFIG_PASSPHRASE }}
         run: pulumi preview --stack __TENANT_NAME__ --json > preview.json
 
       - name: Refuse to apply a plan that destroys tenant infrastructure
@@ -340,6 +343,8 @@ jobs:
           fi
 
       - name: Apply
+        env:
+          PULUMI_CONFIG_PASSPHRASE: ${{ secrets.PULUMI_CONFIG_PASSPHRASE }}
         run: pulumi up --stack __TENANT_NAME__ --yes
 
       - name: Write outcome to job summary
