@@ -11,9 +11,11 @@ stack.
 Identity pool and provider, its project roles and the Pulumi state bucket are
 created by the platform's provisioning flow and live in that stack's state —
 not here. The passphrase that decrypts this stack lives only in this repo's
-own `PULUMI_CONFIG_PASSPHRASE` secret, minted once at provisioning time.
-Architecture and rationale live in the platform's private architecture
-documentation.
+own `PULUMI_CONFIG_PASSPHRASE` secret, minted once at provisioning time. The
+stack's `encryptionsalt` is not committed either (`branchLeft/standards`
+PUL-12): it is held in `PULUMI_ENCRYPTION_SALT` and appended to the working
+copy of the stack config by the deploy job. Architecture and rationale live in
+the platform's private architecture documentation.
 
 **Private, and a tenant roster of one.** A hostname plus Cloud Run service name
 is that tenant's identity. Never carry it into a public repo, an issue, or a PR

@@ -44,3 +44,25 @@ repos:
         language: system
         files: ^scripts/assert-no-tenant-deletes\.py$
         pass_filenames: false
+
+      # Stdlib unittest, so there is nothing to install. It also exercises the
+      # committed-secret guard's own `--self-test`, which is why that one has
+      # no hook of its own -- CI still invokes it directly, because CI runs the
+      # script rather than the test runner.
+      - id: scripts-tests
+        name: scripts unit tests
+        entry: sh -c "python3 -m unittest discover -s scripts -p 'test_*.py'"
+        language: system
+        files: ^scripts/.*\.py$
+        pass_filenames: false
+
+      # The salt is an offline verifier for this stack's passphrase and is
+      # never committed. Pulumi writes one back into the config file during an
+      # ordinary `pulumi config set`, where the diff looks like exactly what
+      # the command was asked to do, so this has to be mechanical rather than a
+      # rule people follow.
+      - id: no-committed-pulumi-secrets
+        name: no encryptionsalt in a committed stack config
+        entry: python3 scripts/assert-no-committed-pulumi-secrets.py
+        language: system
+        files: ^(.*/)?Pulumi\.[^/]+\.yaml$

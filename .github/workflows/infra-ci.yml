@@ -21,6 +21,10 @@ name: Infra CI
 #      infrastructure (scripts/assert-no-tenant-deletes.py).
 #   5. The deploy job declares an `environment`. It is a deployment-history
 #      label here and does not gate -- see the `environment:` key below.
+#   6. This stack's encryption salt is restored from a repository secret at
+#      deploy time instead of being committed beside the ciphertexts it
+#      unwraps, and a separate job refuses a tree that carries one
+#      (scripts/assert-no-committed-pulumi-secrets.py).
 #
 # `npm ci` authenticates with the run's own GITHUB_TOKEN.
 # @branchleft/ghost-platform-tenant is a public package, and any authenticated
@@ -43,6 +47,14 @@ name: Infra CI
 # unwrap this stack's data key, and an unset repository secret expands to an
 # empty string here rather than an absent variable, which the guard step below
 # exists to catch.
+#
+# `PULUMI_ENCRYPTION_SALT`: this stack's encryption salt, held as a repo secret
+# rather than committed beside the ciphertexts it unwraps. A salt in a tree
+# anyone can clone is an offline verifier for the passphrase above -- whoever
+# holds it can test candidates at their own rate, with no state backend and no
+# cloud IAM in the loop -- which `branchLeft/standards` PUL-12 bans outright.
+# The deploy job appends it to the working copy of the stack config for that
+# job only.
 #
 # Both checkout steps set `persist-credentials: false` regardless: without
 # it, the token GitHub issues for checkout would sit on disk for every later
@@ -107,6 +119,42 @@ jobs:
         run: |
           python3 scripts/assert-no-tenant-deletes.py --self-test
           python3 scripts/assert-no-tenant-deletes.py --verify-coverage node_modules/@branchleft/ghost-platform-tenant/dist
+
+  # Its own job, and deliberately not one `deploy` needs. What makes a
+  # committed salt dangerous is publication: one already on `main` is already
+  # in every clone, so refusing to apply does not take it back and would take
+  # the tenant's site down instead. The gate that matters is the merge, which
+  # means this check has to be in the branch ruleset to have any teeth -- see
+  # README.md. The deploy job's own salt step reports the same condition as a
+  # warning and deploys on the committed value, so a repo in that state keeps
+  # working while it is fixed.
+  #
+  # It runs in the template repo too, where the scan finds no stack config at
+  # all: that file arrives when a tenant repo is generated, and the guard has
+  # to sit here to travel with it.
+  secret-guard:
+    name: Committed-secret guard
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      # Stdlib unittest, no runner to install and nothing from npm -- this job
+      # holds no credential and needs none.
+      - name: Script unit tests
+        run: python3 -m unittest discover -s scripts -p 'test_*.py'
+
+      # `--scan-tree` rather than a changed-file list: a salt that arrived on a
+      # branch nobody checked has to fail here rather than at publication, and
+      # a hook pattern that silently stops matching is a hook that passes
+      # everything.
+      - name: Refuse a committed encryption salt
+        run: |
+          python3 scripts/assert-no-committed-pulumi-secrets.py --self-test
+          python3 scripts/assert-no-committed-pulumi-secrets.py --scan-tree .
 
   deploy:
     name: Deploy (pulumi up)
@@ -205,6 +253,77 @@ jobs:
             exit 1
           fi
           pulumi login "gs://$STATE_BUCKET"
+
+      # The salt is not committed (branchLeft/standards PUL-12). It is appended
+      # to the working copy here, for this job only, and never committed back.
+      # Placed after the backend login and before `pulumi preview` -- the first
+      # command that reads an encrypted value, not `up`.
+      #
+      # The value arrives through `env:` rather than as `${{ secrets.X }}`
+      # inside `run`: an expression in `run` is substituted before the shell
+      # parses the line, so a value carrying shell metacharacters would
+      # execute.
+      #
+      # It skips rather than appends when the config already carries a salt,
+      # and asks the guard script rather than matching the key again here --
+      # two definitions of "a salt is committed" drift apart. Skipping is not
+      # politeness: appending would leave a duplicate YAML mapping key, and the
+      # two values would have to agree for the file to mean anything even where
+      # a parser tolerated it. A repo in that state also has no secret to
+      # restore from, so requiring one would break a deploy that works.
+      #
+      # Fails closed on an empty value, naming the repository secret rather
+      # than the passphrase: otherwise Pulumi reads a config whose salt line is
+      # blank, reports this stack's secrets as corrupt, and sends whoever
+      # debugs it at the passphrase. The `v1:` prefix is checked for the same
+      # reason -- the value reaches the secret by hand, so a truncated paste or
+      # one that kept its `encryptionsalt: ` key in front is the realistic
+      # failure, and it would otherwise surface as a decryption error.
+      - name: Restore the stack's encryption salt
+        env:
+          PULUMI_ENCRYPTION_SALT: ${{ secrets.PULUMI_ENCRYPTION_SALT }}
+        run: |
+          config=Pulumi.__TENANT_NAME__.yaml
+          if [ ! -f "$config" ]; then
+            echo "::error::$config is missing. The provisioning flow commits this stack's config, and without it there is nothing for this job to deploy."
+            exit 1
+          fi
+          # Captured rather than shown: on exit 1 the script's ::error::
+          # annotations would mark a step that succeeded, and on any other
+          # status they are the only evidence of what went wrong. `|| status=`
+          # keeps `set -e` from aborting on the non-zero exit this expects.
+          #
+          # The script's exit status is three-valued: 0 clean, 1 a salt is
+          # committed, 3 a named file could not be read. Only 1 may skip the
+          # restore. A moved script, an absent interpreter, a config that is
+          # not valid UTF-8 and argparse's own usage exit all land outside
+          # that, and treating any of them as a committed salt would deploy
+          # with no salt at all -- then send whoever reads the resulting
+          # decryption error at the passphrase, which is the misdiagnosis the
+          # checks below exist to prevent.
+          salt_status=0
+          salt_report=$(python3 scripts/assert-no-committed-pulumi-secrets.py "$config" 2>&1) || salt_status=$?
+          if [ "$salt_status" -eq 1 ]; then
+            echo "::warning::$config already carries an encryptionsalt, so none was restored and this stack still decrypts with the committed value. Move that value into the PULUMI_ENCRYPTION_SALT repository secret and delete the line from the file; the Committed-secret guard job fails while it is there."
+            exit 0
+          fi
+          if [ "$salt_status" -ne 0 ]; then
+            printf '%s\n' "$salt_report"
+            echo "::error::scripts/assert-no-committed-pulumi-secrets.py exited $salt_status. That is neither 'no salt committed' (0) nor 'a salt is committed' (1), so whether $config carries one is unknown and this refuses to guess. The output above is the script's own."
+            exit 1
+          fi
+          if [ -z "$PULUMI_ENCRYPTION_SALT" ]; then
+            echo "::error::the PULUMI_ENCRYPTION_SALT repository secret is empty or unset, and $config carries no salt of its own. Set the secret to this stack's encryption salt before deploying."
+            exit 1
+          fi
+          case "$PULUMI_ENCRYPTION_SALT" in
+            v1:*) ;;
+            *)
+              echo "::error::the PULUMI_ENCRYPTION_SALT repository secret does not look like a Pulumi-generated salt (expected a 'v1:' prefix). Set it to the value alone, without the 'encryptionsalt: ' key in front of it."
+              exit 1
+              ;;
+          esac
+          printf '\nencryptionsalt: %s\n' "$PULUMI_ENCRYPTION_SALT" >> "$config"
 
       - name: Preview the plan
         run: pulumi preview --stack __TENANT_NAME__ --json > preview.json

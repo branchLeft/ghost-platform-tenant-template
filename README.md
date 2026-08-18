@@ -90,7 +90,7 @@ Omitting `bulkEmailBaseUrl` (the default) sends no `bulkEmail` block to
 | `bulkEmailDomain` | Yes | `GhostTenantBulkEmailArgs.domain` |
 | `bulkEmailApiKey` | Yes, as a secret (`pulumi config set --secret`) | `GhostTenantBulkEmailArgs.apiKey`, routed to Secret Manager by the component |
 
-## Repo variables and secret
+## Repo variables and secrets
 
 Written by the provisioning flow, not by hand:
 
@@ -101,6 +101,7 @@ Written by the provisioning flow, not by hand:
 | `GCP_WORKLOAD_IDENTITY_PROVIDER` | variable | The provider CI federates through. |
 | `PULUMI_STATE_BUCKET` | variable | This tenant's own Pulumi state bucket, without the `gs://` scheme. |
 | `PULUMI_CONFIG_PASSPHRASE` | secret | This tenant's own Pulumi secrets passphrase, minted fresh at onboarding and unique to this repo -- never shared with another tenant, and never the platform repo's own. Without it CI cannot decrypt this stack's checkpoint. |
+| `PULUMI_ENCRYPTION_SALT` | secret | This stack's `encryptionsalt`, the `v1:`-prefixed value alone with no `encryptionsalt: ` key in front of it. Not a second passphrase: it is what Pulumi derives this stack's key from, and it is a secret only because holding it lets someone test passphrase guesses offline. **Not yet written by the provisioning flow** -- see the two states below. |
 
 `npm ci` installs `@branchleft/ghost-platform-tenant` using the workflow
 run's own `GITHUB_TOKEN` -- the package is public on GitHub Packages, but
@@ -121,6 +122,49 @@ npx tsc --noEmit          # type-check only, no credentials needed
 `@branchleft/ghost-platform-tenant` (see `.npmrc`). `pulumi preview`/`up` need
 this tenant's own state bucket and a GCP identity with access to it -- see
 `RUNBOOK-bootstrap.md`.
+
+## The encryption salt is not committed
+
+`branchLeft/standards` PUL-12 bans a committed `encryptionsalt`. The salt is an
+offline verifier for the stack passphrase -- whoever holds it can test
+candidates at their own rate, with no state backend and no cloud IAM in the
+loop. Encrypted `secure:` config values stay committed regardless: a ciphertext
+with no salt beside it is not an oracle.
+
+**A generated repo is in one of two states, and `Pulumi.<tenant-name>.yaml`
+tells you which.** The provisioning flow does not yet set
+`PULUMI_ENCRYPTION_SALT`, and it still commits the salt into the stack config
+it hands over. Until that changes, both states exist:
+
+| `Pulumi.<tenant-name>.yaml` | What CI does | What is true |
+|---|---|---|
+| No `encryptionsalt` line | Appends the value from `PULUMI_ENCRYPTION_SALT` to the working copy, for the deploy job only, and never commits it | The target state. The `Committed-secret guard` job passes. |
+| Has an `encryptionsalt` line | Warns, restores nothing, and deploys on the committed value | The salt is published in this repo. The guard job fails until it is moved -- see `RUNBOOK-bootstrap.md`. **Set the secret before deleting the line**, or the next deploy has nothing to decrypt the stack with. |
+
+To apply by hand from a checkout in the first state, append your own held copy
+and do not commit it:
+
+```bash
+printf '\nencryptionsalt: %s\n' "$PULUMI_ENCRYPTION_SALT" >> Pulumi.<tenant-name>.yaml
+```
+
+`scripts/assert-no-committed-pulumi-secrets.py` is the mechanical check, because
+Pulumi writes the salt back into the file itself during an ordinary
+`pulumi config set` and the diff then looks like what the command was asked to
+do. It runs as a pre-commit hook and as CI's `Committed-secret guard` job, and
+its module docstring lists the shapes it cannot see.
+
+```bash
+python3 scripts/assert-no-committed-pulumi-secrets.py --self-test
+python3 scripts/assert-no-committed-pulumi-secrets.py --scan-tree .
+python3 -m unittest discover -s scripts -p 'test_*.py'
+```
+
+**The guard job needs to be a required status check to block anything.**
+Outside a ruleset it reports red and the merge goes through anyway. It is
+deliberately not a job the deploy depends on: a salt already on `main` is
+already in every clone, so refusing to apply would take the site down without
+taking the salt back.
 
 ## Delete-guard preflight
 
