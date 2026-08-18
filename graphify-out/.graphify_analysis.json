@@ -1,6 +1,14 @@
 {
   "communities": {
     "0": [
+      "config",
+      "config_config",
+      "config_deployerserviceaccountemail",
+      "config_gcpconfig",
+      "config_platformdbinstanceconnectionname",
+      "config_platformmediabucketurl",
+      "config_platformtenantimagerepositorydockerpath",
+      "config_projectid",
       "index",
       "index_bulkemailbaseurl",
       "index_cloudrunservicename",
@@ -17,6 +25,65 @@
       "index_tenantserviceaccountemail"
     ],
     "1": [
+      "scripts_test_assert_no_committed_pulumi_secrets",
+      "scripts_test_assert_no_committed_pulumi_secrets_lines_flagged",
+      "scripts_test_assert_no_committed_pulumi_secrets_load_module",
+      "scripts_test_assert_no_committed_pulumi_secrets_matchercatchesasalt",
+      "scripts_test_assert_no_committed_pulumi_secrets_matchercatchesasalt_test_a_salt_beside_a_ciphertext_is_still_caught",
+      "scripts_test_assert_no_committed_pulumi_secrets_matchercatchesasalt_test_case_is_ignored",
+      "scripts_test_assert_no_committed_pulumi_secrets_matchercatchesasalt_test_every_offending_line_is_reported_not_just_the_first",
+      "scripts_test_assert_no_committed_pulumi_secrets_matchercatchesasalt_test_hash_inside_the_value_is_not_a_comment",
+      "scripts_test_assert_no_committed_pulumi_secrets_matchercatchesasalt_test_indented_key",
+      "scripts_test_assert_no_committed_pulumi_secrets_matchercatchesasalt_test_key_as_a_list_item",
+      "scripts_test_assert_no_committed_pulumi_secrets_matchercatchesasalt_test_leading_byte_order_mark_does_not_hide_line_one",
+      "scripts_test_assert_no_committed_pulumi_secrets_matchercatchesasalt_test_plain_key_at_column_zero",
+      "scripts_test_assert_no_committed_pulumi_secrets_matchercatchesasalt_test_quoted_keys",
+      "scripts_test_assert_no_committed_pulumi_secrets_matcherdoesnotcrywolf",
+      "scripts_test_assert_no_committed_pulumi_secrets_matcherdoesnotcrywolf_test_a_ciphertext_with_no_salt_is_allowed",
+      "scripts_test_assert_no_committed_pulumi_secrets_matcherdoesnotcrywolf_test_a_clean_config",
+      "scripts_test_assert_no_committed_pulumi_secrets_matcherdoesnotcrywolf_test_a_commented_line",
+      "scripts_test_assert_no_committed_pulumi_secrets_matcherdoesnotcrywolf_test_a_key_merely_containing_the_word",
+      "scripts_test_assert_no_committed_pulumi_secrets_matcherdoesnotcrywolf_test_the_word_appearing_in_a_value",
+      "scripts_test_assert_no_committed_pulumi_secrets_rationale_26",
+      "scripts_test_assert_no_committed_pulumi_secrets_rationale_43",
+      "scripts_test_assert_no_committed_pulumi_secrets_rationale_84"
+    ],
+    "2": [
+      "path",
+      "scripts_assert_no_committed_pulumi_secrets",
+      "scripts_assert_no_committed_pulumi_secrets_check",
+      "scripts_assert_no_committed_pulumi_secrets_find_stack_configs",
+      "scripts_assert_no_committed_pulumi_secrets_is_commented",
+      "scripts_assert_no_committed_pulumi_secrets_is_stack_config",
+      "scripts_assert_no_committed_pulumi_secrets_main",
+      "scripts_assert_no_committed_pulumi_secrets_offending_lines",
+      "scripts_assert_no_committed_pulumi_secrets_quiet_check",
+      "scripts_assert_no_committed_pulumi_secrets_rationale_124",
+      "scripts_assert_no_committed_pulumi_secrets_rationale_133",
+      "scripts_assert_no_committed_pulumi_secrets_rationale_236",
+      "scripts_assert_no_committed_pulumi_secrets_self_test",
+      "scripts_assert_placeholders_substituted",
+      "scripts_assert_placeholders_substituted_find_placeholders",
+      "scripts_assert_placeholders_substituted_main"
+    ],
+    "3": [
+      "package",
+      "package_dependencies",
+      "package_dependencies_branchleft_ghost_platform_tenant",
+      "package_dependencies_pulumi_gcp",
+      "package_dependencies_pulumi_pulumi",
+      "package_main",
+      "package_name",
+      "package_prettier",
+      "package_private",
+      "package_scripts",
+      "package_scripts_format",
+      "package_scripts_format_check",
+      "package_scripts_typecheck",
+      "pulumi_gcp",
+      "pulumi_pulumi"
+    ],
+    "4": [
       "pattern",
       "scripts_assert_no_tenant_deletes",
       "scripts_assert_no_tenant_deletes_coverage_self_test",
@@ -31,7 +98,7 @@
       "scripts_assert_no_tenant_deletes_self_test",
       "scripts_assert_no_tenant_deletes_verify_coverage"
     ],
-    "2": [
+    "5": [
       "ref_branchleft_tsconfig_pulumi_json",
       "ref_branchleft_tsconfig_strict_1_json",
       "ref_claude",
@@ -46,7 +113,21 @@
       "tsconfig_extends",
       "tsconfig_include"
     ],
-    "3": [
+    "6": [
+      "scripts_test_assert_no_committed_pulumi_secrets_exitstatus",
+      "scripts_test_assert_no_committed_pulumi_secrets_exitstatus_run",
+      "scripts_test_assert_no_committed_pulumi_secrets_exitstatus_test_a_clean_file_exits_zero",
+      "scripts_test_assert_no_committed_pulumi_secrets_exitstatus_test_a_config_that_is_not_utf8_exits_unreadable_not_a_traceback",
+      "scripts_test_assert_no_committed_pulumi_secrets_exitstatus_test_a_salted_file_exits_one_and_names_the_file",
+      "scripts_test_assert_no_committed_pulumi_secrets_exitstatus_test_an_unread_file_outranks_a_finding_elsewhere",
+      "scripts_test_assert_no_committed_pulumi_secrets_exitstatus_test_an_unreadable_path_is_its_own_status_not_a_finding",
+      "scripts_test_assert_no_committed_pulumi_secrets_exitstatus_test_scan_tree_finds_a_salt_nobody_named",
+      "scripts_test_assert_no_committed_pulumi_secrets_exitstatus_test_scan_tree_over_a_tree_with_no_stack_config_exits_zero",
+      "scripts_test_assert_no_committed_pulumi_secrets_exitstatus_test_the_bundled_self_test_passes",
+      "scripts_test_assert_no_committed_pulumi_secrets_exitstatus_test_the_three_exit_statuses_are_distinct_and_avoid_argparse",
+      "scripts_test_assert_no_committed_pulumi_secrets_rationale_138"
+    ],
+    "7": [
       "branchleft_prettier_config",
       "branchleft_tsconfig",
       "package_devdependencies",
@@ -59,67 +140,83 @@
       "types_node",
       "typescript"
     ],
-    "4": [
-      "claude_md",
-      "ghost_tenant_component",
-      "package_dependencies",
-      "package_dependencies_branchleft_ghost_platform_tenant",
-      "package_dependencies_pulumi_gcp",
-      "package_dependencies_pulumi_pulumi",
-      "pulumi_gcp",
-      "pulumi_pulumi",
-      "pulumi_yaml",
-      "readme_md",
-      "readme_tenant_md"
-    ],
-    "5": [
-      "package",
-      "package_main",
-      "package_name",
-      "package_prettier",
-      "package_private",
-      "package_scripts",
-      "package_scripts_format",
-      "package_scripts_format_check",
-      "package_scripts_typecheck"
-    ],
-    "6": [
-      "config",
-      "config_config",
-      "config_deployerserviceaccountemail",
-      "config_gcpconfig",
-      "config_platformdbinstanceconnectionname",
-      "config_platformmediabucketurl",
-      "config_platformtenantimagerepositorydockerpath",
-      "config_projectid"
-    ],
-    "7": [
-      "path",
-      "scripts_assert_placeholders_substituted",
-      "scripts_assert_placeholders_substituted_find_placeholders",
-      "scripts_assert_placeholders_substituted_main"
-    ],
     "8": [
-      "github_workflows_infra_ci_yml",
-      "runbook_bootstrap_md"
+      "scripts_test_assert_no_committed_pulumi_secrets_fileselection",
+      "scripts_test_assert_no_committed_pulumi_secrets_fileselection_test_scan_tree_recurses_and_skips_vendored_trees",
+      "scripts_test_assert_no_committed_pulumi_secrets_fileselection_test_stack_configs_are_matched_and_project_files_are_not"
     ],
     "9": [
-      "pre_commit_config_yaml"
+      "claude_md",
+      "github_workflows_graphify"
+    ],
+    "10": [
+      "pulumi_stack_config",
+      "runbook_bootstrap_md"
+    ],
+    "11": [
+      "ghost_platform_tenant_pkg"
+    ],
+    "12": [
+      "github_workflows_infra_ci"
+    ],
+    "13": [
+      "pre_commit_config"
+    ],
+    "14": [
+      "pulumi_yaml"
+    ],
+    "15": [
+      "readme_md"
+    ],
+    "16": [
+      "readme_tenant_md"
     ]
   },
   "cohesion": {
-    "0": 0.14285714285714285,
-    "1": 0.2564102564102564,
-    "2": 0.15384615384615385,
-    "3": 0.18181818181818182,
-    "4": 0.2,
-    "5": 0.2222222222222222,
-    "6": 0.25,
-    "7": 0.8333333333333334,
-    "8": 1.0,
-    "9": 1.0
+    "0": 0.11255411255411256,
+    "1": 0.15151515151515152,
+    "2": 0.275,
+    "3": 0.13333333333333333,
+    "4": 0.2564102564102564,
+    "5": 0.15384615384615385,
+    "6": 0.2727272727272727,
+    "7": 0.18181818181818182,
+    "8": 0.6666666666666666,
+    "9": 1.0,
+    "10": 1.0,
+    "11": 1.0,
+    "12": 1.0,
+    "13": 1.0,
+    "14": 1.0,
+    "15": 1.0,
+    "16": 1.0
   },
   "gods": [
+    {
+      "id": "scripts_test_assert_no_committed_pulumi_secrets_lines_flagged",
+      "label": "lines_flagged()",
+      "degree": 15
+    },
+    {
+      "id": "scripts_test_assert_no_committed_pulumi_secrets_exitstatus",
+      "label": "ExitStatus",
+      "degree": 12
+    },
+    {
+      "id": "scripts_test_assert_no_committed_pulumi_secrets_matchercatchesasalt",
+      "label": "MatcherCatchesASalt",
+      "degree": 11
+    },
+    {
+      "id": "scripts_assert_no_committed_pulumi_secrets_self_test",
+      "label": "_self_test()",
+      "degree": 7
+    },
+    {
+      "id": "scripts_test_assert_no_committed_pulumi_secrets_matcherdoesnotcrywolf",
+      "label": "MatcherDoesNotCryWolf",
+      "degree": 7
+    },
     {
       "id": "tsconfig_exclude",
       "label": "exclude",
@@ -136,44 +233,19 @@
       "degree": 5
     },
     {
-      "id": "ghost_tenant_component",
-      "label": "@branchleft/ghost-platform-tenant",
+      "id": "scripts_assert_no_committed_pulumi_secrets_offending_lines",
+      "label": "offending_lines()",
       "degree": 5
     },
     {
-      "id": "package_scripts",
-      "label": "scripts",
-      "degree": 4
-    },
-    {
-      "id": "scripts_assert_no_tenant_deletes_declaration_pattern_tenant_suffix",
-      "label": "_declaration_pattern_tenant_suffix()",
-      "degree": 4
-    },
-    {
-      "id": "scripts_assert_no_tenant_deletes_destructive_steps",
-      "label": "destructive_steps()",
-      "degree": 4
-    },
-    {
-      "id": "scripts_assert_no_tenant_deletes_coverage_self_test",
-      "label": "_coverage_self_test()",
-      "degree": 4
-    },
-    {
-      "id": "scripts_assert_no_tenant_deletes_main",
-      "label": "main()",
-      "degree": 4
-    },
-    {
-      "id": "scripts_assert_placeholders_substituted_find_placeholders",
-      "label": "find_placeholders()",
-      "degree": 3
+      "id": "scripts_assert_no_committed_pulumi_secrets_find_stack_configs",
+      "label": "find_stack_configs()",
+      "degree": 5
     }
   ],
   "surprises": [],
   "tokens": {
-    "input": 9883,
-    "output": 1062
+    "input": 13409,
+    "output": 1098
   }
 }
