@@ -32,6 +32,12 @@ Usage:
     assert-no-committed-pulumi-secrets.py --scan-tree DIR  # find them itself
     assert-no-committed-pulumi-secrets.py --self-test
 
+Exit status is three-valued, because a caller that branches on "is a salt
+committed here" has to be able to tell a no from an answer that was never
+obtained: 0 nothing committed, 1 at least one salt committed, 3 at least one
+named file could not be read. 3 wins over 1 when both happen -- a tree with an
+unread file in it has not been cleared.
+
 `--scan-tree` exists so CI does not inherit pre-commit's `files:` pattern as
 its only definition of which files matter. A hook whose pattern silently stops
 matching is a hook that passes everything, and the pattern lives in a different
@@ -107,6 +113,12 @@ STACK_CONFIG = re.compile(r"^Pulumi\.[^/]+\.yaml$")
 
 SKIP_DIRS = {".git", ".worktrees", "node_modules", "graphify-out", "dist", "bin", "vendor"}
 
+EXIT_SALT_FOUND = 1
+# Not 2: argparse exits 2 on a usage error, and a caller that has to tell
+# "could not read the file" from "could not understand the command line"
+# cannot be handed the same number for both.
+EXIT_UNREADABLE = 3
+
 
 def is_commented(line: str) -> bool:
     """Whether the line is entirely a comment.
@@ -147,27 +159,37 @@ def find_stack_configs(root: pathlib.Path) -> list[pathlib.Path]:
 
 
 def check(paths: list[pathlib.Path]) -> int:
-    failed = False
+    found_salt = False
+    unreadable = False
     for path in paths:
         try:
             text = path.read_text(encoding="utf-8")
-        except OSError as exc:
+        # UnicodeDecodeError is a ValueError, not an OSError, so it is named
+        # here rather than covered by it. Uncaught it would leave the
+        # interpreter exiting 1 on a traceback -- the same status as a
+        # finding, which is precisely the distinction callers need.
+        except (OSError, UnicodeDecodeError) as exc:
             # Not a pass. A file this cannot read is a file it cannot clear,
             # and reporting clean for it is the failure mode that matters.
             print(f"::error::cannot read {path}: {exc}", file=sys.stderr)
-            failed = True
+            unreadable = True
             continue
         for number, line in offending_lines(text):
             print(f"::error file={path},line={number}::{line}", file=sys.stderr)
-            failed = True
-    if failed:
+            found_salt = True
+    if found_salt:
         print(
             "\nRemove these before committing. The salt is supplied at deploy from a "
             "repository secret, and an operator applying by hand appends their own "
             "copy without committing it -- see README.md.",
             file=sys.stderr,
         )
-        return 1
+    # Reported ahead of a finding: a tree holding a file nobody could read has
+    # not been cleared, whatever else was found in the files that did read.
+    if unreadable:
+        return EXIT_UNREADABLE
+    if found_salt:
+        return EXIT_SALT_FOUND
     return 0
 
 
@@ -283,7 +305,7 @@ def _self_test() -> int:
             failures += 1
 
         code, report = _quiet_check(find_stack_configs(root))
-        if code == 1 and "nested/Pulumi.tenant.yaml" in report.replace("\\", "/"):
+        if code == EXIT_SALT_FOUND and "nested/Pulumi.tenant.yaml" in report.replace("\\", "/"):
             print("PASS: a tree containing a salted stack config exits 1, naming the file")
         else:
             print(f"FAIL: salted tree -> exit {code}, report {report!r}", file=sys.stderr)
@@ -302,7 +324,7 @@ def _self_test() -> int:
         bom_file = root / "nested" / "Pulumi.bom.yaml"
         bom_file.write_bytes(b"\xef\xbb\xbf" + BOM_SALT[len(BOM) :].encode("utf-8"))
         code, report = _quiet_check([bom_file])
-        if code == 1:
+        if code == EXIT_SALT_FOUND:
             print("PASS: a real BOM-prefixed file on disk fails")
         else:
             print(f"FAIL: BOM-prefixed file -> exit {code}, report {report!r}", file=sys.stderr)
@@ -310,11 +332,21 @@ def _self_test() -> int:
         bom_file.unlink()
 
         code, _ = _quiet_check([root / "Pulumi.missing.yaml"])
-        if code == 1:
-            print("PASS: an unreadable path fails rather than reporting clean")
+        if code == EXIT_UNREADABLE:
+            print("PASS: an unreadable path exits 3, not 0 and not a finding")
         else:
-            print("FAIL: an unreadable path did not fail", file=sys.stderr)
+            print(f"FAIL: an unreadable path -> exit {code} (expected {EXIT_UNREADABLE})", file=sys.stderr)
             failures += 1
+
+        undecodable = root / "Pulumi.binary.yaml"
+        undecodable.write_bytes(b"config: x\n\xff\xfe not utf-8\n")
+        code, _ = _quiet_check([undecodable])
+        if code == EXIT_UNREADABLE:
+            print("PASS: a config that is not valid UTF-8 exits 3, not a traceback")
+        else:
+            print(f"FAIL: undecodable config -> exit {code} (expected {EXIT_UNREADABLE})", file=sys.stderr)
+            failures += 1
+        undecodable.unlink()
 
     # This repo's own shape: a tree holding a project file and no stack config
     # at all. `--scan-tree` must report clean, not complain that it was given

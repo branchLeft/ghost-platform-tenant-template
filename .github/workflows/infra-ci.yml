@@ -288,13 +288,29 @@ jobs:
             echo "::error::$config is missing. The provisioning flow commits this stack's config, and without it there is nothing for this job to deploy."
             exit 1
           fi
-          # stderr is dropped because this is a question, not a verdict: the
-          # script's ::error:: annotations would otherwise mark a step that
-          # succeeded. The Committed-secret guard job reports the same finding
-          # as a failure.
-          if ! python3 scripts/assert-no-committed-pulumi-secrets.py "$config" 2>/dev/null; then
+          # Captured rather than shown: on exit 1 the script's ::error::
+          # annotations would mark a step that succeeded, and on any other
+          # status they are the only evidence of what went wrong. `|| status=`
+          # keeps `set -e` from aborting on the non-zero exit this expects.
+          #
+          # The script's exit status is three-valued: 0 clean, 1 a salt is
+          # committed, 3 a named file could not be read. Only 1 may skip the
+          # restore. A moved script, an absent interpreter, a config that is
+          # not valid UTF-8 and argparse's own usage exit all land outside
+          # that, and treating any of them as a committed salt would deploy
+          # with no salt at all -- then send whoever reads the resulting
+          # decryption error at the passphrase, which is the misdiagnosis the
+          # checks below exist to prevent.
+          salt_status=0
+          salt_report=$(python3 scripts/assert-no-committed-pulumi-secrets.py "$config" 2>&1) || salt_status=$?
+          if [ "$salt_status" -eq 1 ]; then
             echo "::warning::$config already carries an encryptionsalt, so none was restored and this stack still decrypts with the committed value. Move that value into the PULUMI_ENCRYPTION_SALT repository secret and delete the line from the file; the Committed-secret guard job fails while it is there."
             exit 0
+          fi
+          if [ "$salt_status" -ne 0 ]; then
+            printf '%s\n' "$salt_report"
+            echo "::error::scripts/assert-no-committed-pulumi-secrets.py exited $salt_status. That is neither 'no salt committed' (0) nor 'a salt is committed' (1), so whether $config carries one is unknown and this refuses to guess. The output above is the script's own."
+            exit 1
           fi
           if [ -z "$PULUMI_ENCRYPTION_SALT" ]; then
             echo "::error::the PULUMI_ENCRYPTION_SALT repository secret is empty or unset, and $config carries no salt of its own. Set the secret to this stack's encryption salt before deploying."

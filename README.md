@@ -101,7 +101,7 @@ Written by the provisioning flow, not by hand:
 | `GCP_WORKLOAD_IDENTITY_PROVIDER` | variable | The provider CI federates through. |
 | `PULUMI_STATE_BUCKET` | variable | This tenant's own Pulumi state bucket, without the `gs://` scheme. |
 | `PULUMI_CONFIG_PASSPHRASE` | secret | This tenant's own Pulumi secrets passphrase, minted fresh at onboarding and unique to this repo -- never shared with another tenant, and never the platform repo's own. Without it CI cannot decrypt this stack's checkpoint. |
-| `PULUMI_ENCRYPTION_SALT` | secret | This stack's `encryptionsalt`, the `v1:`-prefixed value alone with no `encryptionsalt: ` key in front of it. Not a second passphrase: it is what Pulumi derives this stack's key from, and it is a secret only because holding it lets someone test passphrase guesses offline. |
+| `PULUMI_ENCRYPTION_SALT` | secret | This stack's `encryptionsalt`, the `v1:`-prefixed value alone with no `encryptionsalt: ` key in front of it. Not a second passphrase: it is what Pulumi derives this stack's key from, and it is a secret only because holding it lets someone test passphrase guesses offline. **Not yet written by the provisioning flow** -- see the two states below. |
 
 `npm ci` installs `@branchleft/ghost-platform-tenant` using the workflow
 run's own `GITHUB_TOKEN` -- the package is public on GitHub Packages, but
@@ -128,12 +128,21 @@ this tenant's own state bucket and a GCP identity with access to it -- see
 `branchLeft/standards` PUL-12 bans a committed `encryptionsalt`. The salt is an
 offline verifier for the stack passphrase -- whoever holds it can test
 candidates at their own rate, with no state backend and no cloud IAM in the
-loop -- so it lives in the `PULUMI_ENCRYPTION_SALT` repo secret and CI appends
-it to the working copy of `Pulumi.<tenant-name>.yaml` for the deploy job only.
-Nothing commits the result. Encrypted `secure:` config values stay committed:
-a ciphertext with no salt beside it is not an oracle.
+loop. Encrypted `secure:` config values stay committed regardless: a ciphertext
+with no salt beside it is not an oracle.
 
-To apply by hand, append your own held copy and do not commit it:
+**A generated repo is in one of two states, and `Pulumi.<tenant-name>.yaml`
+tells you which.** The provisioning flow does not yet set
+`PULUMI_ENCRYPTION_SALT`, and it still commits the salt into the stack config
+it hands over. Until that changes, both states exist:
+
+| `Pulumi.<tenant-name>.yaml` | What CI does | What is true |
+|---|---|---|
+| No `encryptionsalt` line | Appends the value from `PULUMI_ENCRYPTION_SALT` to the working copy, for the deploy job only, and never commits it | The target state. The `Committed-secret guard` job passes. |
+| Has an `encryptionsalt` line | Warns, restores nothing, and deploys on the committed value | The salt is published in this repo. The guard job fails until it is moved -- see `RUNBOOK-bootstrap.md`. **Set the secret before deleting the line**, or the next deploy has nothing to decrypt the stack with. |
+
+To apply by hand from a checkout in the first state, append your own held copy
+and do not commit it:
 
 ```bash
 printf '\nencryptionsalt: %s\n' "$PULUMI_ENCRYPTION_SALT" >> Pulumi.<tenant-name>.yaml

@@ -16,12 +16,23 @@ it refuses.
 ## The one action a human takes here
 
 **Merge the pull request the provisioning flow opened.** It commits
-`Pulumi.<tenant-name>.yaml` — this stack's plain config values. Neither of the
-two values that decrypt it is in there: the passphrase lives only in this
-repo's own `PULUMI_CONFIG_PASSPHRASE` secret, and the encryption salt only in
-`PULUMI_ENCRYPTION_SALT`, which the deploy job appends to the working copy of
-that file and never commits back. Until the PR merges, CI has no stack config
-to read and the deploy job fails.
+`Pulumi.<tenant-name>.yaml` — this stack's config values. Until it merges, CI
+has no stack config to read and the deploy job fails.
+
+The passphrase that decrypts the stack is never in that file; it lives only in
+this repo's own `PULUMI_CONFIG_PASSPHRASE` secret. The encryption salt belongs
+in `PULUMI_ENCRYPTION_SALT`, which the deploy job appends to the working copy
+and never commits back — but **the provisioning flow does not set that secret
+yet, and still commits the salt into the file it hands over.** So read the PR
+before merging it:
+
+- **No `encryptionsalt` line in `Pulumi.<tenant-name>.yaml`.** The target state.
+  Merge, and the deploy restores the salt from the secret.
+- **An `encryptionsalt` line is present.** Also merge — the deploy job warns,
+  restores nothing and applies on the committed value, so onboarding completes
+  either way. Then follow "The committed-secret guard fails on a freshly
+  generated repo" below, which has an order that matters. The guard job stays
+  red until you do.
 
 Merging is itself the confirmation test: the push to `main` runs the `deploy`
 job, and a healthy first run finds nothing to do. `pulumi up` reporting
@@ -128,20 +139,35 @@ cannot exchange a token at all.
 deploy still works — the salt step reads the committed value, warns, and
 restores nothing — so this is a fix to make, not an outage.
 
-Take the value from the failing annotation, set it as the secret, and delete the
-line:
+**Set the secret first.** Deleting the line before the secret exists leaves the
+next deploy with nothing to decrypt the stack. The failing annotation carries
+the value, the file and the line number — `::error file=Pulumi.<tenant-name>.yaml,line=N::encryptionsalt: v1:...`
+— so take the `v1:`-prefixed value from it, without the `encryptionsalt: ` key
+in front:
 
 ```bash
 gh secret set PULUMI_ENCRYPTION_SALT --repo branchLeft/<generated-repo>
-grep -v '^[[:space:]]*encryptionsalt[[:space:]]*:' Pulumi.<tenant-name>.yaml > salt-free.tmp
-mv salt-free.tmp Pulumi.<tenant-name>.yaml
 ```
 
-Commit the deletion on a branch and merge it. `gh secret set` reads the value
-from stdin when no `--body` is given, which keeps it out of shell history, and
-`grep -v` is written in place of `sed -i` because the two spell in-place
-editing differently on macOS and on Linux. Deleting the line without setting the
-secret first leaves the next deploy with nothing to decrypt the stack.
+It reads the value from stdin when no `--body` is given, which keeps it out of
+shell history.
+
+**Then delete the line the annotation names**, in an editor. No `sed` or `grep`
+recipe is given here on purpose: the guard matches quoted (`"encryptionsalt":`)
+and byte-order-mark-prefixed forms that a one-line pattern written from memory
+does not, so a recipe that looks like it worked can leave the salt in place and
+the guard red with nothing left to try. The annotation's line number is exact
+whatever form the key took.
+
+**Then confirm, before committing:**
+
+```bash
+python3 scripts/assert-no-committed-pulumi-secrets.py Pulumi.<tenant-name>.yaml
+```
+
+It prints nothing and exits 0 when the file is clean. That is the same check CI
+runs, so a pass here is a pass there. Commit the deletion on a branch and merge
+it.
 
 ---
 

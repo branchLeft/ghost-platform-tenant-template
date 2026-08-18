@@ -149,7 +149,7 @@ class ExitStatus(unittest.TestCase):
             path = pathlib.Path(raw) / "Pulumi.tenant.yaml"
             path.write_text("encryptionsalt: v1:AAA=\n", encoding="utf-8")
             code, report = self._run([str(path)])
-            self.assertEqual(code, 1)
+            self.assertEqual(code, guard.EXIT_SALT_FOUND)
             self.assertIn("Pulumi.tenant.yaml", report)
 
     def test_a_clean_file_exits_zero(self):
@@ -158,10 +158,38 @@ class ExitStatus(unittest.TestCase):
             path.write_text("config:\n  gcp:project: p\n", encoding="utf-8")
             self.assertEqual(self._run([str(path)])[0], 0)
 
-    def test_an_unreadable_path_fails_rather_than_reporting_clean(self):
+    def test_an_unreadable_path_is_its_own_status_not_a_finding(self):
+        # The deploy job branches on exit 1 to mean "a salt is committed, skip
+        # the restore". Handing it that answer for a file nobody read would
+        # deploy on an unverified config, so an unread file gets its own
+        # status rather than sharing one with a finding.
         with tempfile.TemporaryDirectory() as raw:
             missing = pathlib.Path(raw) / "Pulumi.missing.yaml"
-            self.assertEqual(self._run([str(missing)])[0], 1)
+            self.assertEqual(self._run([str(missing)])[0], guard.EXIT_UNREADABLE)
+
+    def test_a_config_that_is_not_utf8_exits_unreadable_not_a_traceback(self):
+        # UnicodeDecodeError is a ValueError, so `except OSError` alone leaves
+        # the interpreter exiting 1 on a traceback -- the same status as a
+        # finding.
+        with tempfile.TemporaryDirectory() as raw:
+            path = pathlib.Path(raw) / "Pulumi.tenant.yaml"
+            path.write_bytes(b"config: x\n\xff\xfe not utf-8\n")
+            self.assertEqual(self._run([str(path)])[0], guard.EXIT_UNREADABLE)
+
+    def test_an_unread_file_outranks_a_finding_elsewhere(self):
+        with tempfile.TemporaryDirectory() as raw:
+            root = pathlib.Path(raw)
+            (root / "Pulumi.tenant.yaml").write_text("encryptionsalt: v1:AAA=\n", encoding="utf-8")
+            missing = root / "Pulumi.missing.yaml"
+            self.assertEqual(
+                self._run([str(root / "Pulumi.tenant.yaml"), str(missing)])[0],
+                guard.EXIT_UNREADABLE,
+            )
+
+    def test_the_three_exit_statuses_are_distinct_and_avoid_argparse(self):
+        # argparse exits 2 on a usage error; nothing else may claim it.
+        self.assertEqual(len({0, guard.EXIT_SALT_FOUND, guard.EXIT_UNREADABLE}), 3)
+        self.assertNotIn(2, {guard.EXIT_SALT_FOUND, guard.EXIT_UNREADABLE})
 
     def test_scan_tree_over_a_tree_with_no_stack_config_exits_zero(self):
         # This repo's own shape. `--scan-tree` matching nothing is a clean
@@ -176,7 +204,7 @@ class ExitStatus(unittest.TestCase):
         with tempfile.TemporaryDirectory() as raw:
             root = pathlib.Path(raw)
             (root / "Pulumi.tenant.yaml").write_text("encryptionsalt: v1:AAA=\n", encoding="utf-8")
-            self.assertEqual(self._run(["--scan-tree", str(root)])[0], 1)
+            self.assertEqual(self._run(["--scan-tree", str(root)])[0], guard.EXIT_SALT_FOUND)
 
     def test_the_bundled_self_test_passes(self):
         with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()):
