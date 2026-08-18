@@ -2,3 +2,4 @@
 /node_modules/
 Pulumi.*.yaml.bak
 /preview.json
+__pycache__/

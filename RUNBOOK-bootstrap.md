@@ -16,10 +16,12 @@ it refuses.
 ## The one action a human takes here
 
 **Merge the pull request the provisioning flow opened.** It commits
-`Pulumi.<tenant-name>.yaml` — the stack's secrets provider and its encryption
-salt (not the passphrase itself, which lives only in this repo's own
-`PULUMI_CONFIG_PASSPHRASE` secret) — and its plain config values. Until it
-merges, CI has no stack config to read and the deploy job fails.
+`Pulumi.<tenant-name>.yaml` — this stack's plain config values. Neither of the
+two values that decrypt it is in there: the passphrase lives only in this
+repo's own `PULUMI_CONFIG_PASSPHRASE` secret, and the encryption salt only in
+`PULUMI_ENCRYPTION_SALT`, which the deploy job appends to the working copy of
+that file and never commits back. Until the PR merges, CI has no stack config
+to read and the deploy job fails.
 
 Merging is itself the confirmation test: the push to `main` runs the `deploy`
 job, and a healthy first run finds nothing to do. `pulumi up` reporting
@@ -116,6 +118,30 @@ a merge.
 **Only `main` can authenticate.** The provider's `attributeCondition` requires
 `assertion.ref == "refs/heads/main"`, so a workflow run from any other branch
 cannot exchange a token at all.
+
+---
+
+## The committed-secret guard fails on a freshly generated repo
+
+`Committed-secret guard` failing on a repo nobody has edited means
+`Pulumi.<tenant-name>.yaml` arrived with an `encryptionsalt` line in it. The
+deploy still works — the salt step reads the committed value, warns, and
+restores nothing — so this is a fix to make, not an outage.
+
+Take the value from the failing annotation, set it as the secret, and delete the
+line:
+
+```bash
+gh secret set PULUMI_ENCRYPTION_SALT --repo branchLeft/<generated-repo>
+grep -v '^[[:space:]]*encryptionsalt[[:space:]]*:' Pulumi.<tenant-name>.yaml > salt-free.tmp
+mv salt-free.tmp Pulumi.<tenant-name>.yaml
+```
+
+Commit the deletion on a branch and merge it. `gh secret set` reads the value
+from stdin when no `--body` is given, which keeps it out of shell history, and
+`grep -v` is written in place of `sed -i` because the two spell in-place
+editing differently on macOS and on Linux. Deleting the line without setting the
+secret first leaves the next deploy with nothing to decrypt the stack.
 
 ---
 

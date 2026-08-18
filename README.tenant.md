@@ -39,5 +39,12 @@ deployer service account email), four repo variables and one repo secret.
   file.
 - Optional mail and bulk-email config keys are documented in the
   [template's README](https://github.com/branchLeft/ghost-platform-tenant-template#optional-mail-config).
+- This stack's `encryptionsalt` is never committed. It lives in this repo's
+  `PULUMI_ENCRYPTION_SALT` secret, and the deploy job appends it to the working
+  copy of `Pulumi.__TENANT_NAME__.yaml` for that job alone. To run `pulumi`
+  locally, append your own held copy and do not commit it:
+  `printf '\nencryptionsalt: %s\n' "$PULUMI_ENCRYPTION_SALT" >> Pulumi.__TENANT_NAME__.yaml`.
+  `scripts/assert-no-committed-pulumi-secrets.py` fails a commit, and CI's
+  `Committed-secret guard` job fails a pull request, that puts one back.
 
 Bootstrap record and recovery paths: `RUNBOOK-bootstrap.md`.
