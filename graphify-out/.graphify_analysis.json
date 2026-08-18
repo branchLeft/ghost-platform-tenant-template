@@ -1,6 +1,33 @@
 {
   "communities": {
     "0": [
+      "scripts_test_assert_no_committed_pulumi_secrets",
+      "scripts_test_assert_no_committed_pulumi_secrets_fileselection",
+      "scripts_test_assert_no_committed_pulumi_secrets_fileselection_test_scan_tree_recurses_and_skips_vendored_trees",
+      "scripts_test_assert_no_committed_pulumi_secrets_fileselection_test_stack_configs_are_matched_and_project_files_are_not",
+      "scripts_test_assert_no_committed_pulumi_secrets_lines_flagged",
+      "scripts_test_assert_no_committed_pulumi_secrets_load_module",
+      "scripts_test_assert_no_committed_pulumi_secrets_matchercatchesasalt",
+      "scripts_test_assert_no_committed_pulumi_secrets_matchercatchesasalt_test_a_salt_beside_a_ciphertext_is_still_caught",
+      "scripts_test_assert_no_committed_pulumi_secrets_matchercatchesasalt_test_case_is_ignored",
+      "scripts_test_assert_no_committed_pulumi_secrets_matchercatchesasalt_test_every_offending_line_is_reported_not_just_the_first",
+      "scripts_test_assert_no_committed_pulumi_secrets_matchercatchesasalt_test_hash_inside_the_value_is_not_a_comment",
+      "scripts_test_assert_no_committed_pulumi_secrets_matchercatchesasalt_test_indented_key",
+      "scripts_test_assert_no_committed_pulumi_secrets_matchercatchesasalt_test_key_as_a_list_item",
+      "scripts_test_assert_no_committed_pulumi_secrets_matchercatchesasalt_test_leading_byte_order_mark_does_not_hide_line_one",
+      "scripts_test_assert_no_committed_pulumi_secrets_matchercatchesasalt_test_plain_key_at_column_zero",
+      "scripts_test_assert_no_committed_pulumi_secrets_matchercatchesasalt_test_quoted_keys",
+      "scripts_test_assert_no_committed_pulumi_secrets_matcherdoesnotcrywolf",
+      "scripts_test_assert_no_committed_pulumi_secrets_matcherdoesnotcrywolf_test_a_ciphertext_with_no_salt_is_allowed",
+      "scripts_test_assert_no_committed_pulumi_secrets_matcherdoesnotcrywolf_test_a_clean_config",
+      "scripts_test_assert_no_committed_pulumi_secrets_matcherdoesnotcrywolf_test_a_commented_line",
+      "scripts_test_assert_no_committed_pulumi_secrets_matcherdoesnotcrywolf_test_a_key_merely_containing_the_word",
+      "scripts_test_assert_no_committed_pulumi_secrets_matcherdoesnotcrywolf_test_the_word_appearing_in_a_value",
+      "scripts_test_assert_no_committed_pulumi_secrets_rationale_26",
+      "scripts_test_assert_no_committed_pulumi_secrets_rationale_43",
+      "scripts_test_assert_no_committed_pulumi_secrets_rationale_84"
+    ],
+    "1": [
       "config",
       "config_config",
       "config_deployerserviceaccountemail",
@@ -23,30 +50,6 @@
       "index_tenant",
       "index_tenantname",
       "index_tenantserviceaccountemail"
-    ],
-    "1": [
-      "scripts_test_assert_no_committed_pulumi_secrets",
-      "scripts_test_assert_no_committed_pulumi_secrets_lines_flagged",
-      "scripts_test_assert_no_committed_pulumi_secrets_load_module",
-      "scripts_test_assert_no_committed_pulumi_secrets_matchercatchesasalt",
-      "scripts_test_assert_no_committed_pulumi_secrets_matchercatchesasalt_test_a_salt_beside_a_ciphertext_is_still_caught",
-      "scripts_test_assert_no_committed_pulumi_secrets_matchercatchesasalt_test_case_is_ignored",
-      "scripts_test_assert_no_committed_pulumi_secrets_matchercatchesasalt_test_every_offending_line_is_reported_not_just_the_first",
-      "scripts_test_assert_no_committed_pulumi_secrets_matchercatchesasalt_test_hash_inside_the_value_is_not_a_comment",
-      "scripts_test_assert_no_committed_pulumi_secrets_matchercatchesasalt_test_indented_key",
-      "scripts_test_assert_no_committed_pulumi_secrets_matchercatchesasalt_test_key_as_a_list_item",
-      "scripts_test_assert_no_committed_pulumi_secrets_matchercatchesasalt_test_leading_byte_order_mark_does_not_hide_line_one",
-      "scripts_test_assert_no_committed_pulumi_secrets_matchercatchesasalt_test_plain_key_at_column_zero",
-      "scripts_test_assert_no_committed_pulumi_secrets_matchercatchesasalt_test_quoted_keys",
-      "scripts_test_assert_no_committed_pulumi_secrets_matcherdoesnotcrywolf",
-      "scripts_test_assert_no_committed_pulumi_secrets_matcherdoesnotcrywolf_test_a_ciphertext_with_no_salt_is_allowed",
-      "scripts_test_assert_no_committed_pulumi_secrets_matcherdoesnotcrywolf_test_a_clean_config",
-      "scripts_test_assert_no_committed_pulumi_secrets_matcherdoesnotcrywolf_test_a_commented_line",
-      "scripts_test_assert_no_committed_pulumi_secrets_matcherdoesnotcrywolf_test_a_key_merely_containing_the_word",
-      "scripts_test_assert_no_committed_pulumi_secrets_matcherdoesnotcrywolf_test_the_word_appearing_in_a_value",
-      "scripts_test_assert_no_committed_pulumi_secrets_rationale_26",
-      "scripts_test_assert_no_committed_pulumi_secrets_rationale_43",
-      "scripts_test_assert_no_committed_pulumi_secrets_rationale_84"
     ],
     "2": [
       "path",
@@ -141,47 +144,55 @@
       "typescript"
     ],
     "8": [
-      "scripts_test_assert_no_committed_pulumi_secrets_fileselection",
-      "scripts_test_assert_no_committed_pulumi_secrets_fileselection_test_scan_tree_recurses_and_skips_vendored_trees",
-      "scripts_test_assert_no_committed_pulumi_secrets_fileselection_test_stack_configs_are_matched_and_project_files_are_not"
+      "github_workflows_infra_ci_deploy",
+      "github_workflows_infra_ci_typecheck",
+      "google_cloud_platform",
+      "pulumi_cli"
     ],
     "9": [
+      "branchleft_github_workflows_docs_lint",
+      "github_workflows_docs_lint_docs_lint"
+    ],
+    "10": [
+      "branchleft_standards_standards",
+      "github_workflows_standards_standards"
+    ],
+    "11": [
       "claude_md",
       "github_workflows_graphify"
     ],
-    "10": [
-      "pulumi_stack_config",
-      "runbook_bootstrap_md"
-    ],
-    "11": [
+    "12": [
       "ghost_platform_tenant_pkg"
     ],
-    "12": [
-      "github_workflows_infra_ci"
-    ],
     "13": [
-      "pre_commit_config"
+      "github_workflows_infra_ci_secret_guard"
     ],
     "14": [
-      "pulumi_yaml"
+      "pre_commit_config"
     ],
     "15": [
-      "readme_md"
+      "pulumi_yaml"
     ],
     "16": [
+      "readme_md"
+    ],
+    "17": [
       "readme_tenant_md"
+    ],
+    "18": [
+      "runbook_bootstrap_md"
     ]
   },
   "cohesion": {
-    "0": 0.11255411255411256,
-    "1": 0.15151515151515152,
+    "0": 0.12666666666666668,
+    "1": 0.11255411255411256,
     "2": 0.275,
     "3": 0.13333333333333333,
     "4": 0.2564102564102564,
     "5": 0.15384615384615385,
     "6": 0.2727272727272727,
     "7": 0.18181818181818182,
-    "8": 0.6666666666666666,
+    "8": 0.5,
     "9": 1.0,
     "10": 1.0,
     "11": 1.0,
@@ -189,7 +200,9 @@
     "13": 1.0,
     "14": 1.0,
     "15": 1.0,
-    "16": 1.0
+    "16": 1.0,
+    "17": 1.0,
+    "18": 1.0
   },
   "gods": [
     {
@@ -245,7 +258,7 @@
   ],
   "surprises": [],
   "tokens": {
-    "input": 13409,
-    "output": 1098
+    "input": 6014,
+    "output": 1688
   }
 }
