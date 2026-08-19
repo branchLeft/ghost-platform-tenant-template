@@ -1,38 +1,38 @@
 {
   "config.ts": {
-    "mtime": 1787059892.659375,
+    "mtime": 1787071175.9987798,
     "ast_hash": "55001846c0f3b02efce634e4094eca1b",
     "semantic_hash": "55001846c0f3b02efce634e4094eca1b"
   },
   "index.ts": {
-    "mtime": 1787059892.6614904,
+    "mtime": 1787071176.0012064,
     "ast_hash": "d3c22a1ac01f212c1f8435eb678fdace",
     "semantic_hash": "d3c22a1ac01f212c1f8435eb678fdace"
   },
   "package.json": {
-    "mtime": 1787059892.6623418,
+    "mtime": 1787071176.001267,
     "ast_hash": "a14dba4a2c91321c2a78c5b13fdaddf7",
     "semantic_hash": "a14dba4a2c91321c2a78c5b13fdaddf7"
   },
   "scripts/assert-no-tenant-deletes.py": {
-    "mtime": 1787059892.66283,
+    "mtime": 1787071176.0027664,
     "ast_hash": "1da89c51c698cdcf71c69e216cd64d42",
     "semantic_hash": "1da89c51c698cdcf71c69e216cd64d42"
   },
   "scripts/assert-placeholders-substituted.py": {
-    "mtime": 1787059892.66283,
+    "mtime": 1787071176.0027664,
     "ast_hash": "dd2dfccba76d2c1668d1a5b1c7121f6b",
     "semantic_hash": "dd2dfccba76d2c1668d1a5b1c7121f6b"
   },
   "tsconfig.json": {
-    "mtime": 1787059892.66283,
+    "mtime": 1787071176.0027664,
     "ast_hash": "cc33d6b917e44286b3d29b2e92c8f3c9",
     "semantic_hash": "cc33d6b917e44286b3d29b2e92c8f3c9"
   },
   ".github/workflows/infra-ci.yml": {
-    "mtime": 1787059892.659375,
-    "ast_hash": "416987c05cafd17269a7d643186ecbad",
-    "semantic_hash": "416987c05cafd17269a7d643186ecbad"
+    "mtime": 1787071175.9987798,
+    "ast_hash": "cc81742530cc6797d6f72a49c3ff5e23",
+    "semantic_hash": "cc81742530cc6797d6f72a49c3ff5e23"
   },
   ".pre-commit-config.yaml": {
     "mtime": 1787059892.659375,
@@ -65,12 +65,12 @@
     "semantic_hash": "b388ebf59fc46f01f9f5745a9f59cb0c"
   },
   "scripts/assert-no-committed-pulumi-secrets.py": {
-    "mtime": 1787059892.6623418,
+    "mtime": 1787071176.001267,
     "ast_hash": "59821ec3dc0333bb02bf93cd80ab2b26",
     "semantic_hash": "59821ec3dc0333bb02bf93cd80ab2b26"
   },
   "scripts/test_assert_no_committed_pulumi_secrets.py": {
-    "mtime": 1787059892.66283,
+    "mtime": 1787071176.0027664,
     "ast_hash": "5d164495f623bbda5dff69c2885aec99",
     "semantic_hash": "5d164495f623bbda5dff69c2885aec99"
   },
@@ -78,5 +78,15 @@
     "mtime": 1787059892.659375,
     "ast_hash": "5e99ff748361558e6027c5e08316300b",
     "semantic_hash": "5e99ff748361558e6027c5e08316300b"
+  },
+  ".github/workflows/docs-lint.yml": {
+    "mtime": 1787071175.9987063,
+    "ast_hash": "4fa72331e35b01e2cb7b005f9fbe1f44",
+    "semantic_hash": "4fa72331e35b01e2cb7b005f9fbe1f44"
+  },
+  ".github/workflows/standards.yml": {
+    "mtime": 1787071175.9987798,
+    "ast_hash": "a3a40d6065349b725b09e50b5f9ef764",
+    "semantic_hash": "a3a40d6065349b725b09e50b5f9ef764"
   }
 }
