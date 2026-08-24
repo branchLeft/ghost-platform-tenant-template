@@ -1,7 +1,13 @@
-# Substituted by the provisioning script when this repo is generated from
-# the template -- must be unique per tenant. Each tenant's Pulumi state
-# lives in its own bucket, configured via the PULUMI_STATE_BUCKET CI
-# variable, with the state object path derived from this project name.
+# Substituted by the provisioning flow when this repo is generated from the
+# template -- must be unique per tenant, because every tenant stack shares one
+# Pulumi state bucket and the state object path is derived from this name.
+#
+# The backend is a Hetzner Object Storage bucket, reached through the full
+# `PULUMI_BACKEND_URL` repository variable (an `s3://...?endpoint=...` string,
+# not a bucket name). It is deliberately not the estate's own state bucket:
+# an S3 credential is not scoped per stack, so a tenant deployer that could
+# reach the estate's bucket could destroy the checkpoint the production hcloud
+# token lives in, and destroying a checkpoint needs no ability to decrypt it.
 name: __TENANT_PULUMI_PROJECT__
 runtime: nodejs
 description: >-

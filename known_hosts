@@ -1,0 +1,20 @@
+# This tenant's app host SSH host key, pinned.
+#
+# The deploy step runs with `StrictHostKeyChecking=yes` against this file. It
+# presents a private key that can pin an image into this tenant's Compose slot
+# and restart it, so an unpinned deploy hands that key to anything that can win
+# a race for the address.
+#
+# `ssh-keyscan` must NOT be used to fill this in: it is trust-on-first-use, and
+# recording whatever answered defeats the point of pinning. The value comes from
+# the host itself, over the operator's own root session:
+#
+#   ssh -i ~/.ssh/id_ed25519_hetzner root@<app-host-public-ipv4> \
+#     'cat /etc/ssh/ssh_host_ed25519_key.pub'
+#
+# Then write one line here: the host's public address (the same value as the
+# APP_HOST_SSH_ADDRESS repository variable), a space, and that whole line.
+#
+# CI refuses to deploy while this file carries no key line. It is committed
+# rather than held as a secret because a host public key is not one -- publishing
+# it is what pinning means.

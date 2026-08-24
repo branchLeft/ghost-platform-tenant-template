@@ -2,4 +2,7 @@
 /node_modules/
 Pulumi.*.yaml.bak
 /preview.json
+# The deploy job writes the slot key here on the runner. Ignored so a local
+# reproduction of that step cannot commit a private key.
+/deploy_key
 __pycache__/

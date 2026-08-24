@@ -9,8 +9,7 @@
     "format:check": "prettier --check . --ignore-path .gitignore --ignore-path .prettierignore --ignore-path node_modules/@branchleft/prettier-config/prettierignore"
   },
   "dependencies": {
-    "@branchleft/ghost-platform-tenant": "0.4.0",
-    "@pulumi/gcp": "^9.32.1",
+    "@branchleft/ghost-platform-tenant": "1.0.0",
     "@pulumi/pulumi": "^3.255.0"
   },
   "devDependencies": {
