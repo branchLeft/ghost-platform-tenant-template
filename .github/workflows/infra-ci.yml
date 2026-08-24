@@ -349,14 +349,20 @@ jobs:
       # the last command in this script, and without errexit its non-zero exit
       # would be swallowed and the step's exit code would end up being the
       # self-test's. That shape is exactly how a guard reports green over a plan
-      # that would have orphaned a tenant's content volume.
+      # that would have deleted a tenant's content volume.
       #
       # The full plan is NOT printed on failure, unlike the GCP-era version of
       # this step. This stack's outputs include `secretsEnvFile`, a Pulumi
       # secret: Pulumi renders it as `[secret]` in `--json`, and the difference
       # between relying on that and not printing the plan at all is one upstream
       # change. `pulumi preview --diff` from a checkout is the debugging path.
-      - name: Refuse to apply a plan that orphans tenant data
+      # Only the destructive-operation half of this guard is live. The identity
+      # half matches nothing, because `GhostTenant` registers empty inputs and
+      # therefore produces no step of its own when only its inputs change --
+      # reproduced against the published component, tracked as
+      # branchLeft/workspace#280. Do not read this step as protecting `uid` or
+      # `appHostPrivateIp`; it does not.
+      - name: Refuse to apply a plan carrying a delete or replace
         run: |
           set -euo pipefail
           GUARD=node_modules/@branchleft/ghost-platform-tenant/scripts/assert-no-tenant-deletes.py

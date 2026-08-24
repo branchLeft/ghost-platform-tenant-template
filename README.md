@@ -24,7 +24,9 @@ account-level service. What is genuinely per-tenant is *configuration* — a
 Compose stack carrying a runtime-isolation posture, a secrets file, a UID, two
 volumes and a set of Ghost environment variables — and that is what this
 renders. The stack is the versioned, reviewed, passphrase-wrapped record of it,
-and its checkpoint is what the delete guard protects.
+and its checkpoint is what the delete guard is meant to protect — see the
+caveat under **Delete-guard preflight** for the half of that which does not
+currently work.
 
 So `pulumi up` here is not a deploy. Its useful products are two outputs an
 operator places on the host by hand:
@@ -233,10 +235,27 @@ back.
 
 The guard is `node_modules/@branchleft/ghost-platform-tenant/scripts/assert-no-tenant-deletes.py`,
 shipped inside the component. CI runs it against a real `pulumi preview --json`
-plan and refuses to apply anything that would orphan this tenant's live data —
-renaming the content volume orphans its themes and settings on the host under
-the old name, changing the UID loses it access to its own `0700` volume, and
-changing the database name boots Ghost against an empty schema.
+plan. It has two halves, and only one of them currently works.
+
+**What it does refuse:** any `delete` or `replace` step in the plan. That
+catches a slug change, which Pulumi renders as a delete and a create, and with
+it the content volume rename that orphans this tenant's themes and settings on
+the host under the old name.
+
+> **The identity half of this guard does not fire today, and that is
+> reproduced, not suspected.** `GhostTenant` registers itself with empty inputs
+> (`super(..., {}, opts)`), so a change to `uid`, `appHostPrivateIp` or
+> `maxUserConnections` produces no step for `ghostPlatform:tenant:GhostTenant`
+> in the plan at all — the whole preview is `same pulumi:pulumi:Stack` — and the
+> guard's identity comparison matches zero steps and exits 0. Verified against
+> the published component: `uid` 30007 → 30099 previewed clean, applied, and
+> re-rendered `user: '30099:30099'` over a content volume owned `0700` by 30007.
+> What *is* enforced is the destructive-operation half: a `delete` or `replace`
+> in the plan is refused, which catches a slug change because that is a
+> delete-and-create. Fixing the identity half is
+> [branchLeft/workspace#280](https://github.com/branchLeft/workspace/issues/280),
+> against the component rather than this repo. Until it lands, treat `uid`,
+> `appHostPrivateIp` and the volume names as fields nothing mechanical protects.
 
 ```bash
 GUARD=node_modules/@branchleft/ghost-platform-tenant/scripts/assert-no-tenant-deletes.py

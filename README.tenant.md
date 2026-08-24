@@ -42,8 +42,8 @@ anywhere on the path.
 - CI (`.github/workflows/infra-ci.yml`) type-checks every pull request, and on
   `main` applies the `__TENANT_NAME__` stack and then deploys its pinned image.
   Both jobs refuse to run while a template placeholder survives, and the deploy
-  job's delete-guard preflight aborts any plan that would orphan this tenant's
-  data.
+  job's delete-guard preflight aborts any plan carrying a `delete` or `replace`
+  step. Its other half does not currently fire — see the `uid` bullet below.
 - Changes are pull requests against `Pulumi.__TENANT_NAME__.yaml` and
   `index.ts`. Secret config is encrypted with this repo's own passphrase — set
   it with `pulumi config set --secret` from a checkout, with
@@ -52,10 +52,16 @@ anywhere on the path.
 - **Changing the image** is a one-line change to `imageRef`, digest-pinned. A
   tag is refused at preview: a stack deployed by tag has no answer to "what is
   running", and a restart months later can silently change it.
-- **Changing `uid`, the volume names, the database name or `appHostPrivateIp`**
-  is refused by the delete guard. Each of those orphans live data rather than
-  updating it. If one is genuinely wanted it is a deliberate operation with a
-  migration in front of it, not a merge.
+- **Changing `uid` or `appHostPrivateIp` is NOT currently refused by anything**,
+  and both orphan live data rather than updating it: the container starts under
+  a UID that cannot read its own `0700` content volume. The delete guard's
+  identity half matches no steps, because the component registers empty inputs
+  and so never appears in the plan — reproduced against the published component,
+  tracked as
+  [branchLeft/workspace#280](https://github.com/branchLeft/workspace/issues/280).
+  Treat both as fields to change only with a migration in front of them, and do
+  not rely on CI to stop you. Changing the **slug** *is* refused, because Pulumi
+  renders that as a delete and a create.
 - **`edgeRequestBodyMaxSize`** has to reach this tenant's site block in the
   edge's site registry in `branchLeft/shared-infra`. It is derived from the same
   input as the container's `/tmp` ceiling so the two cannot disagree; setting it

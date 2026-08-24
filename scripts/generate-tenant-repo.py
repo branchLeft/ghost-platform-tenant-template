@@ -5,21 +5,28 @@ Run by the platform's provisioning flow, from the root of the clone, once:
 
     generate-tenant-repo.py --slug blog
 
-It renames the tenant-facing README over the template-facing one, substitutes
-every `__LIKE_THIS__` placeholder, and then refuses if any placeholder survives
-anywhere in the tree.
+It removes what belongs to the template and not to a tenant, substitutes every
+`__LIKE_THIS__` placeholder, renames the tenant-facing README over the
+template-facing one, and then refuses if any placeholder survives anywhere.
 
-**It lives here rather than in the provisioning workflow on purpose.** The
-substitution set is a property of the template — which files carry a
-placeholder is decided by whoever edits this repo — and a copy of that list in
-another repository's workflow goes stale the first time a placeholder is added
-to a new file. The failure is silent and it propagates: the flow substitutes the
-files it knows about, the generated repo ships the literal token in the one it
-does not, and nothing downstream validates a Pulumi project name.
+**It lives here rather than in the provisioning workflow on purpose.** What a
+tenant repo should and should not contain is a property of the template — a
+copy of that knowledge in another repository's workflow goes stale the first
+time a file is added here. The failure is silent and it propagates.
 
-So the list is here, next to the files, and
-`scripts/test_generate_tenant_repo.py` runs the whole generation against a copy
-of this repo's own tree on every push.
+**Removal is not tidiness; it is what makes a generated repo's CI pass.** The
+template's own test suite asserts template-only facts — that `README.tenant.md`
+exists, that `Pulumi.yaml` still carries an unsubstituted placeholder — and both
+jobs in the generated `infra-ci.yml` run `unittest discover -s scripts`. Left in
+place, every tenant repo fails its own type-check job from birth, `deploy` never
+runs because it `needs: [typecheck]`, and no tenant ever deploys. The graph
+artefact is worse than useless in a tenant: it describes the template, while the
+generated `CLAUDE.md` tells agents to answer questions from it.
+
+Order matters, and it is the reverse of the obvious one. The rename runs
+**last**: a failure after it would leave `README.tenant.md` gone and a re-run
+would die naming the wrong cause. Removals are idempotent, so everything before
+the rename is safe to re-run.
 
 Exit 0 on success, 1 on any refusal, 2 on usage error.
 """
@@ -29,6 +36,7 @@ from __future__ import annotations
 import argparse
 import pathlib
 import re
+import shutil
 import sys
 
 # Mirrors `validateTenantSlug` in @branchleft/ghost-platform-tenant. The slug
@@ -54,25 +62,56 @@ RESERVED_SLUGS = ("website", "edge", "db", "monitoring")
 
 PLACEHOLDER = re.compile(r"__[A-Z][A-Z0-9_]*__")
 
+# Removed from the generated repo. Each one either asserts something only true
+# of the template, or describes the template rather than the tenant.
+#
+# `graphify-out/` is ~400 KB of graph describing this repository, and the
+# workspace convention already names a generated single-stack tenant repo as a
+# deliberate graphify exception -- so its workflow goes too, rather than
+# rebuilding that graph on a schedule for every tenant forever at API cost.
+TEMPLATE_ONLY_PATHS = (
+    "scripts/test_generate_tenant_repo.py",
+    "scripts/test_assert_placeholders_substituted.py",
+    ".github/workflows/graphify.yml",
+    "graphify-out",
+    # Last, and self-referential: this script is already loaded, so unlinking it
+    # mid-run is safe on POSIX, but it is ordered last so that a failure leaves
+    # the generator present for a re-run.
+    "scripts/generate-tenant-repo.py",
+)
+
+# Everything between these markers is dropped from the file that carries them.
+# Used for the graphify guidance in `CLAUDE.md`, which would otherwise point a
+# tenant repo's agents at a graph this script has just deleted.
+BLOCK_START = "<!-- template-only:start -->"
+BLOCK_END = "<!-- template-only:end -->"
+BLOCK_FILES = ("CLAUDE.md",)
+
 # The tenant-facing README replaces the template-facing one, rather than being
 # substituted in place: a generated repo's landing page should describe that
-# tenant's stack, not call itself a template.
+# tenant's stack, not call itself a template. Applied last -- see the docstring.
 RENAMES = (("README.tenant.md", "README.md"),)
 
-# Every file carrying a placeholder, **after** the rename above. Adding a
-# placeholder to a file that is not in this list is the defect this script and
-# its test exist to make impossible.
+# Every file carrying a placeholder. Named by their **pre-rename** paths, so
+# that substitution can run before the rename. Adding a placeholder to a file
+# that is not in this list is the defect this script and its test exist to make
+# impossible.
 SUBSTITUTED_FILES = (
     "Pulumi.yaml",
     ".github/workflows/infra-ci.yml",
-    "README.md",
+    "README.tenant.md",
 )
 
-# Files whose placeholder mentions are prose or pattern data rather than values
-# to substitute. Checked by the final sweep, so this list is what stops that
-# sweep failing on its own documentation.
-SWEEP_EXCLUDED_DIRS = ("scripts", "graphify-out", ".claude", ".git", "node_modules")
+# Directories the final sweep does not walk. `.git` and `node_modules` are not
+# authored content; `scripts` holds the pattern itself as data.
+SWEEP_EXCLUDED_DIRS = ("scripts", ".git", "node_modules")
+
+# A `#` comment line naming a placeholder is documenting it, not carrying one.
+# **Not applied to markdown**, where `#` opens a heading: `# __TENANT_NAME__` is
+# the single most likely place for a real surviving placeholder, and treating it
+# as a comment would hide exactly that.
 COMMENT_LINE = re.compile(r"^\s*#")
+COMMENT_EXEMPT_SUFFIXES = (".md",)
 
 
 class GenerateError(Exception):
@@ -108,17 +147,42 @@ def substitutions(slug: str) -> dict[str, str]:
     }
 
 
-def apply_renames(root: pathlib.Path) -> list[str]:
+def remove_template_only(root: pathlib.Path) -> list[str]:
+    """Delete what belongs to the template. Idempotent: a missing path is fine."""
     actions = []
-    for source, target in RENAMES:
-        src = root / source
-        if not src.is_file():
+    for name in TEMPLATE_ONLY_PATHS:
+        path = root / name
+        if path.is_dir():
+            shutil.rmtree(path)
+            actions.append(f"removed {name}/")
+        elif path.exists():
+            path.unlink()
+            actions.append(f"removed {name}")
+    return actions
+
+
+def strip_template_only_blocks(root: pathlib.Path) -> list[str]:
+    actions = []
+    for name in BLOCK_FILES:
+        path = root / name
+        if not path.is_file():
+            continue
+        text = path.read_text(encoding="utf-8")
+        if BLOCK_START not in text:
+            continue
+        if text.count(BLOCK_START) != text.count(BLOCK_END):
             raise GenerateError(
-                f"{source} is missing from this tree. A template snapshot without it cannot be "
-                "generated from -- nothing else produces the tenant-facing README."
+                f"{name} has {text.count(BLOCK_START)} template-only start markers and "
+                f"{text.count(BLOCK_END)} end markers. Refusing to guess where a block ends."
             )
-        src.replace(root / target)
-        actions.append(f"renamed {source} -> {target}")
+        stripped = re.sub(
+            re.escape(BLOCK_START) + r".*?" + re.escape(BLOCK_END) + r"\n?",
+            "",
+            text,
+            flags=re.DOTALL,
+        )
+        path.write_text(stripped, encoding="utf-8")
+        actions.append(f"stripped template-only block(s) from {name}")
     return actions
 
 
@@ -141,13 +205,22 @@ def apply_substitutions(root: pathlib.Path, slug: str) -> list[str]:
     return actions
 
 
-def sweep(root: pathlib.Path) -> list[str]:
-    """Return every `path:line` outside the excluded dirs still carrying a token.
+def apply_renames(root: pathlib.Path) -> list[str]:
+    actions = []
+    for source, target in RENAMES:
+        src = root / source
+        if not src.is_file():
+            raise GenerateError(
+                f"{source} is missing from this tree. A template snapshot without it cannot be "
+                "generated from -- nothing else produces the tenant-facing README."
+            )
+        src.replace(root / target)
+        actions.append(f"renamed {source} -> {target}")
+    return actions
 
-    A `#` comment line naming a placeholder is documenting it rather than
-    carrying one, and a placeholder in a comment is substituted harmlessly where
-    the file is substituted at all -- so those are not findings.
-    """
+
+def sweep(root: pathlib.Path) -> list[str]:
+    """Return every `path:line` still carrying a placeholder token."""
     findings = []
     for path in sorted(root.rglob("*")):
         if not path.is_file():
@@ -159,8 +232,9 @@ def sweep(root: pathlib.Path) -> list[str]:
             text = path.read_text(encoding="utf-8")
         except (UnicodeDecodeError, OSError):
             continue
+        skip_comments = path.suffix not in COMMENT_EXEMPT_SUFFIXES
         for number, line in enumerate(text.splitlines(), start=1):
-            if COMMENT_LINE.match(line):
+            if skip_comments and COMMENT_LINE.match(line):
                 continue
             found = PLACEHOLDER.findall(line)
             if found:
@@ -170,8 +244,10 @@ def sweep(root: pathlib.Path) -> list[str]:
 
 def generate(root: pathlib.Path, slug: str) -> list[str]:
     validate_slug(slug)
-    actions = apply_renames(root)
+    actions = remove_template_only(root)
+    actions.extend(strip_template_only_blocks(root))
     actions.extend(apply_substitutions(root, slug))
+    actions.extend(apply_renames(root))
     findings = sweep(root)
     if findings:
         raise GenerateError(

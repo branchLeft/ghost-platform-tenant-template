@@ -115,6 +115,14 @@ gh run view --repo branchLeft/<generated-repo> <run-id> --log-failed
 still reports the overall run as successful. Check that `Deploy` actually ran
 and read its job summary, which names the digest that reached the host.
 
+**Every later merge to `main` is a restart of this tenant's site, not only the
+first.** The deploy step runs on every push to `main` and `branchleft-deploy`
+has no same-digest no-op: it rewrites `/etc/branchleft/<slug>.image.env` and
+restarts `branchleft-compose@<slug>` whatever the reference. So a merge that
+only changes a comment in `index.ts` still takes Ghost down for the length of a
+`docker compose up --wait`. Batch cosmetic changes, and do not merge one during
+an incident on this tenant.
+
 ---
 
 ## What CI deliberately cannot do

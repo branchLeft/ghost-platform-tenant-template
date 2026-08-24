@@ -64,6 +64,12 @@ def copy_repo(destination: pathlib.Path) -> pathlib.Path:
         target = destination / name
         target.parent.mkdir(parents=True, exist_ok=True)
         shutil.copy2(source, target)
+    # `git ls-files` output is filtered above to keep the copy cheap, so the
+    # graph artefact is re-created as a stub. Without it the "graphify-out is
+    # removed" assertion would pass against a tree that never had one.
+    graph = destination / "graphify-out"
+    graph.mkdir(exist_ok=True)
+    (graph / "graph.json").write_text('{"stub": true}\n', encoding="utf-8")
     return destination
 
 
@@ -139,6 +145,55 @@ class Generate(unittest.TestCase):
             readme = (root / "README.md").read_text(encoding="utf-8")
             self.assertTrue(readme.startswith("# acme-blog "))
 
+    def test_the_generated_repo_passes_its_own_ci(self) -> None:
+        """The finding this test exists for: every tenant repo was red from birth.
+
+        The template's own suite asserts template-only facts -- that
+        `README.tenant.md` exists, that `Pulumi.yaml` still carries an
+        unsubstituted placeholder -- and both jobs in the generated
+        `infra-ci.yml` run `unittest discover -s scripts`. Left in place they
+        fail in every generated repo, `deploy` never runs because it
+        `needs: [typecheck]`, and no tenant ever deploys. Asserting on files is
+        what missed it; running what the generated repo's CI runs is what
+        catches it.
+        """
+        with tempfile.TemporaryDirectory() as tmp:
+            root = copy_repo(pathlib.Path(tmp))
+            module.generate(root, "acme-blog")
+            for command in (
+                ["python3", "-m", "unittest", "discover", "-s", "scripts", "-p", "test_*.py"],
+                ["python3", "scripts/assert-placeholders-substituted.py"],
+                ["python3", "scripts/assert-no-committed-pulumi-secrets.py", "--self-test"],
+                ["python3", "scripts/assert-no-committed-pulumi-secrets.py", "--scan-tree", "."],
+            ):
+                result = subprocess.run(command, cwd=root, capture_output=True, text=True)
+                self.assertEqual(
+                    result.returncode,
+                    0,
+                    f"a generated tenant repo fails `{' '.join(command)}`:\n"
+                    f"{result.stdout}\n{result.stderr}",
+                )
+
+    def test_template_only_artefacts_do_not_reach_a_tenant(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = copy_repo(pathlib.Path(tmp))
+            module.generate(root, "acme-blog")
+            for name in module.TEMPLATE_ONLY_PATHS:
+                self.assertFalse((root / name).exists(), f"{name} survived generation")
+
+    def test_the_generated_claude_md_does_not_point_at_a_deleted_graph(self) -> None:
+        # The graph artefact and its workflow are removed, so guidance telling a
+        # tenant repo's agents to answer from `graphify-out/` would send them at
+        # a directory that is not there -- and, worse, would have described the
+        # template rather than the tenant if it were.
+        with tempfile.TemporaryDirectory() as tmp:
+            root = copy_repo(pathlib.Path(tmp))
+            module.generate(root, "acme-blog")
+            claude = (root / "CLAUDE.md").read_text(encoding="utf-8")
+            self.assertNotIn("graphify", claude)
+            self.assertNotIn(module.BLOCK_START, claude)
+            self.assertNotIn(module.BLOCK_END, claude)
+
     def test_the_pulumi_project_name_is_substituted(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             root = copy_repo(pathlib.Path(tmp))
@@ -180,6 +235,28 @@ class Generate(unittest.TestCase):
             with self.assertRaises(module.GenerateError):
                 module.generate(root, "website")
             self.assertTrue((root / "README.tenant.md").is_file())
+
+    def test_a_failure_before_the_rename_leaves_a_re_runnable_tree(self) -> None:
+        # The rename runs last precisely so this holds. With it first, any later
+        # failure left `README.tenant.md` gone, and the re-run died naming the
+        # missing README rather than the thing that actually failed.
+        with tempfile.TemporaryDirectory() as tmp:
+            root = copy_repo(pathlib.Path(tmp))
+            (root / "Pulumi.yaml").unlink()
+            with self.assertRaises(module.GenerateError):
+                module.generate(root, "acme-blog")
+            self.assertTrue((root / "README.tenant.md").is_file())
+
+    def test_a_placeholder_in_a_markdown_heading_is_not_mistaken_for_a_comment(self) -> None:
+        # `#` opens a heading in markdown, and `# __TENANT_NAME__` is the single
+        # most likely place for a real surviving placeholder -- the comment
+        # exclusion must not reach it.
+        with tempfile.TemporaryDirectory() as tmp:
+            root = copy_repo(pathlib.Path(tmp))
+            (root / "NOTES.md").write_text("# __TENANT_NAME__\n", encoding="utf-8")
+            with self.assertRaises(module.GenerateError) as caught:
+                module.generate(root, "acme-blog")
+            self.assertIn("NOTES.md", str(caught.exception))
 
 
 class Main(unittest.TestCase):
