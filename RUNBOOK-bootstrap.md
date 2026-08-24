@@ -17,8 +17,34 @@ every app host is exactly the thing the deploy design exists not to have.
 ## What an operator finishes in the handover pull request
 
 The pull request arrives carrying `Pulumi.<slug>.yaml` with the plain config
-values only. Three things have to be added to it before it can merge, all from a
-local checkout with `PULUMI_CONFIG_PASSPHRASE` exported:
+values only. Three things have to be added to it before it can merge, from a
+local checkout of the `provisioning/handover` branch.
+
+**Set the environment up first, in this order.** The salt step is the one that
+matters: `Pulumi.<slug>.yaml` is handed over without an `encryptionsalt`, and a
+`pulumi config set --secret` against a file that has none mints a _new_ salt
+into it — after which the stack's checkpoint and its own config disagree about
+which key its secrets are under, and nothing says so until a deploy fails to
+decrypt them.
+
+```bash
+export PULUMI_CONFIG_PASSPHRASE='<the escrowed value, decrypted>'
+export AWS_ACCESS_KEY_ID='<Hetzner S3 access key id>'
+export AWS_SECRET_ACCESS_KEY='<Hetzner S3 secret access key>'
+pulumi login "$(gh variable get PULUMI_BACKEND_URL --repo branchLeft/<generated-repo>)"
+
+printf '\nencryptionsalt: %s\n' '<this stack's salt>' >> Pulumi.<slug>.yaml
+```
+
+The salt is in this repo's `PULUMI_ENCRYPTION_SALT` environment secret, which is
+write-only. If you no longer hold a copy, read it back out of the checkpoint:
+
+```bash
+pulumi stack export --stack <slug> \
+  | python3 -c 'import json,sys; print(json.load(sys.stdin)["deployment"]["secrets_providers"]["state"]["salt"])'
+```
+
+Then:
 
 1. **The database password**, printed once by `provision_tenant_db.py` on `db1`
    and printed by nothing afterwards:
@@ -45,7 +71,20 @@ local checkout with `PULUMI_CONFIG_PASSPHRASE` exported:
 
    Write one line: `<app-host-public-ipv4> ` followed by that whole output.
 
-Each of those is a value a `workflow_dispatch` input could not have carried:
+**Then take the salt back out before committing.** It must not reach the commit
+(`branchLeft/standards` PUL-12), and the `Committed-secret guard` job fails
+while it is there:
+
+```bash
+python3 - <<'EOF'
+import pathlib, re
+p = next(pathlib.Path('.').glob('Pulumi.*.yaml'))
+p.write_text(re.sub(r'(?m)^encryptionsalt:.*\n', '', p.read_text()))
+EOF
+python3 scripts/assert-no-committed-pulumi-secrets.py --scan-tree .
+```
+
+Each of the three values above is one a `workflow_dispatch` input could not have carried:
 inputs are plaintext in the run's API response and in its form. That the
 passphrase has to be used here, on day one, is deliberate — it is what proves
 the escrow works while the tenant is still new, rather than the first time
