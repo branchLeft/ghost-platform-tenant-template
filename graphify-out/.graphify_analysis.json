@@ -1,6 +1,74 @@
 {
   "communities": {
     "0": [
+      "config",
+      "config_apphostprivateip",
+      "config_bulkemail",
+      "config_bulkemailbaseurl",
+      "config_config",
+      "config_databasehost",
+      "config_databasemaxuserconnections",
+      "config_databasepassword",
+      "config_hostport",
+      "config_imageref",
+      "config_mail",
+      "config_mailhost",
+      "config_mediaaccesskeyid",
+      "config_mediabucket",
+      "config_mediaendpoint",
+      "config_mediapublicbaseurl",
+      "config_mediaregion",
+      "config_mediasecretaccesskey",
+      "config_mediatenantprefix",
+      "config_rssbudgetmib",
+      "config_siteurl",
+      "config_slug",
+      "config_uid",
+      "config_uploadceilingmib",
+      "index",
+      "index_apphost",
+      "index_composefile",
+      "index_composeunit",
+      "index_databasename",
+      "index_databaseuser",
+      "index_edgerequestbodymaxsize",
+      "index_hostprovisioningcommand",
+      "index_identity",
+      "index_image",
+      "index_imageenvpath",
+      "index_secretsenvfile",
+      "index_secretsenvpath",
+      "index_stackdirectory",
+      "index_tenant"
+    ],
+    "1": [
+      "branchleft_ghost_platform_tenant",
+      "branchleft_prettier_config",
+      "branchleft_tsconfig",
+      "package",
+      "package_dependencies",
+      "package_dependencies_branchleft_ghost_platform_tenant",
+      "package_dependencies_pulumi_pulumi",
+      "package_devdependencies",
+      "package_devdependencies_branchleft_prettier_config",
+      "package_devdependencies_branchleft_tsconfig",
+      "package_devdependencies_prettier",
+      "package_devdependencies_types_node",
+      "package_devdependencies_typescript",
+      "package_main",
+      "package_name",
+      "package_prettier",
+      "package_private",
+      "package_scripts",
+      "package_scripts_format",
+      "package_scripts_format_check",
+      "package_scripts_typecheck",
+      "prettier",
+      "pulumi_pulumi",
+      "types_node",
+      "typescript"
+    ],
+    "2": [
       "scripts_test_assert_no_committed_pulumi_secrets",
       "scripts_test_assert_no_committed_pulumi_secrets_fileselection",
       "scripts_test_assert_no_committed_pulumi_secrets_fileselection_test_scan_tree_recurses_and_skips_vendored_trees",
@@ -27,31 +95,52 @@
       "scripts_test_assert_no_committed_pulumi_secrets_rationale_43",
       "scripts_test_assert_no_committed_pulumi_secrets_rationale_84"
     ],
-    "1": [
-      "config",
-      "config_config",
-      "config_deployerserviceaccountemail",
-      "config_gcpconfig",
-      "config_platformdbinstanceconnectionname",
-      "config_platformmediabucketurl",
-      "config_platformtenantimagerepositorydockerpath",
-      "config_projectid",
-      "index",
-      "index_bulkemailbaseurl",
-      "index_cloudrunservicename",
-      "index_cloudrunserviceuri",
-      "index_config",
-      "index_databasename",
-      "index_deployercanactastenantsa",
-      "index_imagedigestortag",
-      "index_mailhost",
-      "index_maxuserconnectionsstatement",
-      "index_siteurl",
-      "index_tenant",
-      "index_tenantname",
-      "index_tenantserviceaccountemail"
+    "3": [
+      "scripts_test_generate_tenant_repo",
+      "scripts_test_generate_tenant_repo_copy_repo",
+      "scripts_test_generate_tenant_repo_generate",
+      "scripts_test_generate_tenant_repo_generate_test_a_failure_before_the_rename_leaves_a_re_runnable_tree",
+      "scripts_test_generate_tenant_repo_generate_test_a_listed_file_that_moved_refuses_rather_than_skipping",
+      "scripts_test_generate_tenant_repo_generate_test_a_missing_tenant_readme_refuses_rather_than_skipping",
+      "scripts_test_generate_tenant_repo_generate_test_a_placeholder_in_a_markdown_heading_is_not_mistaken_for_a_comment",
+      "scripts_test_generate_tenant_repo_generate_test_a_placeholder_in_an_unlisted_file_fails_generation",
+      "scripts_test_generate_tenant_repo_generate_test_a_reserved_slug_is_refused_before_anything_is_written",
+      "scripts_test_generate_tenant_repo_generate_test_generating_this_repos_own_tree_leaves_no_token",
+      "scripts_test_generate_tenant_repo_generate_test_template_only_artefacts_do_not_reach_a_tenant",
+      "scripts_test_generate_tenant_repo_generate_test_the_generated_claude_md_does_not_point_at_a_deleted_graph",
+      "scripts_test_generate_tenant_repo_generate_test_the_generated_repo_passes_its_own_ci",
+      "scripts_test_generate_tenant_repo_generate_test_the_pulumi_project_name_is_substituted",
+      "scripts_test_generate_tenant_repo_generate_test_the_tenant_readme_replaces_the_template_one",
+      "scripts_test_generate_tenant_repo_main",
+      "scripts_test_generate_tenant_repo_main_test_exit_one_on_a_refusal",
+      "scripts_test_generate_tenant_repo_main_test_exit_zero_on_a_clean_generation",
+      "scripts_test_generate_tenant_repo_py_path",
+      "scripts_test_generate_tenant_repo_rationale_1",
+      "scripts_test_generate_tenant_repo_rationale_149",
+      "scripts_test_generate_tenant_repo_substitutions",
+      "scripts_test_generate_tenant_repo_substitutions_test_project_name_is_the_slug_plus_infra",
+      "scripts_test_generate_tenant_repo_substitutions_test_tenant_name_is_the_bare_slug",
+      "scripts_test_generate_tenant_repo_tracked_files"
     ],
-    "2": [
+    "4": [
+      "exception",
+      "scripts_generate_tenant_repo",
+      "scripts_generate_tenant_repo_apply_renames",
+      "scripts_generate_tenant_repo_apply_substitutions",
+      "scripts_generate_tenant_repo_generate",
+      "scripts_generate_tenant_repo_generateerror",
+      "scripts_generate_tenant_repo_main",
+      "scripts_generate_tenant_repo_py_path",
+      "scripts_generate_tenant_repo_rationale_118",
+      "scripts_generate_tenant_repo_rationale_151",
+      "scripts_generate_tenant_repo_rationale_223",
+      "scripts_generate_tenant_repo_remove_template_only",
+      "scripts_generate_tenant_repo_strip_template_only_blocks",
+      "scripts_generate_tenant_repo_substitutions",
+      "scripts_generate_tenant_repo_sweep",
+      "scripts_generate_tenant_repo_validate_slug"
+    ],
+    "5": [
       "path",
       "scripts_assert_no_committed_pulumi_secrets",
       "scripts_assert_no_committed_pulumi_secrets_check",
@@ -64,44 +153,9 @@
       "scripts_assert_no_committed_pulumi_secrets_rationale_124",
       "scripts_assert_no_committed_pulumi_secrets_rationale_133",
       "scripts_assert_no_committed_pulumi_secrets_rationale_236",
-      "scripts_assert_no_committed_pulumi_secrets_self_test",
-      "scripts_assert_placeholders_substituted",
-      "scripts_assert_placeholders_substituted_find_placeholders",
-      "scripts_assert_placeholders_substituted_main"
+      "scripts_assert_no_committed_pulumi_secrets_self_test"
     ],
-    "3": [
-      "package",
-      "package_dependencies",
-      "package_dependencies_branchleft_ghost_platform_tenant",
-      "package_dependencies_pulumi_gcp",
-      "package_dependencies_pulumi_pulumi",
-      "package_main",
-      "package_name",
-      "package_prettier",
-      "package_private",
-      "package_scripts",
-      "package_scripts_format",
-      "package_scripts_format_check",
-      "package_scripts_typecheck",
-      "pulumi_gcp",
-      "pulumi_pulumi"
-    ],
-    "4": [
-      "pattern",
-      "scripts_assert_no_tenant_deletes",
-      "scripts_assert_no_tenant_deletes_coverage_self_test",
-      "scripts_assert_no_tenant_deletes_declaration_pattern_tenant_suffix",
-      "scripts_assert_no_tenant_deletes_destructive_steps",
-      "scripts_assert_no_tenant_deletes_main",
-      "scripts_assert_no_tenant_deletes_plan",
-      "scripts_assert_no_tenant_deletes_rationale_118",
-      "scripts_assert_no_tenant_deletes_rationale_145",
-      "scripts_assert_no_tenant_deletes_rationale_268",
-      "scripts_assert_no_tenant_deletes_rationale_317",
-      "scripts_assert_no_tenant_deletes_self_test",
-      "scripts_assert_no_tenant_deletes_verify_coverage"
-    ],
-    "5": [
+    "6": [
       "ref_branchleft_tsconfig_pulumi_json",
       "ref_branchleft_tsconfig_strict_1_json",
       "ref_claude",
@@ -116,7 +170,22 @@
       "tsconfig_extends",
       "tsconfig_include"
     ],
-    "6": [
+    "7": [
+      "scripts_test_assert_placeholders_substituted",
+      "scripts_test_assert_placeholders_substituted_defaultfiles",
+      "scripts_test_assert_placeholders_substituted_defaultfiles_test_default_files_covers_every_placeholder_in_the_tree",
+      "scripts_test_assert_placeholders_substituted_defaultfiles_test_every_named_file_exists_in_this_repo",
+      "scripts_test_assert_placeholders_substituted_defaultfiles_test_the_template_itself_still_carries_every_placeholder",
+      "scripts_test_assert_placeholders_substituted_findplaceholders",
+      "scripts_test_assert_placeholders_substituted_findplaceholders_test_lowercase_and_single_underscore_forms_are_not_placeholders",
+      "scripts_test_assert_placeholders_substituted_findplaceholders_test_reports_each_distinct_placeholder_once_sorted",
+      "scripts_test_assert_placeholders_substituted_main",
+      "scripts_test_assert_placeholders_substituted_main_test_a_missing_file_exits_one_rather_than_passing",
+      "scripts_test_assert_placeholders_substituted_main_test_a_surviving_placeholder_exits_one",
+      "scripts_test_assert_placeholders_substituted_main_test_clean_files_exit_zero",
+      "scripts_test_assert_placeholders_substituted_rationale_1"
+    ],
+    "8": [
       "scripts_test_assert_no_committed_pulumi_secrets_exitstatus",
       "scripts_test_assert_no_committed_pulumi_secrets_exitstatus_run",
       "scripts_test_assert_no_committed_pulumi_secrets_exitstatus_test_a_clean_file_exits_zero",
@@ -130,85 +199,99 @@
       "scripts_test_assert_no_committed_pulumi_secrets_exitstatus_test_the_three_exit_statuses_are_distinct_and_avoid_argparse",
       "scripts_test_assert_no_committed_pulumi_secrets_rationale_138"
     ],
-    "7": [
-      "branchleft_prettier_config",
-      "branchleft_tsconfig",
-      "package_devdependencies",
-      "package_devdependencies_branchleft_prettier_config",
-      "package_devdependencies_branchleft_tsconfig",
-      "package_devdependencies_prettier",
-      "package_devdependencies_types_node",
-      "package_devdependencies_typescript",
-      "prettier",
-      "types_node",
-      "typescript"
-    ],
-    "8": [
-      "github_workflows_infra_ci_deploy",
-      "github_workflows_infra_ci_typecheck",
-      "google_cloud_platform",
-      "pulumi_cli"
-    ],
     "9": [
+      "scripts_test_generate_tenant_repo_component_constants",
+      "scripts_test_generate_tenant_repo_rationale_39",
+      "scripts_test_generate_tenant_repo_validateslug",
+      "scripts_test_generate_tenant_repo_validateslug_test_accepts_an_ordinary_slug",
+      "scripts_test_generate_tenant_repo_validateslug_test_bounds_match_the_installed_component",
+      "scripts_test_generate_tenant_repo_validateslug_test_refuses_a_slug_past_the_mysql_identifier_bound",
+      "scripts_test_generate_tenant_repo_validateslug_test_refuses_every_reserved_stack_name",
+      "scripts_test_generate_tenant_repo_validateslug_test_refuses_uppercase_underscores_and_a_leading_digit"
+    ],
+    "10": [
+      "claude_md",
+      "ghost_platform_tenant_component",
+      "pulumi_yaml",
+      "readme_md",
+      "readme_tenant_md"
+    ],
+    "11": [
+      "scripts_assert_placeholders_substituted",
+      "scripts_assert_placeholders_substituted_find_placeholders",
+      "scripts_assert_placeholders_substituted_main",
+      "scripts_assert_placeholders_substituted_py_path"
+    ],
+    "12": [
+      "github_workflows_infra_ci_yml",
+      "hetzner_object_storage",
+      "pulumi_stack"
+    ],
+    "13": [
       "branchleft_github_workflows_docs_lint",
       "github_workflows_docs_lint_docs_lint"
     ],
-    "10": [
+    "14": [
       "branchleft_standards_standards",
       "github_workflows_standards_standards"
     ],
-    "11": [
-      "claude_md",
+    "15": [
       "github_workflows_graphify"
     ],
-    "12": [
-      "ghost_platform_tenant_pkg"
-    ],
-    "13": [
-      "github_workflows_infra_ci_secret_guard"
-    ],
-    "14": [
-      "pre_commit_config"
-    ],
-    "15": [
-      "pulumi_yaml"
-    ],
     "16": [
-      "readme_md"
+      "google_cloud_platform"
     ],
     "17": [
-      "readme_tenant_md"
+      "pattern"
     ],
     "18": [
+      "pre_commit_config_yaml"
+    ],
+    "19": [
+      "pulumi_cli"
+    ],
+    "20": [
       "runbook_bootstrap_md"
     ]
   },
   "cohesion": {
-    "0": 0.12666666666666668,
-    "1": 0.11255411255411256,
-    "2": 0.275,
-    "3": 0.13333333333333333,
-    "4": 0.2564102564102564,
-    "5": 0.15384615384615385,
-    "6": 0.2727272727272727,
-    "7": 0.18181818181818182,
-    "8": 0.5,
-    "9": 1.0,
-    "10": 1.0,
-    "11": 1.0,
-    "12": 1.0,
+    "0": 0.07827260458839407,
+    "1": 0.08,
+    "2": 0.12666666666666668,
+    "3": 0.17666666666666667,
+    "4": 0.2833333333333333,
+    "5": 0.358974358974359,
+    "6": 0.15384615384615385,
+    "7": 0.15384615384615385,
+    "8": 0.2727272727272727,
+    "9": 0.25,
+    "10": 0.4,
+    "11": 0.8333333333333334,
+    "12": 0.6666666666666666,
     "13": 1.0,
     "14": 1.0,
     "15": 1.0,
     "16": 1.0,
     "17": 1.0,
-    "18": 1.0
+    "18": 1.0,
+    "19": 1.0,
+    "20": 1.0
   },
   "gods": [
+    {
+      "id": "scripts_test_generate_tenant_repo_copy_repo",
+      "label": "copy_repo()",
+      "degree": 17
+    },
     {
       "id": "scripts_test_assert_no_committed_pulumi_secrets_lines_flagged",
       "label": "lines_flagged()",
       "degree": 15
+    },
+    {
+      "id": "scripts_test_generate_tenant_repo_generate",
+      "label": "Generate",
+      "degree": 13
     },
     {
       "id": "scripts_test_assert_no_committed_pulumi_secrets_exitstatus",
@@ -221,6 +304,16 @@
       "degree": 11
     },
     {
+      "id": "scripts_generate_tenant_repo_generate",
+      "label": "generate()",
+      "degree": 10
+    },
+    {
+      "id": "scripts_generate_tenant_repo_generateerror",
+      "label": "GenerateError",
+      "degree": 8
+    },
+    {
       "id": "scripts_assert_no_committed_pulumi_secrets_self_test",
       "label": "_self_test()",
       "degree": 7
@@ -231,34 +324,14 @@
       "degree": 7
     },
     {
-      "id": "tsconfig_exclude",
-      "label": "exclude",
-      "degree": 5
-    },
-    {
-      "id": "scripts_assert_no_tenant_deletes_self_test",
-      "label": "self_test()",
-      "degree": 5
-    },
-    {
-      "id": "scripts_assert_no_tenant_deletes_verify_coverage",
-      "label": "verify_coverage()",
-      "degree": 5
-    },
-    {
-      "id": "scripts_assert_no_committed_pulumi_secrets_offending_lines",
-      "label": "offending_lines()",
-      "degree": 5
-    },
-    {
-      "id": "scripts_assert_no_committed_pulumi_secrets_find_stack_configs",
-      "label": "find_stack_configs()",
-      "degree": 5
+      "id": "scripts_test_generate_tenant_repo_validateslug",
+      "label": "ValidateSlug",
+      "degree": 6
     }
   ],
   "surprises": [],
   "tokens": {
-    "input": 6014,
-    "output": 1688
+    "input": 16208,
+    "output": 1092
   }
 }

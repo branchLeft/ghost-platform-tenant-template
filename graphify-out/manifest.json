@@ -1,76 +1,71 @@
 {
   "config.ts": {
-    "mtime": 1787071175.9987798,
-    "ast_hash": "55001846c0f3b02efce634e4094eca1b",
-    "semantic_hash": "55001846c0f3b02efce634e4094eca1b"
+    "mtime": 1787612370.8525205,
+    "ast_hash": "3adcbdb05fe939ae36ca85ae51726079",
+    "semantic_hash": "3adcbdb05fe939ae36ca85ae51726079"
   },
   "index.ts": {
-    "mtime": 1787071176.0012064,
-    "ast_hash": "d3c22a1ac01f212c1f8435eb678fdace",
-    "semantic_hash": "d3c22a1ac01f212c1f8435eb678fdace"
+    "mtime": 1787612370.8549361,
+    "ast_hash": "4d904865ba99f929c2dc87dc43a41d67",
+    "semantic_hash": "4d904865ba99f929c2dc87dc43a41d67"
   },
   "package.json": {
-    "mtime": 1787071176.001267,
-    "ast_hash": "a14dba4a2c91321c2a78c5b13fdaddf7",
-    "semantic_hash": "a14dba4a2c91321c2a78c5b13fdaddf7"
-  },
-  "scripts/assert-no-tenant-deletes.py": {
-    "mtime": 1787071176.0027664,
-    "ast_hash": "1da89c51c698cdcf71c69e216cd64d42",
-    "semantic_hash": "1da89c51c698cdcf71c69e216cd64d42"
+    "mtime": 1787612370.8550136,
+    "ast_hash": "f308bf2053e483ef2a604f5cd49fe607",
+    "semantic_hash": "f308bf2053e483ef2a604f5cd49fe607"
   },
   "scripts/assert-placeholders-substituted.py": {
-    "mtime": 1787071176.0027664,
-    "ast_hash": "dd2dfccba76d2c1668d1a5b1c7121f6b",
-    "semantic_hash": "dd2dfccba76d2c1668d1a5b1c7121f6b"
+    "mtime": 1787612370.8565342,
+    "ast_hash": "fd091ce9bd96d3178499de64db541968",
+    "semantic_hash": "fd091ce9bd96d3178499de64db541968"
   },
   "tsconfig.json": {
-    "mtime": 1787071176.0027664,
+    "mtime": 1787612370.8565342,
     "ast_hash": "cc33d6b917e44286b3d29b2e92c8f3c9",
     "semantic_hash": "cc33d6b917e44286b3d29b2e92c8f3c9"
   },
   ".github/workflows/infra-ci.yml": {
-    "mtime": 1787071175.9987798,
-    "ast_hash": "cc81742530cc6797d6f72a49c3ff5e23",
-    "semantic_hash": "cc81742530cc6797d6f72a49c3ff5e23"
+    "mtime": 1787612370.8525205,
+    "ast_hash": "dbb33ea5eb3d3f46f5c21ba4bbb387b2",
+    "semantic_hash": "dbb33ea5eb3d3f46f5c21ba4bbb387b2"
   },
   ".pre-commit-config.yaml": {
-    "mtime": 1787059892.659375,
-    "ast_hash": "a9207d2d595865ad6f3f1e1ba4450c26",
-    "semantic_hash": "a9207d2d595865ad6f3f1e1ba4450c26"
+    "mtime": 1787612370.8525205,
+    "ast_hash": "08dce04bef64eb32eef54cd2e769d759",
+    "semantic_hash": "08dce04bef64eb32eef54cd2e769d759"
   },
   "CLAUDE.md": {
-    "mtime": 1787059892.659375,
-    "ast_hash": "b8b0298126cbb010dc1ab6266757f7fe",
-    "semantic_hash": "b8b0298126cbb010dc1ab6266757f7fe"
+    "mtime": 1787612370.8525205,
+    "ast_hash": "997d562e506dbd127e4d684ac2c89659",
+    "semantic_hash": "997d562e506dbd127e4d684ac2c89659"
   },
   "Pulumi.yaml": {
-    "mtime": 1786975999.586702,
-    "ast_hash": "7268dfe6bdcedc00f553e9773849f22a",
-    "semantic_hash": "7268dfe6bdcedc00f553e9773849f22a"
+    "mtime": 1787612370.8525205,
+    "ast_hash": "3a0f0b55d9492d607382e419287fc5b3",
+    "semantic_hash": "3a0f0b55d9492d607382e419287fc5b3"
   },
   "README.md": {
-    "mtime": 1787059892.659375,
-    "ast_hash": "36fd61ed71e2cf3532241657505656fd",
-    "semantic_hash": "36fd61ed71e2cf3532241657505656fd"
+    "mtime": 1787612370.8525205,
+    "ast_hash": "732b1a4423176ed2af82f98d28a3b80a",
+    "semantic_hash": "732b1a4423176ed2af82f98d28a3b80a"
   },
   "README.tenant.md": {
-    "mtime": 1787059892.659375,
-    "ast_hash": "104ed16b5339ca9dd1090b7c294f4ab7",
-    "semantic_hash": "104ed16b5339ca9dd1090b7c294f4ab7"
+    "mtime": 1787612370.8525205,
+    "ast_hash": "e1f6cd64fb3a5d6226ed668cf926a04f",
+    "semantic_hash": "e1f6cd64fb3a5d6226ed668cf926a04f"
   },
   "RUNBOOK-bootstrap.md": {
-    "mtime": 1787059892.659375,
-    "ast_hash": "b388ebf59fc46f01f9f5745a9f59cb0c",
-    "semantic_hash": "b388ebf59fc46f01f9f5745a9f59cb0c"
+    "mtime": 1787612370.8525205,
+    "ast_hash": "4940aeb42fad89f64188e7a71fcd64d9",
+    "semantic_hash": "4940aeb42fad89f64188e7a71fcd64d9"
   },
   "scripts/assert-no-committed-pulumi-secrets.py": {
-    "mtime": 1787071176.001267,
+    "mtime": 1787612370.8550136,
     "ast_hash": "59821ec3dc0333bb02bf93cd80ab2b26",
     "semantic_hash": "59821ec3dc0333bb02bf93cd80ab2b26"
   },
   "scripts/test_assert_no_committed_pulumi_secrets.py": {
-    "mtime": 1787071176.0027664,
+    "mtime": 1787612370.8565342,
     "ast_hash": "5d164495f623bbda5dff69c2885aec99",
     "semantic_hash": "5d164495f623bbda5dff69c2885aec99"
   },
@@ -88,5 +83,20 @@
     "mtime": 1787071175.9987798,
     "ast_hash": "a3a40d6065349b725b09e50b5f9ef764",
     "semantic_hash": "a3a40d6065349b725b09e50b5f9ef764"
+  },
+  "scripts/generate-tenant-repo.py": {
+    "mtime": 1787612370.8565342,
+    "ast_hash": "7372fd06638b0bef3ce5b9dda024bbeb",
+    "semantic_hash": "7372fd06638b0bef3ce5b9dda024bbeb"
+  },
+  "scripts/test_assert_placeholders_substituted.py": {
+    "mtime": 1787612370.8565342,
+    "ast_hash": "21b425d968c609fd082cbdefb4172eb2",
+    "semantic_hash": "21b425d968c609fd082cbdefb4172eb2"
+  },
+  "scripts/test_generate_tenant_repo.py": {
+    "mtime": 1787612370.8565342,
+    "ast_hash": "f39f3a3c9e64840aa5507902d783ee2b",
+    "semantic_hash": "f39f3a3c9e64840aa5507902d783ee2b"
   }
 }
