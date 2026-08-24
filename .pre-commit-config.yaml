@@ -38,13 +38,6 @@ repos:
         files: \.ts$
         pass_filenames: false
 
-      - id: tenant-delete-guard
-        name: tenant delete guard self-test
-        entry: python3 scripts/assert-no-tenant-deletes.py --self-test
-        language: system
-        files: ^scripts/assert-no-tenant-deletes\.py$
-        pass_filenames: false
-
       # Stdlib unittest, so there is nothing to install. It also exercises the
       # committed-secret guard's own `--self-test`, which is why that one has
       # no hook of its own -- CI still invokes it directly, because CI runs the

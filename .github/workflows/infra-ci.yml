@@ -1,67 +1,66 @@
 name: Infra CI
 
-# Type-checks this repo's Pulumi program on every PR, and applies its one
-# stack on every push to main.
+# Type-checks this repo's Pulumi program on every PR, and on every push to main
+# applies its one stack and then deploys the pinned image to this tenant's
+# Compose slot on its app host.
 #
-# Mirrors branchLeft/ghost-platform's infra/platform-ci.yml; the same five
-# guardrails apply here:
+# WHAT THIS STACK IS. The `GhostTenant` component declares no cloud resources.
+# Everything durable a tenant uses already exists and is shared -- the app host,
+# `db1`, the Object Storage bucket -- so what is per-tenant is *configuration*,
+# and this stack is the versioned, reviewed, passphrase-wrapped record of it.
+# `pulumi up` therefore renders rather than creates: its useful products are the
+# `composeFile` and `secretsEnvFile` outputs an operator places on the host.
 #
-#   1. The apply runs only on push to main. Pull requests get type-check
-#      only -- the WIF-federated deployer SA that can create/mutate/delete
-#      real infrastructure is never reachable from a PR run.
-#   2. Credentials are short-lived, exchanged via Workload Identity
-#      Federation and scoped by attributeCondition to this repository alone.
-#      No service-account key exists anywhere.
-#   3. The deployer identity, its federation and its roles are created by the
-#      platform's provisioning flow and live in that stack's state, not this
-#      one. This program cannot widen its own permissions because it does not
-#      declare them.
-#   4. A preflight parses the real `pulumi preview` plan for this exact run
-#      and aborts before `pulumi up` if it would destroy protected
-#      infrastructure (scripts/assert-no-tenant-deletes.py).
-#   5. The deploy job declares an `environment`. It is a deployment-history
-#      label here and does not gate -- see the `environment:` key below.
-#   6. This stack's encryption salt is restored from a repository secret at
-#      deploy time instead of being committed beside the ciphertexts it
-#      unwraps, and a separate job refuses a tree that carries one
-#      (scripts/assert-no-committed-pulumi-secrets.py).
+# WHAT DEPLOYS. Only the image. `branchleft-deploy` on the app host writes
+# /etc/branchleft/<slug>.image.env and restarts branchleft-compose@<slug>; it
+# never writes the secrets file and never rewrites the Compose file, both of
+# which are root-owned and operator-written. So a compromised copy of this
+# repo's credentials can change which image this tenant runs and nothing else on
+# that host -- see the reach table in the platform's migration programme doc.
+#
+# CREDENTIALS. Every credential this workflow holds is an **environment**
+# secret on `production`, never a repository secret. A repository secret is
+# readable by any workflow run in this repo, including one from a branch; an
+# environment secret is readable only by a job that declares that environment,
+# which is only the deploy job below. On a public repo the environment also
+# carries a required-reviewer rule. On a private one it cannot (that is a plan
+# tier limit, not a configuration mistake), and the scoping above is then the
+# whole of what the environment buys -- which is still the property that matters
+# here.
+#
+#   APP_HOST_DEPLOY_KEY   this tenant's own ed25519 private key. Never shared
+#                         with another tenant and never reused across hosts.
+#                         Its authorized_keys entry on the host carries a forced
+#                         command naming this stack, written by root, so the key
+#                         cannot address any other stack: there is no
+#                         caller-supplied stack name anywhere on the path.
+#   PULUMI_CONFIG_PASSPHRASE  this stack's own secrets passphrase, minted at
+#                         onboarding, never shared with another tenant or with
+#                         the platform repo that created it.
+#   PULUMI_ENCRYPTION_SALT    this stack's `encryptionsalt`, held as a secret
+#                         rather than committed beside the ciphertexts it
+#                         unwraps (branchLeft/standards PUL-12). A salt in a tree
+#                         anyone can clone is an offline verifier for the
+#                         passphrase above.
+#   HETZNER_S3_ACCESS_KEY_ID / HETZNER_S3_SECRET_ACCESS_KEY
+#                         reach the Pulumi state backend. Not scoped per stack:
+#                         they reach every tenant stack in that bucket, which is
+#                         why that bucket holds tenant stacks alone and never the
+#                         estate's own.
+#
+# No GCP identity, no Workload Identity Federation, no service account. The
+# provider-enforced repository pin those gave is not replaced like for like; the
+# environment scoping above is the replacement.
 #
 # `npm ci` authenticates with the run's own GITHUB_TOKEN.
 # @branchleft/ghost-platform-tenant is a public package, and any authenticated
-# token can read one, so a tenant repo holds no long-lived credential of its
-# own. GitHub Packages' npm registry still rejects anonymous requests, which is
-# why a token is needed at all.
+# token can read one, so a tenant repo holds no long-lived package credential.
+# GitHub Packages' npm registry still rejects anonymous requests, which is why a
+# token is needed at all.
 #
-# `PULUMI_STATE_BUCKET`: this tenant has its own state bucket, written as a
-# repo variable by the provisioning flow. Per-tenant rather than shared so a
-# plain bucket-scoped `roles/storage.objectAdmin` is already correctly
-# confined and no tenant can enumerate another's stacks -- an object-name
-# prefix condition on a shared bucket cannot do that job, because
-# `storage.objects.list` is evaluated against the bucket and the filestate
-# backend resolves a stack by listing.
-#
-# `PULUMI_CONFIG_PASSPHRASE`: this tenant's own secrets passphrase, written as
-# a repo secret by the provisioning flow at onboarding time and never shared
-# with any other tenant or with the platform repo that created it. Bound in
-# each deploy-job step's own `env:` rather than at job level -- a job-level
-# binding sits in the environment of every step in the job, including
-# `npm ci` and its transitive postinstall scripts. Without it Pulumi cannot
-# unwrap this stack's data key, and an unset repository secret expands to an
-# empty string here rather than an absent variable, which the guard step below
-# exists to catch.
-#
-# `PULUMI_ENCRYPTION_SALT`: this stack's encryption salt, held as a repo secret
-# rather than committed beside the ciphertexts it unwraps. A salt in a tree
-# anyone can clone is an offline verifier for the passphrase above -- whoever
-# holds it can test candidates at their own rate, with no state backend and no
-# cloud IAM in the loop -- which `branchLeft/standards` PUL-12 bans outright.
-# The deploy job appends it to the working copy of the stack config for that
-# job only.
-#
-# Both checkout steps set `persist-credentials: false` regardless: without
-# it, the token GitHub issues for checkout would sit on disk for every later
-# step in the job -- including `npm ci`'s transitive postinstall scripts --
-# to read.
+# Both checkout steps set `persist-credentials: false` regardless: without it,
+# the token GitHub issues for checkout would sit on disk for every later step in
+# the job -- including `npm ci`'s transitive postinstall scripts -- to read.
 
 on:
   push:
@@ -100,40 +99,49 @@ jobs:
       - name: Type check
         run: npx tsc --noEmit
 
-      # Skipped in the template repo itself, where an unsubstituted
-      # placeholder is the correct, permanent state of `main` -- this step
-      # exists for repos generated *from* the template. `!= true` (not
-      # `== false`) so an absent/null `is_template` -- which live runs
-      # against this repo confirm does not happen for push or pull_request,
-      # but a future GitHub payload change is not this repo's to guarantee
-      # -- fails open into running the check, not skipping it.
+      # Skipped in the template repo itself, where an unsubstituted placeholder
+      # is the correct, permanent state of `main` -- this step exists for repos
+      # generated *from* the template. `!= true` (not `== false`) so an
+      # absent/null `is_template` fails open into running the check, not
+      # skipping it.
       - name: Verify template placeholders are substituted
         if: github.event.repository.is_template != true
         run: python3 scripts/assert-placeholders-substituted.py
 
-      # Cheap, credential-free, and catches the way the deploy job's safety
-      # gates die quietly. Runs here as well as in `deploy` so the PR that
-      # introduces the drift fails, rather than the merge that ships it.
-      # Unlike the placeholder check above, this is meaningful in the
-      # template repo too -- it doesn't depend on placeholders being
-      # substituted -- so it always runs.
-      - name: Verify the delete-guard still covers every protected resource
+      # The guard ships inside the component now, rather than being a copy in
+      # this repo that has to be kept in step with a component it does not
+      # travel with. `--verify-coverage` takes the package ROOT: the script
+      # looks for `dist/index.js` beneath what it is given, so pointing it at
+      # `dist` asks for `dist/dist/index.js` and it reports a missing tree
+      # rather than a coverage result.
+      #
+      # Cheap, credential-free, and it catches the way the deploy job's safety
+      # gates die quietly -- so the pull request that introduces the drift
+      # fails, rather than the merge that ships it.
+      - name: Verify the delete-guard still covers every protected field
         run: |
-          python3 scripts/assert-no-tenant-deletes.py --self-test
-          python3 scripts/assert-no-tenant-deletes.py --verify-coverage node_modules/@branchleft/ghost-platform-tenant/dist
+          GUARD=node_modules/@branchleft/ghost-platform-tenant/scripts/assert-no-tenant-deletes.py
+          python3 "$GUARD" --self-test
+          python3 "$GUARD" --verify-coverage node_modules/@branchleft/ghost-platform-tenant
 
-  # Its own job, and deliberately not one `deploy` needs. What makes a
-  # committed salt dangerous is publication: one already on `main` is already
-  # in every clone, so refusing to apply does not take it back and would take
-  # the tenant's site down instead. The gate that matters is the merge, which
-  # means this check has to be in the branch ruleset to have any teeth -- see
-  # README.md. The deploy job's own salt step reports the same condition as a
-  # warning and deploys on the committed value, so a repo in that state keeps
-  # working while it is fixed.
-  #
-  # It runs in the template repo too, where the scan finds no stack config at
-  # all: that file arrives when a tenant repo is generated, and the guard has
-  # to sit here to travel with it.
+      # Run here as well as in the credential-free `secret-guard` job, and the
+      # duplication is the point: one assertion in
+      # `test_generate_tenant_repo.py` compares this repo's copy of the reserved
+      # stack names against the installed component's, and skips itself when the
+      # package is absent. `secret-guard` deliberately installs nothing, so
+      # without this step that assertion would be permanently skipped and a
+      # drifted copy would fail open.
+      - name: Script unit tests, against the installed component
+        run: python3 -m unittest discover -s scripts -p 'test_*.py'
+
+  # Its own job, and deliberately not one `deploy` needs. What makes a committed
+  # salt dangerous is publication: one already on `main` is already in every
+  # clone, so refusing to apply does not take it back and would take the tenant's
+  # site down instead. The gate that matters is the merge, which means this check
+  # has to be in the branch ruleset to have any teeth -- see README.md. The
+  # deploy job's own salt step reports the same condition as a warning and
+  # deploys on the committed value, so a repo in that state keeps working while
+  # it is fixed.
   secret-guard:
     name: Committed-secret guard
     runs-on: ubuntu-latest
@@ -150,8 +158,8 @@ jobs:
         run: python3 -m unittest discover -s scripts -p 'test_*.py'
 
       # `--scan-tree` rather than a changed-file list: a salt that arrived on a
-      # branch nobody checked has to fail here rather than at publication, and
-      # a hook pattern that silently stops matching is a hook that passes
+      # branch nobody checked has to fail here rather than at publication, and a
+      # hook pattern that silently stops matching is a hook that passes
       # everything.
       - name: Refuse a committed encryption salt
         run: |
@@ -159,7 +167,7 @@ jobs:
           python3 scripts/assert-no-committed-pulumi-secrets.py --scan-tree .
 
   deploy:
-    name: Deploy (pulumi up)
+    name: Deploy
     runs-on: ubuntu-latest
     needs: [typecheck]
 
@@ -168,24 +176,24 @@ jobs:
     # running, not skipping.
     if: github.event_name == 'push' && github.ref == 'refs/heads/main' && github.event.repository.is_template != true
 
-    # Required reviewers and wait timers are public-repository-only for
-    # GitHub Free, Pro and Team alike, and a tenant repo is private by
-    # design -- so no rule attached here would gate anything. An environment
-    # carrying no protection rule does not pause a run and does not say so:
-    # read `protection_rules`, never the presence of this key.
+    # Load-bearing, not a deployment-history label: every secret this job reads
+    # is scoped to this environment, so no other job in this repo -- including
+    # one added on a branch -- can read any of them. On a public repo it also
+    # carries the required-reviewer rule. An environment carrying no protection
+    # rule does not pause a run and does not say so: read `protection_rules`,
+    # never the presence of this key.
     environment: production
 
-    # Job-level permissions replace the workflow-level block entirely --
-    # every scope this job needs must be listed here.
+    # Job-level permissions replace the workflow-level block entirely -- every
+    # scope this job needs must be listed here. `id-token` is gone with WIF.
     permissions:
       contents: read
       packages: read
-      id-token: write
 
-    # `cancel-in-progress: false` deliberately -- cancelling an apply
-    # mid-flight leaves the stack locked and half-applied.
+    # `cancel-in-progress: false` deliberately -- cancelling mid-flight leaves
+    # the stack locked, or the host between an image pin and its restart.
     concurrency:
-      group: pulumi-deploy-__TENANT_NAME__
+      group: deploy-__TENANT_NAME__
       cancel-in-progress: false
 
     steps:
@@ -195,9 +203,9 @@ jobs:
           persist-credentials: false
 
       # Ahead of every other step -- a literal `__TENANT_NAME__` must never
-      # reach `pulumi preview` (it would select a stack that doesn't exist)
-      # let alone `pulumi up`, and this check needs neither npm ci's
-      # dependencies nor GCP credentials to run.
+      # reach `pulumi preview` (it would select a stack that does not exist) let
+      # alone `pulumi up`, and this check needs no dependencies and no
+      # credentials to run.
       - name: Verify template placeholders are substituted
         run: python3 scripts/assert-placeholders-substituted.py
 
@@ -214,72 +222,76 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Authenticate to GCP (Workload Identity Federation)
-        uses: google-github-actions/auth@7c6bc770dae815cd3e89ee6cdf493a5fab2cc093 # v3.0.0
-        with:
-          project_id: ${{ vars.GCP_PROJECT_ID }}
-          workload_identity_provider: ${{ vars.GCP_WORKLOAD_IDENTITY_PROVIDER }}
-          service_account: ${{ vars.GCP_DEPLOYER_SA_EMAIL }}
-
       - name: Install Pulumi CLI
         uses: pulumi/actions@8e5e406f4007fca908480587cb9893c07090f58d # v7.0.0
 
       # Pulumi's passphrase provider reads PULUMI_CONFIG_PASSPHRASE from the
-      # environment via a plain lookup, which does not distinguish "unset"
-      # from "set to an empty string" -- and GitHub expands a repository
-      # secret that does not exist to `''`, not to an error. So a missing
-      # secret would not fail here or later; it would try to unwrap this
-      # stack's data key with an empty passphrase and fail with a message
-      # about the key, not about the secret. Cheap and credential-free, so it
-      # runs before anything that would act on the stack under that empty
-      # value.
+      # environment via a plain lookup, which does not distinguish "unset" from
+      # "set to an empty string" -- and GitHub expands a secret that does not
+      # exist to `''`, not to an error. So a missing secret would not fail here
+      # or later; it would try to unwrap this stack's data key with an empty
+      # passphrase and fail with a message about the key, not about the secret.
       - name: Confirm this stack's secrets passphrase is set
         env:
           PULUMI_CONFIG_PASSPHRASE: ${{ secrets.PULUMI_CONFIG_PASSPHRASE }}
         run: |
           if [ -z "$PULUMI_CONFIG_PASSPHRASE" ]; then
-            echo "::error::PULUMI_CONFIG_PASSPHRASE is empty or unset. Refusing to continue: Pulumi would treat an empty value as a valid passphrase rather than failing closed."
+            echo "::error::PULUMI_CONFIG_PASSPHRASE is empty or unset on this repository's production environment. Refusing to continue: Pulumi would treat an empty value as a valid passphrase rather than failing closed."
             exit 1
           fi
 
-      # An unset repo variable resolves to an empty string with no error, so
-      # `pulumi login gs://` would otherwise fail somewhere further downstream
-      # with a message about the backend rather than about the variable.
+      # The full backend URL, not a bucket name: an s3:// backend needs the
+      # endpoint, path-style and region query parameters too, and a repo holding
+      # only the bucket would have to rebuild them -- with the endpoint host and
+      # the region having to name the same location, or the failure is an opaque
+      # 403 that reads as a credential problem.
+      #
+      # An unset repository variable resolves to an empty string with no error,
+      # so `pulumi login` would otherwise fail somewhere downstream with a
+      # message about the backend rather than about the variable.
       - name: Log in to the Pulumi state backend
         env:
-          STATE_BUCKET: ${{ vars.PULUMI_STATE_BUCKET }}
+          PULUMI_BACKEND_URL: ${{ vars.PULUMI_BACKEND_URL }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.HETZNER_S3_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.HETZNER_S3_SECRET_ACCESS_KEY }}
         run: |
-          if [ -z "$STATE_BUCKET" ]; then
-            echo "::error::the PULUMI_STATE_BUCKET repo variable is unset or empty"
+          if [ -z "$PULUMI_BACKEND_URL" ]; then
+            echo "::error::the PULUMI_BACKEND_URL repository variable is unset or empty"
             exit 1
           fi
-          pulumi login "gs://$STATE_BUCKET"
+          case "$PULUMI_BACKEND_URL" in
+            s3://*) ;;
+            *)
+              echo "::error::PULUMI_BACKEND_URL must be an s3:// backend. A gs:// backend would give this tenant a GCP dependency, which the Hetzner migration exists to remove."
+              exit 1
+              ;;
+          esac
+          if [ -z "$AWS_ACCESS_KEY_ID" ] || [ -z "$AWS_SECRET_ACCESS_KEY" ]; then
+            echo "::error::HETZNER_S3_ACCESS_KEY_ID / HETZNER_S3_SECRET_ACCESS_KEY are empty or unset on this repository's production environment; the state backend is unreachable without them."
+            exit 1
+          fi
+          pulumi login "$PULUMI_BACKEND_URL"
 
       # The salt is not committed (branchLeft/standards PUL-12). It is appended
       # to the working copy here, for this job only, and never committed back.
       # Placed after the backend login and before `pulumi preview` -- the first
       # command that reads an encrypted value, not `up`.
       #
-      # The value arrives through `env:` rather than as `${{ secrets.X }}`
-      # inside `run`: an expression in `run` is substituted before the shell
-      # parses the line, so a value carrying shell metacharacters would
-      # execute.
+      # The value arrives through `env:` rather than as `${{ secrets.X }}` inside
+      # `run`: an expression in `run` is substituted before the shell parses the
+      # line, so a value carrying shell metacharacters would execute.
       #
-      # It skips rather than appends when the config already carries a salt,
-      # and asks the guard script rather than matching the key again here --
-      # two definitions of "a salt is committed" drift apart. Skipping is not
+      # It skips rather than appends when the config already carries a salt, and
+      # asks the guard script rather than matching the key again here -- two
+      # definitions of "a salt is committed" drift apart. Skipping is not
       # politeness: appending would leave a duplicate YAML mapping key, and the
-      # two values would have to agree for the file to mean anything even where
-      # a parser tolerated it. A repo in that state also has no secret to
-      # restore from, so requiring one would break a deploy that works.
+      # two values would have to agree for the file to mean anything even where a
+      # parser tolerated it.
       #
-      # Fails closed on an empty value, naming the repository secret rather
-      # than the passphrase: otherwise Pulumi reads a config whose salt line is
-      # blank, reports this stack's secrets as corrupt, and sends whoever
-      # debugs it at the passphrase. The `v1:` prefix is checked for the same
-      # reason -- the value reaches the secret by hand, so a truncated paste or
-      # one that kept its `encryptionsalt: ` key in front is the realistic
-      # failure, and it would otherwise surface as a decryption error.
+      # Fails closed on an empty value, naming the repository secret rather than
+      # the passphrase: otherwise Pulumi reads a config whose salt line is blank,
+      # reports this stack's secrets as corrupt, and sends whoever debugs it at
+      # the passphrase. The `v1:` prefix is checked for the same reason.
       - name: Restore the stack's encryption salt
         env:
           PULUMI_ENCRYPTION_SALT: ${{ secrets.PULUMI_ENCRYPTION_SALT }}
@@ -290,22 +302,21 @@ jobs:
             exit 1
           fi
           # Captured rather than shown: on exit 1 the script's ::error::
-          # annotations would mark a step that succeeded, and on any other
-          # status they are the only evidence of what went wrong. `|| status=`
-          # keeps `set -e` from aborting on the non-zero exit this expects.
+          # annotations would mark a step that succeeded, and on any other status
+          # they are the only evidence of what went wrong. `|| status=` keeps
+          # `set -e` from aborting on the non-zero exit this expects.
           #
           # The script's exit status is three-valued: 0 clean, 1 a salt is
           # committed, 3 a named file could not be read. Only 1 may skip the
-          # restore. A moved script, an absent interpreter, a config that is
-          # not valid UTF-8 and argparse's own usage exit all land outside
-          # that, and treating any of them as a committed salt would deploy
-          # with no salt at all -- then send whoever reads the resulting
-          # decryption error at the passphrase, which is the misdiagnosis the
-          # checks below exist to prevent.
+          # restore. A moved script, an absent interpreter, a config that is not
+          # valid UTF-8 and argparse's own usage exit all land outside that, and
+          # treating any of them as a committed salt would deploy with no salt at
+          # all -- then send whoever reads the resulting decryption error at the
+          # passphrase, which is the misdiagnosis these checks exist to prevent.
           salt_status=0
           salt_report=$(python3 scripts/assert-no-committed-pulumi-secrets.py "$config" 2>&1) || salt_status=$?
           if [ "$salt_status" -eq 1 ]; then
-            echo "::warning::$config already carries an encryptionsalt, so none was restored and this stack still decrypts with the committed value. Move that value into the PULUMI_ENCRYPTION_SALT repository secret and delete the line from the file; the Committed-secret guard job fails while it is there."
+            echo "::warning::$config already carries an encryptionsalt, so none was restored and this stack still decrypts with the committed value. Move that value into the PULUMI_ENCRYPTION_SALT environment secret and delete the line from the file; the Committed-secret guard job fails while it is there."
             exit 0
           fi
           if [ "$salt_status" -ne 0 ]; then
@@ -314,13 +325,13 @@ jobs:
             exit 1
           fi
           if [ -z "$PULUMI_ENCRYPTION_SALT" ]; then
-            echo "::error::the PULUMI_ENCRYPTION_SALT repository secret is empty or unset, and $config carries no salt of its own. Set the secret to this stack's encryption salt before deploying."
+            echo "::error::the PULUMI_ENCRYPTION_SALT environment secret is empty or unset, and $config carries no salt of its own. Set the secret to this stack's encryption salt before deploying."
             exit 1
           fi
           case "$PULUMI_ENCRYPTION_SALT" in
             v1:*) ;;
             *)
-              echo "::error::the PULUMI_ENCRYPTION_SALT repository secret does not look like a Pulumi-generated salt (expected a 'v1:' prefix). Set it to the value alone, without the 'encryptionsalt: ' key in front of it."
+              echo "::error::the PULUMI_ENCRYPTION_SALT environment secret does not look like a Pulumi-generated salt (expected a 'v1:' prefix). Set it to the value alone, without the 'encryptionsalt: ' key in front of it."
               exit 1
               ;;
           esac
@@ -329,45 +340,128 @@ jobs:
       - name: Preview the plan
         env:
           PULUMI_CONFIG_PASSPHRASE: ${{ secrets.PULUMI_CONFIG_PASSPHRASE }}
+          PULUMI_BACKEND_URL: ${{ vars.PULUMI_BACKEND_URL }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.HETZNER_S3_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.HETZNER_S3_SECRET_ACCESS_KEY }}
         run: pulumi preview --stack __TENANT_NAME__ --json > preview.json
 
-      - name: Refuse to apply a plan that destroys tenant infrastructure
+      # `set -e` is load-bearing here, not boilerplate: the delete check is not
+      # the last command in this script, and without errexit its non-zero exit
+      # would be swallowed and the step's exit code would end up being the
+      # self-test's. That shape is exactly how a guard reports green over a plan
+      # that would have orphaned a tenant's content volume.
+      #
+      # The full plan is NOT printed on failure, unlike the GCP-era version of
+      # this step. This stack's outputs include `secretsEnvFile`, a Pulumi
+      # secret: Pulumi renders it as `[secret]` in `--json`, and the difference
+      # between relying on that and not printing the plan at all is one upstream
+      # change. `pulumi preview --diff` from a checkout is the debugging path.
+      - name: Refuse to apply a plan that orphans tenant data
         run: |
-          python3 scripts/assert-no-tenant-deletes.py --self-test
-          python3 scripts/assert-no-tenant-deletes.py --verify-coverage node_modules/@branchleft/ghost-platform-tenant/dist
-
-          if ! python3 scripts/assert-no-tenant-deletes.py preview.json; then
-            echo "--- full plan follows ---"
-            python3 -m json.tool preview.json
-            exit 1
-          fi
+          set -euo pipefail
+          GUARD=node_modules/@branchleft/ghost-platform-tenant/scripts/assert-no-tenant-deletes.py
+          python3 "$GUARD" --self-test
+          python3 "$GUARD" --verify-coverage node_modules/@branchleft/ghost-platform-tenant
+          python3 "$GUARD" preview.json
 
       - name: Apply
         env:
           PULUMI_CONFIG_PASSPHRASE: ${{ secrets.PULUMI_CONFIG_PASSPHRASE }}
+          PULUMI_BACKEND_URL: ${{ vars.PULUMI_BACKEND_URL }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.HETZNER_S3_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.HETZNER_S3_SECRET_ACCESS_KEY }}
         run: pulumi up --stack __TENANT_NAME__ --yes
 
+      # Read from the applied stack rather than from the config file, so what is
+      # deployed is what the apply above recorded -- a config value the apply
+      # rejected must not reach the host.
+      - name: Read the image this stack pins
+        id: image
+        env:
+          PULUMI_CONFIG_PASSPHRASE: ${{ secrets.PULUMI_CONFIG_PASSPHRASE }}
+          PULUMI_BACKEND_URL: ${{ vars.PULUMI_BACKEND_URL }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.HETZNER_S3_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.HETZNER_S3_SECRET_ACCESS_KEY }}
+        run: |
+          set -euo pipefail
+          image=$(pulumi stack output image --stack __TENANT_NAME__)
+          # A failing command substitution inside a here-doc or an `echo` does
+          # not trip errexit, so the value is captured and checked before it can
+          # flow into an ssh invocation as an empty string.
+          if [ -z "$image" ]; then
+            echo "::error::the stack output 'image' is empty; refusing to deploy"
+            exit 1
+          fi
+          echo "ref=$image" >> "$GITHUB_OUTPUT"
+
+      # The whole of this repo's reach on the app host. The key's authorized_keys
+      # entry carries `restrict` and a forced command naming this tenant's stack,
+      # written by root, so sshd executes exactly that whatever this step asks
+      # for: the reference on stdin is the only thing this side supplies.
+      #
+      # `StrictHostKeyChecking=yes` against a committed `known_hosts`, never
+      # `ssh-keyscan`: keyscan is trust-on-first-use, so a scan-then-connect
+      # would hand this key to whatever answered.
+      #
+      # The key file is written with a restrictive umask rather than chmod'ed
+      # afterwards -- ssh refuses a group-readable key, and the window between
+      # create and chmod is one this can simply not have.
+      - name: Deploy the pinned image to this tenant's slot
+        env:
+          DEPLOY_KEY: ${{ secrets.APP_HOST_DEPLOY_KEY }}
+          APP_HOST_SSH_ADDRESS: ${{ vars.APP_HOST_SSH_ADDRESS }}
+          IMAGE_REF: ${{ steps.image.outputs.ref }}
+        run: |
+          set -euo pipefail
+          if [ -z "$DEPLOY_KEY" ]; then
+            echo "::error::APP_HOST_DEPLOY_KEY is empty or unset on this repository's production environment. It is this tenant's own slot key, installed on the app host by an operator running provision_deploy_slot.py; see RUNBOOK-bootstrap.md."
+            exit 1
+          fi
+          if [ -z "$APP_HOST_SSH_ADDRESS" ]; then
+            echo "::error::the APP_HOST_SSH_ADDRESS repository variable is unset or empty. It is the app host's PUBLIC address -- CI runs on GitHub-hosted runners and cannot reach the private one the stack binds its port to."
+            exit 1
+          fi
+          # A file of comments is what the template ships, so "the file exists"
+          # proves nothing. What matters is that it carries a key.
+          if ! grep -qE '^[^#[:space:]]' known_hosts; then
+            echo "::error::known_hosts carries no host key line. Fill it in from the host itself over an operator root session -- never with ssh-keyscan, which is trust-on-first-use and would defeat the pinning. The file's own header carries the command."
+            exit 1
+          fi
+          umask 077
+          printf '%s\n' "$DEPLOY_KEY" > deploy_key
+          printf '%s\n' "$IMAGE_REF" \
+            | ssh -T -i deploy_key \
+                -o IdentitiesOnly=yes \
+                -o StrictHostKeyChecking=yes \
+                -o UserKnownHostsFile=known_hosts \
+                -o BatchMode=yes \
+                "deploy@${APP_HOST_SSH_ADDRESS}"
+
+      - name: Remove the deploy key from the runner
+        if: always()
+        run: rm -f deploy_key
+
+      # Deliberately does not publish the preview plan, unlike the GCP-era
+      # version of this workflow: this stack carries a secret output, and a job
+      # summary on a public tenant repo is visible to anyone.
       - name: Write outcome to job summary
         if: always()
-        # Bound rather than interpolated. `github.sha` is not attacker-shaped,
-        # but a `${{ }}` inside `run` is substituted before the shell parses
-        # the script, and that property is worth being able to state without
+        # Bound rather than interpolated. Neither value is attacker-shaped, but a
+        # `${{ }}` inside `run` is substituted before the shell parses the
+        # script, and that property is worth being able to state without
         # exceptions.
         env:
           COMMIT_SHA: ${{ github.sha }}
+          IMAGE_REF: ${{ steps.image.outputs.ref }}
         run: |
           {
-            echo '## Tenant stack deploy'
+            echo '## Tenant deploy'
             echo
             echo "Commit: \`${COMMIT_SHA}\`"
+            echo "Image:  \`${IMAGE_REF:-not read - the run failed before the apply}\`"
             echo
-            echo '### Plan this run applied'
-            echo
-            echo '```json'
-            # The preview plan holds resource URNs, step ops and this stack's
-            # non-secret config. Safe to publish here -- this program sets no
-            # config value as `secure:`. If one ever is, revisit.
-            python3 -m json.tool preview.json 2>/dev/null \
-              || echo '(no plan captured -- the run failed before preview)'
-            echo '```'
+            echo 'The stack renders configuration; only the image reference above'
+            echo 'reached the host. `compose.yml` and `/etc/branchleft/<slug>.env`'
+            echo 'are root-owned and operator-written, and no automated path'
+            echo 'rewrites either.'
           } >> "$GITHUB_STEP_SUMMARY"

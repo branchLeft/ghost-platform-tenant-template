@@ -1,156 +1,150 @@
 # Runbook — a generated tenant repo
 
-**There is nothing to configure in this repo, per tenant, by hand.** No local
-`pulumi up`, no `gcloud` grant, no repo variable, no secret. Everything a
-tenant needs is created by the platform's provisioning flow, under the
-platform's provisioning identity, before this repo is handed over —
-`branchLeft/ghost-platform`'s `infra/platform/RUNBOOK-bootstrap.md` is where
-that identity is set up, once, for the whole platform.
+Onboarding is not finished when this repo appears. The provisioning flow creates
+the repo, mints and escrows this stack's passphrase, writes the non-secret
+config and opens a handover pull request; **everything that needs a credential
+or touches a host is done by an operator afterwards**, and this file is the
+tenant-side half of that. The whole sequence, including the host-side steps,
+lives in `branchLeft/ghost-platform`'s `RUNBOOK-tenant-onboarding.md`.
 
-This file exists for what happens _after_ handover: the one approval that
-completes onboarding, what CI deliberately cannot do, and how to recover when
-it refuses.
+That split is the design, not an unfinished automation. Provisioning runs on a
+GitHub-hosted runner: it cannot reach `db1` or the app host, which are on a
+private network, and giving it a credential that could install credentials on
+every app host is exactly the thing the deploy design exists not to have.
 
 ---
 
-## The one action a human takes here
+## What an operator finishes in the handover pull request
 
-**Merge the pull request the provisioning flow opened.** It commits
-`Pulumi.<tenant-name>.yaml` — this stack's config values. Until it merges, CI
-has no stack config to read and the deploy job fails.
+The pull request arrives carrying `Pulumi.<slug>.yaml` with the plain config
+values only. Three things have to be added to it before it can merge, all from a
+local checkout with `PULUMI_CONFIG_PASSPHRASE` exported:
 
-The passphrase that decrypts the stack is never in that file; it lives only in
-this repo's own `PULUMI_CONFIG_PASSPHRASE` secret. The encryption salt belongs
-in `PULUMI_ENCRYPTION_SALT`, which the deploy job appends to the working copy
-and never commits back — but **the provisioning flow does not set that secret
-yet, and still commits the salt into the file it hands over.** So read the PR
-before merging it:
+1. **The database password**, printed once by `provision_tenant_db.py` on `db1`
+   and printed by nothing afterwards:
 
-- **No `encryptionsalt` line in `Pulumi.<tenant-name>.yaml`.** The target state.
-  Merge, and the deploy restores the salt from the secret.
-- **An `encryptionsalt` line is present.** Also merge — the deploy job warns,
-  restores nothing and applies on the committed value, so onboarding completes
-  either way. Then follow "The committed-secret guard fails on a freshly
-  generated repo" below, which has an order that matters. The guard job stays
-  red until you do.
+   ```bash
+   pulumi config set --secret databasePassword --stack <slug>
+   ```
 
-Merging is itself the confirmation test: the push to `main` runs the `deploy`
-job, and a healthy first run finds nothing to do. `pulumi up` reporting
-`Resources: N unchanged` is the success condition, because the provisioning
-flow already applied everything. That single run proves the federation, the
-state-bucket access, this repo's own passphrase secret, the package-read
-token and every project role work, without changing anything.
+2. **This tenant's Object Storage key pair**, both halves secret:
 
-**A green run is not by itself proof the deploy did anything.** A skipped job
-still reports the overall run as successful. Check that `Deploy (pulumi up)`
-actually ran, and read its job summary.
+   ```bash
+   pulumi config set --secret mediaAccessKeyId --stack <slug>
+   pulumi config set --secret mediaSecretAccessKey --stack <slug>
+   ```
+
+3. **`known_hosts`**, filled in with the app host's SSH host key. Take it from
+   the host itself over your own root session — never `ssh-keyscan`, which is
+   trust-on-first-use and records whatever answered:
+
+   ```bash
+   ssh -i ~/.ssh/id_ed25519_hetzner root@<app-host-public-ipv4> \
+     'cat /etc/ssh/ssh_host_ed25519_key.pub'
+   ```
+
+   Write one line: `<app-host-public-ipv4> ` followed by that whole output.
+
+Each of those is a value a `workflow_dispatch` input could not have carried:
+inputs are plaintext in the run's API response and in its form. That the
+passphrase has to be used here, on day one, is deliberate — it is what proves
+the escrow works while the tenant is still new, rather than the first time
+anyone needs it being an incident.
+
+**Do not merge until the four host-side steps have run** and this repo's
+`APP_HOST_DEPLOY_KEY` environment secret is set. Merging runs the deploy job,
+and the deploy fails — loudly, which is the intent — if the slot has no key, if
+the Compose file is not on the host, or if the volumes were never provisioned.
+
+---
+
+## The confirmation test
+
+Merging is itself the test. A healthy first run:
+
+- applies the stack, reporting the component and its outputs;
+- reads `image` from the applied stack;
+- pipes it over the slot key, and `branchleft-deploy` pins the digest and
+  restarts `branchleft-compose@<slug>`.
 
 ```bash
 gh run list --repo branchLeft/<generated-repo> --workflow "Infra CI" --limit 3
 gh run view --repo branchLeft/<generated-repo> <run-id> --log-failed
 ```
 
-Nothing in that PR is a value that can be entered wrongly. If
-`imageDigestOrTag` looks wrong, that is worth a glance before merging; there
-is nothing else in the file a reviewer can usefully second-guess.
+**A green run is not by itself proof the deploy did anything.** A skipped job
+still reports the overall run as successful. Check that `Deploy` actually ran
+and read its job summary, which names the digest that reached the host.
 
 ---
 
-## What this repo holds, and what it does not
+## What CI deliberately cannot do
 
-This program declares one tenant's workload and one IAM binding. It does not
-declare the identity it runs as — a Pulumi program cannot create the identity
-it runs as, and the roles needed to try (`iam.serviceAccountAdmin`,
-`resourcemanager.projectIamAdmin`) are exactly the ones a deploy identity must
-never hold. The deployer service account, its Workload Identity pool and
-provider, its project roles and this tenant's state bucket all live in the
-platform's provisioning state. The passphrase that decrypts this stack lives
-only in this repo's own `PULUMI_CONFIG_PASSPHRASE` secret, minted once at
-onboarding time and never held by the platform's provisioning flow afterward.
+General rule: `standards/docs/infrastructure.md` IAC-1 — the signal is a refusal,
+the fix a privileged operation, never widening the credential to silence it.
 
-Four stack config values come from there too, written into
-`Pulumi.<tenant-name>.yaml` at provisioning time rather than read from a
-`pulumi.StackReference`: the database instance connection name, the tenant
-image repository path, the media bucket URL, and the deployer service account
-email. A stack reference cannot cross backends, and each tenant now has its
-own state bucket.
+- **Write `/etc/branchleft/<slug>.env` or `/opt/branchleft/<slug>/compose.yml`.**
+  `branchleft-deploy` writes `<slug>.image.env` and nothing else, and it is the
+  only command the slot key can run. Both other files are root-owned, and
+  between them they are the runtime-isolation posture.
+- **Deploy any other tenant.** The slot key's `authorized_keys` entry carries a
+  forced command naming this stack, so sshd runs exactly that whatever the
+  client asks for. There is no argument position for a second name.
+- **Get a shell on the app host.** `restrict` removes pty, agent forwarding and
+  port forwarding, and the forced command replaces subsystem requests too.
+- **Create this tenant's database, DB user, volumes or UID claim.** All four are
+  root-run scripts on hosts a GitHub runner cannot reach.
+- **Change its own credentials.** They are environment secrets on `production`;
+  a workflow run cannot write a secret.
+- **Reach the estate's own Pulumi state.** The state backend this repo logs into
+  is a bucket holding tenant stacks alone. It deliberately is not the bucket the
+  estate's checkpoint — and the production hcloud token inside it — lives in.
 
-Mail and bulk email are both separate from all of that: each is optional,
-per-tenant, and not part of provisioning. See the README's "Optional mail
-config" and "Optional bulk-email config" tables for the keys, and
-`GhostTenantMailArgs`/`GhostTenantBulkEmailArgs` in
-`@branchleft/ghost-platform-tenant` for what they become.
-
-**Once that mail config is live, also set Ghost's members support address to
-the tenant's authorized sending address** (Admin → Settings → Membership,
-"Support email address") — Ghost emails a confirmation link to that address
-to verify the change, so the mailbox must exist and be readable first.
-Skipped, this leaves member magic links failing with an opaque HTTP 400: the
-delivery host rejects the default `noreply@` sender with `501 5.5.4`, and
-nothing in Ghost surfaces that as the cause. See the platform's mail
-architecture documentation for the full mechanics.
-
-The one binding this repo does declare —
-`deployer-can-act-as-<tenant-name>-sa` — is here because it cannot be
-anywhere else: it names the runtime service account that this stack's own
-first apply creates.
+The one reach worth stating plainly rather than burying: the Object Storage
+credential that reaches this stack's state reaches **every tenant stack in that
+bucket**, because an S3 credential is not scoped per stack. That is a known,
+recorded property of the state backend, not something this repo can narrow.
 
 ---
 
-## Several things CI deliberately cannot do
+## Rotating this stack's passphrase
 
-General rule: `standards/docs/infrastructure.md` IAC-1 — the signal is a CI
-403, the fix a privileged apply, never widening the deployer to silence it.
+Rotating means **re-wrapping the stack**, not replacing the secret. Replacing
+only the secret leaves a checkpoint the new value cannot decrypt, and a stack
+whose passphrase is gone cannot even be `pulumi destroy`ed — destroy reads a
+checkpoint it can no longer decrypt.
 
-Each fails loudly with a 403 rather than silently, and because a failed
-resource aborts the whole `pulumi up`, everything else in that run is blocked
-too until the change is applied by an identity that holds the permission.
-This deliberately includes creating or rotating the tenant's DB user
-password, rotating the HMAC media-upload key, changing the tenant's
-storage-prefix IAM conditions, and writing or creating a Secret Manager
-version for any of the tenant's secrets (adding mail config to an
-already-provisioned tenant, say) — the deployer's role is scoped tightly
-enough that all of these need a platform-owner grant before CI's next run
-reports `unchanged` and resumes. It also cannot change its own identity,
-federation or roles, none of which it declares. The exact permission
-boundaries and the reasoning behind each one are recorded in the platform's
-private architecture documentation, not here.
+The order, from a checkout with the _old_ value exported:
 
-Recovery is the same pattern the rest of the programme uses: grant or apply by
-hand under a credential that holds the permission, `pulumi import` it into
-state, then merge.
+```bash
+pulumi stack change-secrets-provider passphrase --stack <slug>   # prompts for the new value
+gh secret set PULUMI_CONFIG_PASSPHRASE --repo branchLeft/<generated-repo> --env production
+gh secret set PULUMI_ENCRYPTION_SALT  --repo branchLeft/<generated-repo> --env production
+```
 
-**A change that would replace or delete the tenant's service account,
-database, DB user, Cloud Run service or media HMAC key** is blocked before
-`pulumi up` runs, by `scripts/assert-no-tenant-deletes.py`. If one is
-genuinely wanted it is a deliberate apply with the plan read line by line, not
-a merge.
-
-**Only `main` can authenticate.** The provider's `attributeCondition` requires
-`assertion.ref == "refs/heads/main"`, so a workflow run from any other branch
-cannot exchange a token at all.
+The salt changes with the passphrase, so both secrets move together. Escrow the
+new value before deleting the old one from wherever it is held.
 
 ---
 
 ## The committed-secret guard fails on a freshly generated repo
 
 `Committed-secret guard` failing on a repo nobody has edited means
-`Pulumi.<tenant-name>.yaml` arrived with an `encryptionsalt` line in it. The
-deploy still works — the salt step reads the committed value, warns, and
-restores nothing — so this is a fix to make, not an outage.
+`Pulumi.<slug>.yaml` arrived with an `encryptionsalt` line in it. The deploy
+still works — the salt step reads the committed value, warns, and restores
+nothing — so this is a fix to make, not an outage.
 
 **Set the secret first.** Deleting the line before the secret exists leaves the
-next deploy with nothing to decrypt the stack. The failing annotation carries
-the value, the file and the line number — `::error file=Pulumi.<tenant-name>.yaml,line=N::encryptionsalt: v1:...`
-— so take the `v1:`-prefixed value from it, without the `encryptionsalt: ` key
-in front:
+next deploy with nothing to decrypt the stack. The failing annotation carries the
+value, the file and the line number, so take the `v1:`-prefixed value from it,
+without the `encryptionsalt: ` key in front:
 
 ```bash
-gh secret set PULUMI_ENCRYPTION_SALT --repo branchLeft/<generated-repo>
+gh secret set PULUMI_ENCRYPTION_SALT --repo branchLeft/<generated-repo> --env production
 ```
 
-It reads the value from stdin when no `--body` is given, which keeps it out of
-shell history.
+It reads from stdin when no `--body` is given, which keeps it out of shell
+history.
 
 **Then delete the line the annotation names**, in an editor. No `sed` or `grep`
 recipe is given here on purpose: the guard matches quoted (`"encryptionsalt":`)
@@ -162,18 +156,43 @@ whatever form the key took.
 **Then confirm, before committing:**
 
 ```bash
-python3 scripts/assert-no-committed-pulumi-secrets.py Pulumi.<tenant-name>.yaml
+python3 scripts/assert-no-committed-pulumi-secrets.py Pulumi.<slug>.yaml
 ```
 
 It prints nothing and exits 0 when the file is clean. That is the same check CI
-runs, so a pass here is a pass there. Commit the deletion on a branch and merge
-it.
+runs, so a pass here is a pass there.
+
+---
+
+## Tearing this tenant down
+
+Order matters, and two of these steps are unrecoverable in the wrong one. Full
+version, with the platform-side steps, in `branchLeft/ghost-platform`'s
+`RUNBOOK-tenant-onboarding.md`.
+
+1. **Revoke the slot first**, so nothing can redeploy while the rest is
+   dismantled:
+   `provision_deploy_slot.py --revoke <slug>` on the app host, as root.
+2. Stop and disable the unit: `systemctl disable --now branchleft-compose@<slug>`.
+3. Take the final backups you intend to keep — the database dump and the media
+   prefix. After step 5 there is no configured place to put them back.
+4. `pulumi destroy` **before** anything deletes this repo or its passphrase
+   secret. A destroy reads the checkpoint, so a repo deleted first strands the
+   stack permanently.
+5. Remove the host-side state: the secrets file, the Compose directory, the two
+   volumes, the UID claim, then the tenant's database and DB user on `db1`.
+6. Remove this tenant's site block from the edge's site registry.
+7. Archive the repo rather than deleting it, unless the tenant asked otherwise.
+
+A tenant removed without step 1 leaves a working deploy key for a stack that no
+longer exists, and on a host that has not been rebuilt the on-host register is
+the only place that would show it.
 
 ---
 
 ## Onboarding another tenant
 
-Not this runbook, and not this repo. Onboarding is a run of the platform's
-provisioning flow, which generates a new repo from
-`ghost-platform-tenant-template` and provisions its identity, state bucket and
-first apply. There is no multi-stack path inside a single generated repo.
+Not this runbook and not this repo. Onboarding is a run of the platform's
+provisioning flow plus its host-side steps —
+`branchLeft/ghost-platform`'s `RUNBOOK-tenant-onboarding.md`. There is no
+multi-stack path inside a single generated repo.

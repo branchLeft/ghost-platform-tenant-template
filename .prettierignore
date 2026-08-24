@@ -7,10 +7,10 @@ vendor/
 # README.tenant.md's `# __TENANT_NAME__` heading becomes `# **TENANT_NAME**`.
 # The provisioning substitution then finds nothing to replace and the generated
 # tenant repo ships the literal word. Nothing catches it —
-# assert-placeholders-substituted.py only scans Pulumi.yaml, the CI workflow and
-# the delete guard, so a destroyed placeholder in a document reads as a clean
-# run. Tokens inside backticks survive, but that is a property of where someone
-# happened to put them, not a rule anything enforces.
+# assert-placeholders-substituted.py scans Pulumi.yaml and the CI workflow, so a
+# destroyed placeholder in a document reads as a clean run. Tokens inside
+# backticks survive, but that is a property of where someone happened to put
+# them, not a rule anything enforces.
 README.md
 README.tenant.md
 CLAUDE.md

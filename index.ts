@@ -1,93 +1,124 @@
 import * as pulumi from '@pulumi/pulumi';
-import * as gcp from '@pulumi/gcp';
 import { GhostTenant } from '@branchleft/ghost-platform-tenant';
 import {
-  projectId,
-  deployerServiceAccountEmail,
-  platformDbInstanceConnectionName,
-  platformTenantImageRepositoryDockerPath,
-  platformMediaBucketUrl,
+  appHostPrivateIp,
+  bulkEmail,
+  databaseHost,
+  databaseMaxUserConnections,
+  databasePassword,
+  hostPort,
+  imageRef,
+  mail,
+  mediaAccessKeyId,
+  mediaBucket,
+  mediaEndpoint,
+  mediaPublicBaseUrl,
+  mediaRegion,
+  mediaSecretAccessKey,
+  mediaTenantPrefix,
+  rssBudgetMib,
+  siteUrl,
+  slug,
+  uid,
+  uploadCeilingMib,
 } from './config';
 
-const config = new pulumi.Config();
-const tenantName = config.require('tenantName');
-const siteUrl = config.require('siteUrl');
+/**
+ * Registry host and path, an optional tag, and a mandatory `sha256` digest.
+ * Deliberately the same shape `branchleft-deploy` enforces on the host: a tag
+ * alone is a mutable pointer, so a stack deployed by tag has no answer to "what
+ * is running" and a restart months later can silently change the image.
+ *
+ * Checked here as well as there because the two refusals land in different
+ * places. The host's refusal fails a deploy that has already been merged; this
+ * one fails the pull request that would have merged it.
+ */
+const DIGEST_PINNED_IMAGE =
+  /^[a-z0-9]+(?:[._-][a-z0-9]+)*(?::[0-9]+)?(?:\/[a-z0-9]+(?:[._-][a-z0-9]+)*)*(?::[A-Za-z0-9_][A-Za-z0-9._-]{0,127})?@sha256:[0-9a-f]{64}$/;
 
-// `require`, not defaulted: an unset value must fail loudly at
-// preview/up rather than deploy a Cloud Run revision against a
-// placeholder image.
-const imageDigestOrTag = config.require('imageDigestOrTag');
+if (!DIGEST_PINNED_IMAGE.test(imageRef)) {
+  throw new Error(
+    `imageRef must be digest-pinned, e.g. ghcr.io/branchleft/ghost@sha256:<64 hex>. ` +
+      `Got: ${imageRef}`
+  );
+}
 
-// `get`, not `require`: a tenant that doesn't send mail yet sets nothing
-// here, and `mail` below stays `undefined`. Once `mailHost` is set, the
-// rest of the block is `require`d — a half-configured mail block should
-// fail at preview, not deploy a revision that silently can't send mail.
-const mailHost = config.get('mailHost');
-const mail = mailHost
-  ? {
-      smtpHost: mailHost,
-      smtpPort: config.get('mailPort'),
-      smtpUser: config.require('mailUser'),
-      smtpPassword: config.requireSecret('mailSmtpPassword'),
-      from: config.require('mailFrom'),
-    }
-  : undefined;
-
-// `get`, not `require`: a tenant that doesn't use bulk email yet sets
-// nothing here, and `bulkEmail` below stays `undefined`. Once
-// `bulkEmailBaseUrl` is set, the rest of the block is `require`d — a
-// half-configured bulk-email block should fail at preview, not deploy a
-// revision that silently can't send newsletters.
-const bulkEmailBaseUrl = config.get('bulkEmailBaseUrl');
-const bulkEmail = bulkEmailBaseUrl
-  ? {
-      baseUrl: bulkEmailBaseUrl,
-      domain: config.require('bulkEmailDomain'),
-      apiKey: config.requireSecret('bulkEmailApiKey'),
-    }
-  : undefined;
-
-const tenant = new GhostTenant(tenantName, {
-  tenantName,
+const tenant = new GhostTenant(slug, {
+  slug,
   siteUrl,
-  imageDigestOrTag,
-  platform: {
-    dbInstanceConnectionName: platformDbInstanceConnectionName,
-    tenantImageRepositoryDockerPath: platformTenantImageRepositoryDockerPath,
-    mediaBucketUrl: platformMediaBucketUrl,
+  uid,
+  appHostPrivateIp,
+  hostPort,
+  database: {
+    host: databaseHost,
+    password: databasePassword,
+    ...(databaseMaxUserConnections === undefined
+      ? {}
+      : { maxUserConnections: databaseMaxUserConnections }),
   },
-  mail,
-  bulkEmail,
+  media: {
+    endpoint: mediaEndpoint,
+    region: mediaRegion,
+    bucket: mediaBucket,
+    // `S3Storage.buildKey` inserts the separator itself, so a trailing slash
+    // here writes every object under `<tenant>//`. Trimmed rather than refused:
+    // a human types this into a form, the two spellings mean the same thing to
+    // that human, and only one of them works.
+    tenantPrefix: mediaTenantPrefix.replace(/\/+$/, ''),
+    publicBaseUrl: mediaPublicBaseUrl,
+    accessKeyId: mediaAccessKeyId,
+    secretAccessKey: mediaSecretAccessKey,
+  },
+  ...(mail === undefined ? {} : { mail }),
+  ...(bulkEmail === undefined ? {} : { bulkEmail }),
+  ...(uploadCeilingMib === undefined ? {} : { uploadCeilingMib }),
+  ...(rssBudgetMib === undefined ? {} : { rssBudgetMib }),
 });
 
 /**
- * Lets the deployer deploy Cloud Run revisions that run as this tenant's own
- * runtime service account — without it, the first apply 403s on
- * `iam.serviceaccounts.actAs` when it sets `template.serviceAccount`.
+ * The exact content of `/etc/branchleft/<slug>.env`, root-owned `0600` on the
+ * app host. A Pulumi secret: it carries this tenant's database password and,
+ * where configured, its SMTP and bulk-mail credentials.
  *
- * Scoped to this one service account, never a project-wide
- * `roles/iam.serviceAccountUser`, which would let this deployer act as every
- * other tenant's deployer too.
- *
- * This is the one identity-shaped resource left in a tenant repo, and it is
- * here because it cannot be anywhere else: the runtime service account it
- * names does not exist until the line above creates it. Creating it needs
- * `iam.serviceaccounts.setIamPolicy` on that account, which the deployer does
- * not hold — so it lands on the provisioning identity's first apply and is
- * `same` on every CI run after that. A change that would recreate it fails
- * loudly in CI rather than being applied.
+ * Read with `pulumi stack output --show-secrets secretsEnvFile`. Written to the
+ * host by an operator alone — no automated path may write this file, which is
+ * why nothing in this repo's CI reads this output.
  */
-export const deployerCanActAsTenantSa = new gcp.serviceaccount.IAMMember(
-  `deployer-can-act-as-${tenantName}-sa`,
-  {
-    serviceAccountId: pulumi.interpolate`projects/${projectId}/serviceAccounts/${tenant.serviceAccountEmail}`,
-    role: 'roles/iam.serviceAccountUser',
-    member: `serviceAccount:${deployerServiceAccountEmail}`,
-  }
-);
+export const secretsEnvFile = tenant.secretsEnvFile;
 
-export const cloudRunServiceName = tenant.cloudRunServiceName;
-export const cloudRunServiceUri = tenant.cloudRunServiceUri;
-export const tenantServiceAccountEmail = tenant.serviceAccountEmail;
+/** The exact content of `/opt/branchleft/<slug>/compose.yml`. Placed on the
+ * host by an operator, for the same reason: every line of it is a
+ * runtime-isolation control, and a stack that omits one still starts. */
+export const composeFile = tenant.composeFile;
+
+/** The root-run command that must create this tenant's volumes before its unit
+ * is enabled. The rendered stack declares both volumes `external`, so skipping
+ * it fails the unit start rather than coming up on a volume Docker seeded. */
+export const hostProvisioningCommand = tenant.hostProvisioningCommand;
+
+/** This tenant's Caddy `request_body max_size`, for its site block in the
+ * edge's site registry in `branchLeft/shared-infra`. Derived from the same
+ * input as the tmpfs ceiling so the two cannot disagree; setting it by hand to
+ * a different number defeats that. */
+export const edgeRequestBodyMaxSize = tenant.edgeRequestBodyMaxSize;
+
+export const composeUnit = tenant.composeUnit;
+export const stackDirectory = tenant.stackDirectory;
+export const secretsEnvPath = tenant.secretsEnvPath;
+export const imageEnvPath = tenant.imageEnvPath;
 export const databaseName = tenant.databaseName;
-export const maxUserConnectionsStatement = tenant.maxUserConnectionsStatement;
+export const databaseUser = tenant.databaseUser;
+
+/** Read by the deploy job, which pipes it to `branchleft-deploy` over this
+ * repo's own slot key. Exported rather than read from config by the job so that
+ * what is deployed is what this stack's last successful apply recorded. */
+export const image = imageRef;
+
+/** Read by `scripts/assert-no-tenant-deletes.py` out of this stack's own
+ * preview plan: the fields whose change orphans live tenant data rather than
+ * updating it. */
+export const identity = tenant.identity;
+
+/** Registered so `pulumi stack output` answers "which app host" without
+ * reading the config file. */
+export const appHost = pulumi.output(appHostPrivateIp);
