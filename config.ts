@@ -77,11 +77,22 @@ export const databasePassword = config.requireSecret('databasePassword');
  * tenant is subject to is visible in its own repo. */
 export const databaseMaxUserConnections = config.getNumber('databaseMaxUserConnections');
 
+/**
+ * Object Storage addressing, and only the platform-wide half of it.
+ *
+ * This tenant's media bucket is `branchleft-media-<slug>` and its public base
+ * URL is that bucket under this endpoint — both derived from the slug inside
+ * the component, neither settable here. That is the isolation control: the
+ * bucket is the only boundary between this tenant's media and another's, so a
+ * config key naming it would be a config key that could name someone else's.
+ *
+ * The endpoint host and the region must name the same Object Storage location.
+ * Against Ceph RGW the region is part of the SigV4 credential scope, so a
+ * mismatch is a signature failure surfacing as an opaque 403 that reads as a
+ * credential problem.
+ */
 export const mediaEndpoint = config.require('mediaEndpoint');
 export const mediaRegion = config.require('mediaRegion');
-export const mediaBucket = config.require('mediaBucket');
-export const mediaTenantPrefix = config.require('mediaTenantPrefix');
-export const mediaPublicBaseUrl = config.require('mediaPublicBaseUrl');
 
 /**
  * Both halves of the Object Storage key pair are secret config, including the
@@ -91,6 +102,11 @@ export const mediaPublicBaseUrl = config.require('mediaPublicBaseUrl');
  * rotating this credential one edit instead of two, and a rotation that updates
  * one half is a tenant whose media stops working with a 403 that reads as a
  * bucket-policy problem.
+ *
+ * The pair is created in the Hetzner Cloud Console — there is no API that mints
+ * one — and the bucket policy naming it as a principal is applied by the same
+ * operator in the same sitting. A key with no policy fencing it is valid for
+ * every bucket in its project.
  */
 export const mediaAccessKeyId = config.requireSecret('mediaAccessKeyId');
 export const mediaSecretAccessKey = config.requireSecret('mediaSecretAccessKey');

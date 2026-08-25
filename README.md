@@ -111,7 +111,7 @@ pull request's diff:
 | `imageRef` | The image this tenant runs, digest-pinned. Refused at preview if it carries no `@sha256:`. |
 | `databaseHost` | `db1`'s private address. |
 | `databaseMaxUserConnections` | Optional. The cap applied on `db1`, recorded so it is visible here. |
-| `mediaEndpoint`, `mediaRegion`, `mediaBucket`, `mediaTenantPrefix`, `mediaPublicBaseUrl` | Object Storage addressing. The endpoint host and the region must name the same location, or the failure is a 403 that reads as a credential problem. |
+| `mediaEndpoint`, `mediaRegion` | Object Storage addressing, platform-wide. The endpoint host and the region must name the same location, or the failure is a 403 that reads as a credential problem. **There is no `mediaBucket` and no `mediaPublicBaseUrl`**: this tenant's bucket is `branchleft-media-<slug>`, derived from the slug inside the component. The bucket is the only boundary between this tenant's media and another tenant's, so it is deliberately not something a stack can set. |
 | `uploadCeilingMib`, `rssBudgetMib` | Optional. Left unset, the component's defaults apply. |
 
 **Set by an operator** with `pulumi config set --secret`, in that same pull
@@ -121,7 +121,7 @@ plaintext in the run's API response and its form:
 | Key | Where the value comes from |
 |---|---|
 | `databasePassword` | Printed **once** by `db/provision/provision_tenant_db.py` on `db1`. Printed by nothing afterwards; a re-run leaves an existing password alone and says nothing about it. |
-| `mediaAccessKeyId`, `mediaSecretAccessKey` | This tenant's Object Storage key pair. Both are secret config, including the id — holding the pair together is what makes a rotation one edit rather than two. |
+| `mediaAccessKeyId`, `mediaSecretAccessKey` | This tenant's Object Storage key pair, created in the Hetzner Cloud Console — no API mints one — and allowlisted by bucket policy to this tenant's bucket alone. Both are secret config, including the id: holding the pair together is what makes a rotation one edit rather than two. |
 
 `uid` deserves its own note. It is host state: `provision_tenant_volume.py
 --list-claims` on the app host reports which UIDs are already handed out, the

@@ -60,6 +60,14 @@ Then:
    pulumi config set --secret mediaSecretAccessKey --stack <slug>
    ```
 
+   This tenant's media bucket, `branchleft-media-<slug>`, and the bucket policy
+   that fences this key to it must already exist —
+   `branchLeft/ghost-platform`'s `RUNBOOK-tenant-onboarding.md` §6 creates and
+   verifies both. Nothing in this stack creates them, and nothing fails if they
+   are missing until the first upload: the deploy succeeds and the tenant's
+   media 404s. Confirm the bucket name after the first apply with
+   `pulumi stack output mediaBucket --stack <slug>`.
+
 3. **`known_hosts`**, filled in with the app host's SSH host key. Take it from
    the host itself over your own root session — never `ssh-keyscan`, which is
    trust-on-first-use and records whatever answered:
