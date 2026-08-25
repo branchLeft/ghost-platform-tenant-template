@@ -15,10 +15,12 @@ public repo, an issue, or a pull-request description outside this repo.
 
 ## What this stack does, and does not
 
-**It creates nothing.** Everything durable this tenant uses already exists and
-is shared: the app host, `db1`, the Object Storage bucket. What is per-tenant is
-*configuration*, and this stack is the versioned, passphrase-wrapped record of
-it. `pulumi up` renders two things an operator places on the host by hand:
+**It creates nothing.** Everything durable this tenant uses already exists: the
+app host and `db1` are shared with other tenants, and this tenant's Object
+Storage bucket is its own — created by an operator before this stack first
+applied, because Hetzner mints S3 credentials only in its Cloud Console. What is
+per-tenant here is *configuration*, and this stack is the versioned,
+passphrase-wrapped record of it. `pulumi up` renders two things an operator places on the host by hand:
 
 ```bash
 pulumi stack output composeFile                      # /opt/branchleft/__TENANT_NAME__/compose.yml
