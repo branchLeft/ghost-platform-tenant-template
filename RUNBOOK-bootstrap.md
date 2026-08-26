@@ -60,6 +60,14 @@ Then:
    pulumi config set --secret mediaSecretAccessKey --stack <slug>
    ```
 
+   This tenant's media bucket, `branchleft-media-<slug>`, and the bucket policy
+   that fences this key to it must already exist —
+   `branchLeft/ghost-platform`'s `RUNBOOK-tenant-onboarding.md` §6 creates and
+   verifies both. Nothing in this stack creates them, and nothing fails if they
+   are missing until the first upload: the deploy succeeds and the tenant's
+   media 404s. Confirm the bucket name after the first apply with
+   `pulumi stack output mediaBucket --stack <slug>`.
+
 3. **`known_hosts`**, filled in with the app host's SSH host key. Take it from
    the host itself over your own root session — never `ssh-keyscan`, which is
    trust-on-first-use and records whatever answered:
@@ -221,8 +229,9 @@ version, with the platform-side steps, in `branchLeft/ghost-platform`'s
    dismantled:
    `provision_deploy_slot.py --revoke <slug>` on the app host, as root.
 2. Stop and disable the unit: `systemctl disable --now branchleft-compose@<slug>`.
-3. Take the final backups you intend to keep — the database dump and the media
-   prefix. After step 5 there is no configured place to put them back.
+3. Take the final backups you intend to keep — the database dump and the whole
+   of this tenant's media bucket, `branchleft-media-<slug>`. After step 5 there
+   is no configured place to put them back.
 4. `pulumi destroy` **before** anything deletes this repo or its passphrase
    secret. A destroy reads the checkpoint, so a repo deleted first strands the
    stack permanently.
@@ -230,6 +239,13 @@ version, with the platform-side steps, in `branchLeft/ghost-platform`'s
    volumes, the UID claim, then the tenant's database and DB user on `db1`.
 6. Remove this tenant's site block from the edge's site registry.
 7. Archive the repo rather than deleting it, unless the tenant asked otherwise.
+8. Delete this tenant's Object Storage **credential first, then its bucket**, in
+   the Hetzner Cloud Console. Both count against account-wide allowances (200
+   credentials and 100 buckets across all projects), so leaving them spends a
+   fixed budget on a tenant that no longer exists. Credential before bucket: a
+   bucket deleted while its key survives leaves a key with no policy fencing it,
+   valid for every other bucket in the project. Emptying the bucket needs the
+   operator's key — the tenant's cannot delete.
 
 A tenant removed without step 1 leaves a working deploy key for a stack that no
 longer exists, and on a host that has not been rebuilt the on-host register is

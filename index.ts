@@ -10,12 +10,9 @@ import {
   imageRef,
   mail,
   mediaAccessKeyId,
-  mediaBucket,
   mediaEndpoint,
-  mediaPublicBaseUrl,
   mediaRegion,
   mediaSecretAccessKey,
-  mediaTenantPrefix,
   rssBudgetMib,
   siteUrl,
   slug,
@@ -56,16 +53,13 @@ const tenant = new GhostTenant(slug, {
       ? {}
       : { maxUserConnections: databaseMaxUserConnections }),
   },
+  // The bucket and the public base URL are derived from the slug by the
+  // component, so this stack holds no value that could name another tenant's
+  // media. `mediaBucket` and `mediaPublicBaseUrl` below are exported for the
+  // operator who has to create that bucket, not read back as inputs.
   media: {
     endpoint: mediaEndpoint,
     region: mediaRegion,
-    bucket: mediaBucket,
-    // `S3Storage.buildKey` inserts the separator itself, so a trailing slash
-    // here writes every object under `<tenant>//`. Trimmed rather than refused:
-    // a human types this into a form, the two spellings mean the same thing to
-    // that human, and only one of them works.
-    tenantPrefix: mediaTenantPrefix.replace(/\/+$/, ''),
-    publicBaseUrl: mediaPublicBaseUrl,
     accessKeyId: mediaAccessKeyId,
     secretAccessKey: mediaSecretAccessKey,
   },
@@ -108,6 +102,15 @@ export const secretsEnvPath = tenant.secretsEnvPath;
 export const imageEnvPath = tenant.imageEnvPath;
 export const databaseName = tenant.databaseName;
 export const databaseUser = tenant.databaseUser;
+
+/** This tenant's own Object Storage bucket, and the base URL Ghost writes into
+ * every published post. Nothing here creates either: the bucket, its versioning
+ * and the policy that fences it to this tenant's key are made by an operator
+ * before this stack first applies, per `RUNBOOK-bootstrap.md`. Exported so that
+ * what was created can be compared against what the container is configured
+ * with — a mismatch is uploads failing after a deploy that reported success. */
+export const mediaBucket = tenant.mediaBucket;
+export const mediaPublicBaseUrl = tenant.mediaPublicBaseUrl;
 
 /** Read by the deploy job, which pipes it to `branchleft-deploy` over this
  * repo's own slot key. Exported rather than read from config by the job so that
