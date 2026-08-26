@@ -14,12 +14,9 @@
       "config_mail",
       "config_mailhost",
       "config_mediaaccesskeyid",
-      "config_mediabucket",
       "config_mediaendpoint",
-      "config_mediapublicbaseurl",
       "config_mediaregion",
       "config_mediasecretaccesskey",
-      "config_mediatenantprefix",
       "config_rssbudgetmib",
       "config_siteurl",
       "config_slug",
@@ -36,6 +33,8 @@
       "index_identity",
       "index_image",
       "index_imageenvpath",
+      "index_mediabucket",
+      "index_mediapublicbaseurl",
       "index_secretsenvfile",
       "index_secretsenvpath",
       "index_stackdirectory",
@@ -210,52 +209,58 @@
       "scripts_test_generate_tenant_repo_validateslug_test_refuses_uppercase_underscores_and_a_leading_digit"
     ],
     "10": [
+      "ghost_platform_repo",
+      "pulumi_slug_yaml",
+      "readme_ghost_platform_tenant_template",
+      "readme_tenant_name",
+      "runbook_bootstrap"
+    ],
+    "11": [
       "claude_md",
       "ghost_platform_tenant_component",
       "pulumi_yaml",
-      "readme_md",
-      "readme_tenant_md"
+      "scripts_assert_no_tenant_deletes"
     ],
-    "11": [
+    "12": [
       "scripts_assert_placeholders_substituted",
       "scripts_assert_placeholders_substituted_find_placeholders",
       "scripts_assert_placeholders_substituted_main",
       "scripts_assert_placeholders_substituted_py_path"
     ],
-    "12": [
+    "13": [
       "github_workflows_infra_ci_yml",
       "hetzner_object_storage",
       "pulumi_stack"
     ],
-    "13": [
+    "14": [
       "branchleft_github_workflows_docs_lint",
       "github_workflows_docs_lint_docs_lint"
     ],
-    "14": [
+    "15": [
       "branchleft_standards_standards",
       "github_workflows_standards_standards"
     ],
-    "15": [
-      "github_workflows_graphify"
-    ],
     "16": [
-      "google_cloud_platform"
+      "branchleft_deploy"
     ],
     "17": [
-      "pattern"
+      "github_workflows_graphify"
     ],
     "18": [
-      "pre_commit_config_yaml"
+      "google_cloud_platform"
     ],
     "19": [
-      "pulumi_cli"
+      "pattern"
     ],
     "20": [
-      "runbook_bootstrap_md"
+      "pre_commit_config_yaml"
+    ],
+    "21": [
+      "pulumi_cli"
     ]
   },
   "cohesion": {
-    "0": 0.07827260458839407,
+    "0": 0.07681365576102418,
     "1": 0.08,
     "2": 0.12666666666666668,
     "3": 0.17666666666666667,
@@ -266,16 +271,17 @@
     "8": 0.2727272727272727,
     "9": 0.25,
     "10": 0.4,
-    "11": 0.8333333333333334,
-    "12": 0.6666666666666666,
-    "13": 1.0,
+    "11": 0.5,
+    "12": 0.8333333333333334,
+    "13": 0.6666666666666666,
     "14": 1.0,
     "15": 1.0,
     "16": 1.0,
     "17": 1.0,
     "18": 1.0,
     "19": 1.0,
-    "20": 1.0
+    "20": 1.0,
+    "21": 1.0
   },
   "gods": [
     {
@@ -329,9 +335,21 @@
       "degree": 6
     }
   ],
-  "surprises": [],
+  "surprises": [
+    {
+      "source": "__TENANT_NAME__ \u2014 Ghost platform tenant stack",
+      "target": "ghost-platform-tenant-template",
+      "source_files": [
+        "README.tenant.md",
+        "README.md"
+      ],
+      "confidence": "EXTRACTED",
+      "relation": "cites",
+      "why": "connects across different repos/directories"
+    }
+  ],
   "tokens": {
-    "input": 16208,
-    "output": 1092
+    "input": 9335,
+    "output": 1954
   }
 }
