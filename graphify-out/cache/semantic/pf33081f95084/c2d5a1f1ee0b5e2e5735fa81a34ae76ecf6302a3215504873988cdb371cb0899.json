@@ -1,0 +1,1 @@
+{"nodes": [{"id": "runbook_bootstrap", "label": "Runbook \u2014 a generated tenant repo", "file_type": "document", "source_file": "RUNBOOK-bootstrap.md"}], "edges": [{"source": "runbook_bootstrap", "target": "ghost_platform_repo", "relation": "references", "confidence": "EXTRACTED", "confidence_score": 1.0, "source_file": "RUNBOOK-bootstrap.md"}], "hyperedges": []}

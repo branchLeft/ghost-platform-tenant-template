@@ -1,0 +1,1 @@
+{"nodes": [{"id": "readme_ghost_platform_tenant_template", "label": "ghost-platform-tenant-template", "file_type": "document", "source_file": "README.md"}], "edges": [{"source": "readme_ghost_platform_tenant_template", "target": "ghost_platform_repo", "relation": "references", "confidence": "EXTRACTED", "confidence_score": 1.0, "source_file": "README.md"}], "hyperedges": []}
