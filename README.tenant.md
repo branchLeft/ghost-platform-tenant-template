@@ -54,16 +54,19 @@ anywhere on the path.
 - **Changing the image** is a one-line change to `imageRef`, digest-pinned. A
   tag is refused at preview: a stack deployed by tag has no answer to "what is
   running", and a restart months later can silently change it.
-- **Changing `uid` or `appHostPrivateIp` is NOT currently refused by anything**,
-  and both orphan live data rather than updating it: the container starts under
-  a UID that cannot read its own `0700` content volume. The delete guard's
-  identity half matches no steps, because the component registers empty inputs
-  and so never appears in the plan — reproduced against the published component,
-  tracked as
+- **Changing `uid` or `appHostPrivateIp` is refused at preview**, and both
+  orphan live data rather than updating it: the container would start under a
+  UID that cannot read its own `0700` content volume. The delete guard compares
+  the component's registered identity — `uid`, `stackName`, `contentVolume`,
+  `adaptersVolume`, `databaseName`, `appHostPrivateIp` — and refuses the plan if
+  any of them moves. Treat them as fields to change only with a migration in
+  front of them; CI will now stop you, but it stops you rather than migrating
+  anything. Changing the **slug** is refused too, because Pulumi renders that as
+  a delete and a create.
+
+  This holds from component `3.0.0`. Below that the identity comparison matched
+  no steps at all and a changed `uid` applied clean — reproduced, and fixed in
   [branchLeft/workspace#280](https://github.com/branchLeft/workspace/issues/280).
-  Treat both as fields to change only with a migration in front of them, and do
-  not rely on CI to stop you. Changing the **slug** *is* refused, because Pulumi
-  renders that as a delete and a create.
 - **`edgeRequestBodyMaxSize`** has to reach this tenant's site block in the
   edge's site registry in `branchLeft/shared-infra`. It is derived from the same
   input as the container's `/tmp` ceiling so the two cannot disagree; setting it
