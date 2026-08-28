@@ -209,17 +209,17 @@
       "scripts_test_generate_tenant_repo_validateslug_test_refuses_uppercase_underscores_and_a_leading_digit"
     ],
     "10": [
+      "ghost_platform_tenant_assert_no_tenant_deletes",
+      "ghost_tenant_component",
+      "github_workflows_infra_ci",
+      "pulumi_cli",
+      "scripts_test_unit"
+    ],
+    "11": [
       "ghost_platform_repo",
-      "pulumi_slug_yaml",
       "readme_ghost_platform_tenant_template",
       "readme_tenant_name",
       "runbook_bootstrap"
-    ],
-    "11": [
-      "claude_md",
-      "ghost_platform_tenant_component",
-      "pulumi_yaml",
-      "scripts_assert_no_tenant_deletes"
     ],
     "12": [
       "scripts_assert_placeholders_substituted",
@@ -228,9 +228,9 @@
       "scripts_assert_placeholders_substituted_py_path"
     ],
     "13": [
-      "github_workflows_infra_ci_yml",
-      "hetzner_object_storage",
-      "pulumi_stack"
+      "claude_md",
+      "ghost_platform_tenant_component",
+      "pulumi_yaml"
     ],
     "14": [
       "branchleft_github_workflows_docs_lint",
@@ -241,22 +241,23 @@
       "github_workflows_standards_standards"
     ],
     "16": [
-      "branchleft_deploy"
+      "hetzner_object_storage",
+      "pulumi_stack"
     ],
     "17": [
-      "github_workflows_graphify"
+      "branchleft_deploy"
     ],
     "18": [
-      "google_cloud_platform"
+      "github_workflows_graphify"
     ],
     "19": [
-      "pattern"
+      "google_cloud_platform"
     ],
     "20": [
-      "pre_commit_config_yaml"
+      "pattern"
     ],
     "21": [
-      "pulumi_cli"
+      "pre_commit_config_yaml"
     ]
   },
   "cohesion": {
@@ -270,7 +271,7 @@
     "7": 0.15384615384615385,
     "8": 0.2727272727272727,
     "9": 0.25,
-    "10": 0.4,
+    "10": 0.5,
     "11": 0.5,
     "12": 0.8333333333333334,
     "13": 0.6666666666666666,
@@ -349,7 +350,7 @@
     }
   ],
   "tokens": {
-    "input": 9335,
-    "output": 1954
+    "input": 6079,
+    "output": 1192
   }
 }

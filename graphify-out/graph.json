@@ -9,7 +9,7 @@
       "source_file": "",
       "source_location": "",
       "_origin": "ast",
-      "community": 19,
+      "community": 20,
       "norm_label": "pattern",
       "id": "pattern"
     },
@@ -691,7 +691,7 @@
       "label": "Graphify Workflow",
       "file_type": "code",
       "source_file": ".github/workflows/graphify.yml",
-      "community": 17,
+      "community": 18,
       "norm_label": "graphify workflow",
       "_origin": "semantic",
       "id": "github_workflows_graphify"
@@ -761,7 +761,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 21,
+      "community": 10,
       "norm_label": "pulumi cli",
       "_origin": "semantic",
       "id": "pulumi_cli"
@@ -775,7 +775,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 18,
+      "community": 19,
       "norm_label": "google cloud platform",
       "_origin": "semantic",
       "id": "google_cloud_platform"
@@ -1503,7 +1503,7 @@
       "label": ".pre-commit-config.yaml",
       "file_type": "code",
       "source_file": ".pre-commit-config.yaml",
-      "community": 20,
+      "community": 21,
       "norm_label": ".pre-commit-config.yaml",
       "_origin": "semantic",
       "id": "pre_commit_config_yaml"
@@ -1512,7 +1512,7 @@
       "label": "CLAUDE.md",
       "file_type": "document",
       "source_file": "CLAUDE.md",
-      "community": 11,
+      "community": 13,
       "norm_label": "claude.md",
       "_origin": "semantic",
       "id": "claude_md"
@@ -1521,25 +1521,16 @@
       "label": "Pulumi.yaml",
       "file_type": "code",
       "source_file": "Pulumi.yaml",
-      "community": 11,
+      "community": 13,
       "norm_label": "pulumi.yaml",
       "_origin": "semantic",
       "id": "pulumi_yaml"
     },
     {
-      "label": ".github/workflows/infra-ci.yml",
-      "file_type": "code",
-      "source_file": ".github/workflows/infra-ci.yml",
-      "community": 13,
-      "norm_label": ".github/workflows/infra-ci.yml",
-      "_origin": "semantic",
-      "id": "github_workflows_infra_ci_yml"
-    },
-    {
       "label": "@branchleft/ghost-platform-tenant",
       "file_type": "concept",
       "source_file": null,
-      "community": 11,
+      "community": 13,
       "norm_label": "@branchleft/ghost-platform-tenant",
       "_origin": "semantic",
       "id": "ghost_platform_tenant_component"
@@ -1548,7 +1539,7 @@
       "label": "Pulumi Stack",
       "file_type": "concept",
       "source_file": "Pulumi.yaml",
-      "community": 13,
+      "community": 16,
       "norm_label": "pulumi stack",
       "_origin": "semantic",
       "id": "pulumi_stack"
@@ -1557,7 +1548,7 @@
       "label": "Hetzner Object Storage",
       "file_type": "concept",
       "source_file": null,
-      "community": 13,
+      "community": 16,
       "norm_label": "hetzner object storage",
       "_origin": "semantic",
       "id": "hetzner_object_storage"
@@ -1568,9 +1559,9 @@
       "source_file": "config.ts",
       "source_location": "L1",
       "_origin": "ast",
-      "id": "config",
       "community": 0,
-      "norm_label": "config.ts"
+      "norm_label": "config.ts",
+      "id": "config"
     },
     {
       "label": "config",
@@ -1578,9 +1569,9 @@
       "source_file": "config.ts",
       "source_location": "L3",
       "_origin": "ast",
-      "id": "config_config",
       "community": 0,
-      "norm_label": "config"
+      "norm_label": "config",
+      "id": "config_config"
     },
     {
       "label": "slug",
@@ -1588,9 +1579,9 @@
       "source_file": "config.ts",
       "source_location": "L31",
       "_origin": "ast",
-      "id": "config_slug",
       "community": 0,
-      "norm_label": "slug"
+      "norm_label": "slug",
+      "id": "config_slug"
     },
     {
       "label": "siteUrl",
@@ -1598,9 +1589,9 @@
       "source_file": "config.ts",
       "source_location": "L34",
       "_origin": "ast",
-      "id": "config_siteurl",
       "community": 0,
-      "norm_label": "siteurl"
+      "norm_label": "siteurl",
+      "id": "config_siteurl"
     },
     {
       "label": "uid",
@@ -1608,9 +1599,9 @@
       "source_file": "config.ts",
       "source_location": "L45",
       "_origin": "ast",
-      "id": "config_uid",
       "community": 0,
-      "norm_label": "uid"
+      "norm_label": "uid",
+      "id": "config_uid"
     },
     {
       "label": "appHostPrivateIp",
@@ -1618,9 +1609,9 @@
       "source_file": "config.ts",
       "source_location": "L48",
       "_origin": "ast",
-      "id": "config_apphostprivateip",
       "community": 0,
-      "norm_label": "apphostprivateip"
+      "norm_label": "apphostprivateip",
+      "id": "config_apphostprivateip"
     },
     {
       "label": "hostPort",
@@ -1628,9 +1619,9 @@
       "source_file": "config.ts",
       "source_location": "L51",
       "_origin": "ast",
-      "id": "config_hostport",
       "community": 0,
-      "norm_label": "hostport"
+      "norm_label": "hostport",
+      "id": "config_hostport"
     },
     {
       "label": "imageRef",
@@ -1638,9 +1629,9 @@
       "source_file": "config.ts",
       "source_location": "L63",
       "_origin": "ast",
-      "id": "config_imageref",
       "community": 0,
-      "norm_label": "imageref"
+      "norm_label": "imageref",
+      "id": "config_imageref"
     },
     {
       "label": "databaseHost",
@@ -1648,9 +1639,9 @@
       "source_file": "config.ts",
       "source_location": "L66",
       "_origin": "ast",
-      "id": "config_databasehost",
       "community": 0,
-      "norm_label": "databasehost"
+      "norm_label": "databasehost",
+      "id": "config_databasehost"
     },
     {
       "label": "databasePassword",
@@ -1658,9 +1649,9 @@
       "source_file": "config.ts",
       "source_location": "L74",
       "_origin": "ast",
-      "id": "config_databasepassword",
       "community": 0,
-      "norm_label": "databasepassword"
+      "norm_label": "databasepassword",
+      "id": "config_databasepassword"
     },
     {
       "label": "databaseMaxUserConnections",
@@ -1668,9 +1659,9 @@
       "source_file": "config.ts",
       "source_location": "L78",
       "_origin": "ast",
-      "id": "config_databasemaxuserconnections",
       "community": 0,
-      "norm_label": "databasemaxuserconnections"
+      "norm_label": "databasemaxuserconnections",
+      "id": "config_databasemaxuserconnections"
     },
     {
       "label": "mediaEndpoint",
@@ -1678,9 +1669,9 @@
       "source_file": "config.ts",
       "source_location": "L94",
       "_origin": "ast",
-      "id": "config_mediaendpoint",
       "community": 0,
-      "norm_label": "mediaendpoint"
+      "norm_label": "mediaendpoint",
+      "id": "config_mediaendpoint"
     },
     {
       "label": "mediaRegion",
@@ -1688,9 +1679,9 @@
       "source_file": "config.ts",
       "source_location": "L95",
       "_origin": "ast",
-      "id": "config_mediaregion",
       "community": 0,
-      "norm_label": "mediaregion"
+      "norm_label": "mediaregion",
+      "id": "config_mediaregion"
     },
     {
       "label": "mediaAccessKeyId",
@@ -1698,9 +1689,9 @@
       "source_file": "config.ts",
       "source_location": "L111",
       "_origin": "ast",
-      "id": "config_mediaaccesskeyid",
       "community": 0,
-      "norm_label": "mediaaccesskeyid"
+      "norm_label": "mediaaccesskeyid",
+      "id": "config_mediaaccesskeyid"
     },
     {
       "label": "mediaSecretAccessKey",
@@ -1708,9 +1699,9 @@
       "source_file": "config.ts",
       "source_location": "L112",
       "_origin": "ast",
-      "id": "config_mediasecretaccesskey",
       "community": 0,
-      "norm_label": "mediasecretaccesskey"
+      "norm_label": "mediasecretaccesskey",
+      "id": "config_mediasecretaccesskey"
     },
     {
       "label": "uploadCeilingMib",
@@ -1718,9 +1709,9 @@
       "source_file": "config.ts",
       "source_location": "L116",
       "_origin": "ast",
-      "id": "config_uploadceilingmib",
       "community": 0,
-      "norm_label": "uploadceilingmib"
+      "norm_label": "uploadceilingmib",
+      "id": "config_uploadceilingmib"
     },
     {
       "label": "rssBudgetMib",
@@ -1728,9 +1719,9 @@
       "source_file": "config.ts",
       "source_location": "L117",
       "_origin": "ast",
-      "id": "config_rssbudgetmib",
       "community": 0,
-      "norm_label": "rssbudgetmib"
+      "norm_label": "rssbudgetmib",
+      "id": "config_rssbudgetmib"
     },
     {
       "label": "mailHost",
@@ -1738,9 +1729,9 @@
       "source_file": "config.ts",
       "source_location": "L125",
       "_origin": "ast",
-      "id": "config_mailhost",
       "community": 0,
-      "norm_label": "mailhost"
+      "norm_label": "mailhost",
+      "id": "config_mailhost"
     },
     {
       "label": "mail",
@@ -1748,9 +1739,9 @@
       "source_file": "config.ts",
       "source_location": "L126",
       "_origin": "ast",
-      "id": "config_mail",
       "community": 0,
-      "norm_label": "mail"
+      "norm_label": "mail",
+      "id": "config_mail"
     },
     {
       "label": "bulkEmailBaseUrl",
@@ -1758,9 +1749,9 @@
       "source_file": "config.ts",
       "source_location": "L137",
       "_origin": "ast",
-      "id": "config_bulkemailbaseurl",
       "community": 0,
-      "norm_label": "bulkemailbaseurl"
+      "norm_label": "bulkemailbaseurl",
+      "id": "config_bulkemailbaseurl"
     },
     {
       "label": "bulkEmail",
@@ -1768,9 +1759,9 @@
       "source_file": "config.ts",
       "source_location": "L138",
       "_origin": "ast",
-      "id": "config_bulkemail",
       "community": 0,
-      "norm_label": "bulkemail"
+      "norm_label": "bulkemail",
+      "id": "config_bulkemail"
     },
     {
       "label": "index.ts",
@@ -1778,9 +1769,9 @@
       "source_file": "index.ts",
       "source_location": "L1",
       "_origin": "ast",
-      "id": "index",
       "community": 0,
-      "norm_label": "index.ts"
+      "norm_label": "index.ts",
+      "id": "index"
     },
     {
       "label": "tenant",
@@ -1788,9 +1779,9 @@
       "source_file": "index.ts",
       "source_location": "L43",
       "_origin": "ast",
-      "id": "index_tenant",
       "community": 0,
-      "norm_label": "tenant"
+      "norm_label": "tenant",
+      "id": "index_tenant"
     },
     {
       "label": "secretsEnvFile",
@@ -1798,9 +1789,9 @@
       "source_file": "index.ts",
       "source_location": "L81",
       "_origin": "ast",
-      "id": "index_secretsenvfile",
       "community": 0,
-      "norm_label": "secretsenvfile"
+      "norm_label": "secretsenvfile",
+      "id": "index_secretsenvfile"
     },
     {
       "label": "composeFile",
@@ -1808,9 +1799,9 @@
       "source_file": "index.ts",
       "source_location": "L86",
       "_origin": "ast",
-      "id": "index_composefile",
       "community": 0,
-      "norm_label": "composefile"
+      "norm_label": "composefile",
+      "id": "index_composefile"
     },
     {
       "label": "hostProvisioningCommand",
@@ -1818,9 +1809,9 @@
       "source_file": "index.ts",
       "source_location": "L91",
       "_origin": "ast",
-      "id": "index_hostprovisioningcommand",
       "community": 0,
-      "norm_label": "hostprovisioningcommand"
+      "norm_label": "hostprovisioningcommand",
+      "id": "index_hostprovisioningcommand"
     },
     {
       "label": "edgeRequestBodyMaxSize",
@@ -1828,9 +1819,9 @@
       "source_file": "index.ts",
       "source_location": "L97",
       "_origin": "ast",
-      "id": "index_edgerequestbodymaxsize",
       "community": 0,
-      "norm_label": "edgerequestbodymaxsize"
+      "norm_label": "edgerequestbodymaxsize",
+      "id": "index_edgerequestbodymaxsize"
     },
     {
       "label": "composeUnit",
@@ -1838,9 +1829,9 @@
       "source_file": "index.ts",
       "source_location": "L99",
       "_origin": "ast",
-      "id": "index_composeunit",
       "community": 0,
-      "norm_label": "composeunit"
+      "norm_label": "composeunit",
+      "id": "index_composeunit"
     },
     {
       "label": "stackDirectory",
@@ -1848,9 +1839,9 @@
       "source_file": "index.ts",
       "source_location": "L100",
       "_origin": "ast",
-      "id": "index_stackdirectory",
       "community": 0,
-      "norm_label": "stackdirectory"
+      "norm_label": "stackdirectory",
+      "id": "index_stackdirectory"
     },
     {
       "label": "secretsEnvPath",
@@ -1858,9 +1849,9 @@
       "source_file": "index.ts",
       "source_location": "L101",
       "_origin": "ast",
-      "id": "index_secretsenvpath",
       "community": 0,
-      "norm_label": "secretsenvpath"
+      "norm_label": "secretsenvpath",
+      "id": "index_secretsenvpath"
     },
     {
       "label": "imageEnvPath",
@@ -1868,9 +1859,9 @@
       "source_file": "index.ts",
       "source_location": "L102",
       "_origin": "ast",
-      "id": "index_imageenvpath",
       "community": 0,
-      "norm_label": "imageenvpath"
+      "norm_label": "imageenvpath",
+      "id": "index_imageenvpath"
     },
     {
       "label": "databaseName",
@@ -1878,9 +1869,9 @@
       "source_file": "index.ts",
       "source_location": "L103",
       "_origin": "ast",
-      "id": "index_databasename",
       "community": 0,
-      "norm_label": "databasename"
+      "norm_label": "databasename",
+      "id": "index_databasename"
     },
     {
       "label": "databaseUser",
@@ -1888,9 +1879,9 @@
       "source_file": "index.ts",
       "source_location": "L104",
       "_origin": "ast",
-      "id": "index_databaseuser",
       "community": 0,
-      "norm_label": "databaseuser"
+      "norm_label": "databaseuser",
+      "id": "index_databaseuser"
     },
     {
       "label": "mediaBucket",
@@ -1898,9 +1889,9 @@
       "source_file": "index.ts",
       "source_location": "L112",
       "_origin": "ast",
-      "id": "index_mediabucket",
       "community": 0,
-      "norm_label": "mediabucket"
+      "norm_label": "mediabucket",
+      "id": "index_mediabucket"
     },
     {
       "label": "mediaPublicBaseUrl",
@@ -1908,9 +1899,9 @@
       "source_file": "index.ts",
       "source_location": "L113",
       "_origin": "ast",
-      "id": "index_mediapublicbaseurl",
       "community": 0,
-      "norm_label": "mediapublicbaseurl"
+      "norm_label": "mediapublicbaseurl",
+      "id": "index_mediapublicbaseurl"
     },
     {
       "label": "image",
@@ -1918,9 +1909,9 @@
       "source_file": "index.ts",
       "source_location": "L118",
       "_origin": "ast",
-      "id": "index_image",
       "community": 0,
-      "norm_label": "image"
+      "norm_label": "image",
+      "id": "index_image"
     },
     {
       "label": "identity",
@@ -1928,9 +1919,9 @@
       "source_file": "index.ts",
       "source_location": "L123",
       "_origin": "ast",
-      "id": "index_identity",
       "community": 0,
-      "norm_label": "identity"
+      "norm_label": "identity",
+      "id": "index_identity"
     },
     {
       "label": "appHost",
@@ -1938,9 +1929,9 @@
       "source_file": "index.ts",
       "source_location": "L127",
       "_origin": "ast",
-      "id": "index_apphost",
       "community": 0,
-      "norm_label": "apphost"
+      "norm_label": "apphost",
+      "id": "index_apphost"
     },
     {
       "label": "package.json",
@@ -1948,9 +1939,9 @@
       "source_file": "package.json",
       "source_location": "L1",
       "_origin": "ast",
-      "id": "package",
       "community": 1,
-      "norm_label": "package.json"
+      "norm_label": "package.json",
+      "id": "package"
     },
     {
       "label": "name",
@@ -1958,9 +1949,9 @@
       "source_file": "package.json",
       "source_location": "L2",
       "_origin": "ast",
-      "id": "package_name",
       "community": 1,
-      "norm_label": "name"
+      "norm_label": "name",
+      "id": "package_name"
     },
     {
       "label": "private",
@@ -1968,9 +1959,9 @@
       "source_file": "package.json",
       "source_location": "L3",
       "_origin": "ast",
-      "id": "package_private",
       "community": 1,
-      "norm_label": "private"
+      "norm_label": "private",
+      "id": "package_private"
     },
     {
       "label": "main",
@@ -1978,9 +1969,9 @@
       "source_file": "package.json",
       "source_location": "L4",
       "_origin": "ast",
-      "id": "package_main",
       "community": 1,
-      "norm_label": "main"
+      "norm_label": "main",
+      "id": "package_main"
     },
     {
       "label": "prettier",
@@ -1988,9 +1979,9 @@
       "source_file": "package.json",
       "source_location": "L5",
       "_origin": "ast",
-      "id": "package_prettier",
       "community": 1,
-      "norm_label": "prettier"
+      "norm_label": "prettier",
+      "id": "package_prettier"
     },
     {
       "label": "scripts",
@@ -1998,9 +1989,9 @@
       "source_file": "package.json",
       "source_location": "L6",
       "_origin": "ast",
-      "id": "package_scripts",
       "community": 1,
-      "norm_label": "scripts"
+      "norm_label": "scripts",
+      "id": "package_scripts"
     },
     {
       "label": "typecheck",
@@ -2008,9 +1999,9 @@
       "source_file": "package.json",
       "source_location": "L7",
       "_origin": "ast",
-      "id": "package_scripts_typecheck",
       "community": 1,
-      "norm_label": "typecheck"
+      "norm_label": "typecheck",
+      "id": "package_scripts_typecheck"
     },
     {
       "label": "format",
@@ -2018,9 +2009,9 @@
       "source_file": "package.json",
       "source_location": "L8",
       "_origin": "ast",
-      "id": "package_scripts_format",
       "community": 1,
-      "norm_label": "format"
+      "norm_label": "format",
+      "id": "package_scripts_format"
     },
     {
       "label": "format:check",
@@ -2028,9 +2019,9 @@
       "source_file": "package.json",
       "source_location": "L9",
       "_origin": "ast",
-      "id": "package_scripts_format_check",
       "community": 1,
-      "norm_label": "format:check"
+      "norm_label": "format:check",
+      "id": "package_scripts_format_check"
     },
     {
       "label": "dependencies",
@@ -2038,9 +2029,9 @@
       "source_file": "package.json",
       "source_location": "L11",
       "_origin": "ast",
-      "id": "package_dependencies",
       "community": 1,
-      "norm_label": "dependencies"
+      "norm_label": "dependencies",
+      "id": "package_dependencies"
     },
     {
       "label": "@branchleft/ghost-platform-tenant",
@@ -2048,9 +2039,9 @@
       "source_file": "package.json",
       "source_location": "L12",
       "_origin": "ast",
-      "id": "package_dependencies_branchleft_ghost_platform_tenant",
       "community": 1,
-      "norm_label": "@branchleft/ghost-platform-tenant"
+      "norm_label": "@branchleft/ghost-platform-tenant",
+      "id": "package_dependencies_branchleft_ghost_platform_tenant"
     },
     {
       "label": "@branchleft/ghost-platform-tenant",
@@ -2058,9 +2049,9 @@
       "source_file": "package.json",
       "source_location": "L12",
       "_origin": "ast",
-      "id": "branchleft_ghost_platform_tenant",
       "community": 1,
-      "norm_label": "@branchleft/ghost-platform-tenant"
+      "norm_label": "@branchleft/ghost-platform-tenant",
+      "id": "branchleft_ghost_platform_tenant"
     },
     {
       "label": "@pulumi/pulumi",
@@ -2068,9 +2059,9 @@
       "source_file": "package.json",
       "source_location": "L13",
       "_origin": "ast",
-      "id": "package_dependencies_pulumi_pulumi",
       "community": 1,
-      "norm_label": "@pulumi/pulumi"
+      "norm_label": "@pulumi/pulumi",
+      "id": "package_dependencies_pulumi_pulumi"
     },
     {
       "label": "@pulumi/pulumi",
@@ -2078,9 +2069,9 @@
       "source_file": "package.json",
       "source_location": "L13",
       "_origin": "ast",
-      "id": "pulumi_pulumi",
       "community": 1,
-      "norm_label": "@pulumi/pulumi"
+      "norm_label": "@pulumi/pulumi",
+      "id": "pulumi_pulumi"
     },
     {
       "label": "devDependencies",
@@ -2088,9 +2079,9 @@
       "source_file": "package.json",
       "source_location": "L15",
       "_origin": "ast",
-      "id": "package_devdependencies",
       "community": 1,
-      "norm_label": "devdependencies"
+      "norm_label": "devdependencies",
+      "id": "package_devdependencies"
     },
     {
       "label": "@branchleft/prettier-config",
@@ -2098,9 +2089,9 @@
       "source_file": "package.json",
       "source_location": "L16",
       "_origin": "ast",
-      "id": "package_devdependencies_branchleft_prettier_config",
       "community": 1,
-      "norm_label": "@branchleft/prettier-config"
+      "norm_label": "@branchleft/prettier-config",
+      "id": "package_devdependencies_branchleft_prettier_config"
     },
     {
       "label": "@branchleft/prettier-config",
@@ -2108,9 +2099,9 @@
       "source_file": "package.json",
       "source_location": "L16",
       "_origin": "ast",
-      "id": "branchleft_prettier_config",
       "community": 1,
-      "norm_label": "@branchleft/prettier-config"
+      "norm_label": "@branchleft/prettier-config",
+      "id": "branchleft_prettier_config"
     },
     {
       "label": "@branchleft/tsconfig",
@@ -2118,9 +2109,9 @@
       "source_file": "package.json",
       "source_location": "L17",
       "_origin": "ast",
-      "id": "package_devdependencies_branchleft_tsconfig",
       "community": 1,
-      "norm_label": "@branchleft/tsconfig"
+      "norm_label": "@branchleft/tsconfig",
+      "id": "package_devdependencies_branchleft_tsconfig"
     },
     {
       "label": "@branchleft/tsconfig",
@@ -2128,9 +2119,9 @@
       "source_file": "package.json",
       "source_location": "L17",
       "_origin": "ast",
-      "id": "branchleft_tsconfig",
       "community": 1,
-      "norm_label": "@branchleft/tsconfig"
+      "norm_label": "@branchleft/tsconfig",
+      "id": "branchleft_tsconfig"
     },
     {
       "label": "@types/node",
@@ -2138,9 +2129,9 @@
       "source_file": "package.json",
       "source_location": "L18",
       "_origin": "ast",
-      "id": "package_devdependencies_types_node",
       "community": 1,
-      "norm_label": "@types/node"
+      "norm_label": "@types/node",
+      "id": "package_devdependencies_types_node"
     },
     {
       "label": "@types/node",
@@ -2148,9 +2139,9 @@
       "source_file": "package.json",
       "source_location": "L18",
       "_origin": "ast",
-      "id": "types_node",
       "community": 1,
-      "norm_label": "@types/node"
+      "norm_label": "@types/node",
+      "id": "types_node"
     },
     {
       "label": "prettier",
@@ -2158,9 +2149,9 @@
       "source_file": "package.json",
       "source_location": "L19",
       "_origin": "ast",
-      "id": "package_devdependencies_prettier",
       "community": 1,
-      "norm_label": "prettier"
+      "norm_label": "prettier",
+      "id": "package_devdependencies_prettier"
     },
     {
       "label": "prettier",
@@ -2168,9 +2159,9 @@
       "source_file": "package.json",
       "source_location": "L19",
       "_origin": "ast",
-      "id": "prettier",
       "community": 1,
-      "norm_label": "prettier"
+      "norm_label": "prettier",
+      "id": "prettier"
     },
     {
       "label": "typescript",
@@ -2178,9 +2169,9 @@
       "source_file": "package.json",
       "source_location": "L20",
       "_origin": "ast",
-      "id": "package_devdependencies_typescript",
       "community": 1,
-      "norm_label": "typescript"
+      "norm_label": "typescript",
+      "id": "package_devdependencies_typescript"
     },
     {
       "label": "typescript",
@@ -2188,65 +2179,86 @@
       "source_file": "package.json",
       "source_location": "L20",
       "_origin": "ast",
-      "id": "typescript",
       "community": 1,
-      "norm_label": "typescript"
+      "norm_label": "typescript",
+      "id": "typescript"
     },
     {
       "label": "ghost-platform-tenant-template",
       "file_type": "document",
       "source_file": "README.md",
-      "id": "readme_ghost_platform_tenant_template",
-      "community": 10,
-      "norm_label": "ghost-platform-tenant-template"
+      "community": 11,
+      "norm_label": "ghost-platform-tenant-template",
+      "_origin": "semantic",
+      "id": "readme_ghost_platform_tenant_template"
     },
     {
       "label": "__TENANT_NAME__ \u2014 Ghost platform tenant stack",
       "file_type": "document",
       "source_file": "README.tenant.md",
-      "id": "readme_tenant_name",
-      "community": 10,
-      "norm_label": "__tenant_name__ \u2014 ghost platform tenant stack"
+      "community": 11,
+      "norm_label": "__tenant_name__ \u2014 ghost platform tenant stack",
+      "_origin": "semantic",
+      "id": "readme_tenant_name"
     },
     {
       "label": "Runbook \u2014 a generated tenant repo",
       "file_type": "document",
       "source_file": "RUNBOOK-bootstrap.md",
-      "id": "runbook_bootstrap",
-      "community": 10,
-      "norm_label": "runbook \u2014 a generated tenant repo"
-    },
-    {
-      "label": "Pulumi.<slug>.yaml",
-      "file_type": "code",
-      "source_file": "Pulumi.<slug>.yaml",
-      "id": "pulumi_slug_yaml",
-      "community": 10,
-      "norm_label": "pulumi.<slug>.yaml"
-    },
-    {
-      "label": "assert-no-tenant-deletes.py",
-      "file_type": "code",
-      "source_file": "scripts/assert-no-tenant-deletes.py",
-      "id": "scripts_assert_no_tenant_deletes",
       "community": 11,
-      "norm_label": "assert-no-tenant-deletes.py"
+      "norm_label": "runbook \u2014 a generated tenant repo",
+      "_origin": "semantic",
+      "id": "runbook_bootstrap"
     },
     {
       "label": "branchleft-deploy",
       "file_type": "code",
       "source_file": null,
-      "id": "branchleft_deploy",
-      "community": 16,
-      "norm_label": "branchleft-deploy"
+      "community": 17,
+      "norm_label": "branchleft-deploy",
+      "_origin": "semantic",
+      "id": "branchleft_deploy"
     },
     {
       "label": "branchLeft/ghost-platform",
       "file_type": "document",
       "source_url": "https://github.com/branchLeft/ghost-platform",
-      "id": "ghost_platform_repo",
+      "community": 11,
+      "norm_label": "branchleft/ghost-platform",
+      "_origin": "semantic",
+      "id": "ghost_platform_repo"
+    },
+    {
+      "label": "Infra CI Workflow",
+      "file_type": "code",
+      "source_file": ".github/workflows/infra-ci.yml",
+      "id": "github_workflows_infra_ci",
       "community": 10,
-      "norm_label": "branchleft/ghost-platform"
+      "norm_label": "infra ci workflow"
+    },
+    {
+      "label": "ghost-platform-tenant/scripts/assert-no-tenant-deletes.py",
+      "file_type": "code",
+      "source_file": "node_modules/@branchleft/ghost-platform-tenant/scripts/assert-no-tenant-deletes.py",
+      "id": "ghost_platform_tenant_assert_no_tenant_deletes",
+      "community": 10,
+      "norm_label": "ghost-platform-tenant/scripts/assert-no-tenant-deletes.py"
+    },
+    {
+      "label": "Script Unit Tests",
+      "file_type": "code",
+      "source_file": "scripts/",
+      "id": "scripts_test_unit",
+      "community": 10,
+      "norm_label": "script unit tests"
+    },
+    {
+      "label": "GhostTenant Component",
+      "file_type": "concept",
+      "source_file": null,
+      "id": "ghost_tenant_component",
+      "community": 10,
+      "norm_label": "ghosttenant component"
     }
   ],
   "links": [
@@ -3383,6 +3395,14 @@
       "_origin": "semantic",
       "source": "github_workflows_standards_standards",
       "target": "branchleft_standards_standards"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": ".github/workflows/infra-ci.yml",
+      "source": "github_workflows_infra_ci",
+      "target": "pulumi_cli"
     },
     {
       "relation": "contains",
@@ -4700,23 +4720,6 @@
       "target": "ghost_platform_tenant_component"
     },
     {
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.9,
-      "source_file": ".github/workflows/infra-ci.yml",
-      "_origin": "semantic",
-      "source": "github_workflows_infra_ci_yml",
-      "target": "pulumi_stack"
-    },
-    {
-      "relation": "references",
-      "confidence": "INFERRED",
-      "confidence_score": 0.9,
-      "source_file": "README.md",
-      "source": "scripts_assert_no_tenant_deletes",
-      "target": "ghost_platform_tenant_component"
-    },
-    {
       "relation": "shares_data_with",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
@@ -4732,9 +4735,9 @@
       "source_location": "L48",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "config",
-      "target": "config_apphostprivateip",
-      "confidence_score": 1.0
+      "target": "config_apphostprivateip"
     },
     {
       "relation": "contains",
@@ -4743,9 +4746,9 @@
       "source_location": "L138",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "config",
-      "target": "config_bulkemail",
-      "confidence_score": 1.0
+      "target": "config_bulkemail"
     },
     {
       "relation": "contains",
@@ -4754,9 +4757,9 @@
       "source_location": "L137",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "config",
-      "target": "config_bulkemailbaseurl",
-      "confidence_score": 1.0
+      "target": "config_bulkemailbaseurl"
     },
     {
       "relation": "contains",
@@ -4765,9 +4768,9 @@
       "source_location": "L3",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "config",
-      "target": "config_config",
-      "confidence_score": 1.0
+      "target": "config_config"
     },
     {
       "relation": "contains",
@@ -4776,9 +4779,9 @@
       "source_location": "L66",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "config",
-      "target": "config_databasehost",
-      "confidence_score": 1.0
+      "target": "config_databasehost"
     },
     {
       "relation": "contains",
@@ -4787,9 +4790,9 @@
       "source_location": "L78",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "config",
-      "target": "config_databasemaxuserconnections",
-      "confidence_score": 1.0
+      "target": "config_databasemaxuserconnections"
     },
     {
       "relation": "contains",
@@ -4798,9 +4801,9 @@
       "source_location": "L74",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "config",
-      "target": "config_databasepassword",
-      "confidence_score": 1.0
+      "target": "config_databasepassword"
     },
     {
       "relation": "contains",
@@ -4809,9 +4812,9 @@
       "source_location": "L51",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "config",
-      "target": "config_hostport",
-      "confidence_score": 1.0
+      "target": "config_hostport"
     },
     {
       "relation": "contains",
@@ -4820,9 +4823,9 @@
       "source_location": "L63",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "config",
-      "target": "config_imageref",
-      "confidence_score": 1.0
+      "target": "config_imageref"
     },
     {
       "relation": "contains",
@@ -4831,9 +4834,9 @@
       "source_location": "L126",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "config",
-      "target": "config_mail",
-      "confidence_score": 1.0
+      "target": "config_mail"
     },
     {
       "relation": "contains",
@@ -4842,9 +4845,9 @@
       "source_location": "L125",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "config",
-      "target": "config_mailhost",
-      "confidence_score": 1.0
+      "target": "config_mailhost"
     },
     {
       "relation": "contains",
@@ -4853,9 +4856,9 @@
       "source_location": "L111",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "config",
-      "target": "config_mediaaccesskeyid",
-      "confidence_score": 1.0
+      "target": "config_mediaaccesskeyid"
     },
     {
       "relation": "contains",
@@ -4864,9 +4867,9 @@
       "source_location": "L94",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "config",
-      "target": "config_mediaendpoint",
-      "confidence_score": 1.0
+      "target": "config_mediaendpoint"
     },
     {
       "relation": "contains",
@@ -4875,9 +4878,9 @@
       "source_location": "L95",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "config",
-      "target": "config_mediaregion",
-      "confidence_score": 1.0
+      "target": "config_mediaregion"
     },
     {
       "relation": "contains",
@@ -4886,9 +4889,9 @@
       "source_location": "L112",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "config",
-      "target": "config_mediasecretaccesskey",
-      "confidence_score": 1.0
+      "target": "config_mediasecretaccesskey"
     },
     {
       "relation": "contains",
@@ -4897,9 +4900,9 @@
       "source_location": "L117",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "config",
-      "target": "config_rssbudgetmib",
-      "confidence_score": 1.0
+      "target": "config_rssbudgetmib"
     },
     {
       "relation": "contains",
@@ -4908,9 +4911,9 @@
       "source_location": "L34",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "config",
-      "target": "config_siteurl",
-      "confidence_score": 1.0
+      "target": "config_siteurl"
     },
     {
       "relation": "contains",
@@ -4919,9 +4922,9 @@
       "source_location": "L31",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "config",
-      "target": "config_slug",
-      "confidence_score": 1.0
+      "target": "config_slug"
     },
     {
       "relation": "contains",
@@ -4930,9 +4933,9 @@
       "source_location": "L45",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "config",
-      "target": "config_uid",
-      "confidence_score": 1.0
+      "target": "config_uid"
     },
     {
       "relation": "contains",
@@ -4941,9 +4944,9 @@
       "source_location": "L116",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "config",
-      "target": "config_uploadceilingmib",
-      "confidence_score": 1.0
+      "target": "config_uploadceilingmib"
     },
     {
       "relation": "re_exports",
@@ -4953,9 +4956,9 @@
       "source_location": "L118",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "index",
-      "target": "config",
-      "confidence_score": 1.0
+      "target": "config"
     },
     {
       "relation": "imports",
@@ -4965,9 +4968,9 @@
       "source_location": "L3",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "index",
-      "target": "config_slug",
-      "confidence_score": 1.0
+      "target": "config_slug"
     },
     {
       "relation": "imports",
@@ -4977,9 +4980,9 @@
       "source_location": "L3",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "index",
-      "target": "config_siteurl",
-      "confidence_score": 1.0
+      "target": "config_siteurl"
     },
     {
       "relation": "imports",
@@ -4989,9 +4992,9 @@
       "source_location": "L3",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "index",
-      "target": "config_uid",
-      "confidence_score": 1.0
+      "target": "config_uid"
     },
     {
       "relation": "imports",
@@ -5001,9 +5004,9 @@
       "source_location": "L3",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "index",
-      "target": "config_apphostprivateip",
-      "confidence_score": 1.0
+      "target": "config_apphostprivateip"
     },
     {
       "relation": "imports",
@@ -5013,9 +5016,9 @@
       "source_location": "L3",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "index",
-      "target": "config_hostport",
-      "confidence_score": 1.0
+      "target": "config_hostport"
     },
     {
       "relation": "imports",
@@ -5025,9 +5028,9 @@
       "source_location": "L3",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "index",
-      "target": "config_imageref",
-      "confidence_score": 1.0
+      "target": "config_imageref"
     },
     {
       "relation": "imports",
@@ -5037,9 +5040,9 @@
       "source_location": "L3",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "index",
-      "target": "config_databasehost",
-      "confidence_score": 1.0
+      "target": "config_databasehost"
     },
     {
       "relation": "imports",
@@ -5049,9 +5052,9 @@
       "source_location": "L3",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "index",
-      "target": "config_databasepassword",
-      "confidence_score": 1.0
+      "target": "config_databasepassword"
     },
     {
       "relation": "imports",
@@ -5061,9 +5064,9 @@
       "source_location": "L3",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "index",
-      "target": "config_databasemaxuserconnections",
-      "confidence_score": 1.0
+      "target": "config_databasemaxuserconnections"
     },
     {
       "relation": "imports",
@@ -5073,9 +5076,9 @@
       "source_location": "L3",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "index",
-      "target": "config_mediaendpoint",
-      "confidence_score": 1.0
+      "target": "config_mediaendpoint"
     },
     {
       "relation": "imports",
@@ -5085,9 +5088,9 @@
       "source_location": "L3",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "index",
-      "target": "config_mediaregion",
-      "confidence_score": 1.0
+      "target": "config_mediaregion"
     },
     {
       "relation": "imports",
@@ -5097,9 +5100,9 @@
       "source_location": "L3",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "index",
-      "target": "config_mediaaccesskeyid",
-      "confidence_score": 1.0
+      "target": "config_mediaaccesskeyid"
     },
     {
       "relation": "imports",
@@ -5109,9 +5112,9 @@
       "source_location": "L3",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "index",
-      "target": "config_mediasecretaccesskey",
-      "confidence_score": 1.0
+      "target": "config_mediasecretaccesskey"
     },
     {
       "relation": "imports",
@@ -5121,9 +5124,9 @@
       "source_location": "L3",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "index",
-      "target": "config_uploadceilingmib",
-      "confidence_score": 1.0
+      "target": "config_uploadceilingmib"
     },
     {
       "relation": "imports",
@@ -5133,9 +5136,9 @@
       "source_location": "L3",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "index",
-      "target": "config_rssbudgetmib",
-      "confidence_score": 1.0
+      "target": "config_rssbudgetmib"
     },
     {
       "relation": "imports",
@@ -5145,9 +5148,9 @@
       "source_location": "L3",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "index",
-      "target": "config_mail",
-      "confidence_score": 1.0
+      "target": "config_mail"
     },
     {
       "relation": "imports",
@@ -5157,9 +5160,9 @@
       "source_location": "L3",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "index",
-      "target": "config_bulkemail",
-      "confidence_score": 1.0
+      "target": "config_bulkemail"
     },
     {
       "relation": "contains",
@@ -5168,9 +5171,9 @@
       "source_location": "L127",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "index",
-      "target": "index_apphost",
-      "confidence_score": 1.0
+      "target": "index_apphost"
     },
     {
       "relation": "contains",
@@ -5179,9 +5182,9 @@
       "source_location": "L86",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "index",
-      "target": "index_composefile",
-      "confidence_score": 1.0
+      "target": "index_composefile"
     },
     {
       "relation": "contains",
@@ -5190,9 +5193,9 @@
       "source_location": "L99",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "index",
-      "target": "index_composeunit",
-      "confidence_score": 1.0
+      "target": "index_composeunit"
     },
     {
       "relation": "contains",
@@ -5201,9 +5204,9 @@
       "source_location": "L103",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "index",
-      "target": "index_databasename",
-      "confidence_score": 1.0
+      "target": "index_databasename"
     },
     {
       "relation": "contains",
@@ -5212,9 +5215,9 @@
       "source_location": "L104",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "index",
-      "target": "index_databaseuser",
-      "confidence_score": 1.0
+      "target": "index_databaseuser"
     },
     {
       "relation": "contains",
@@ -5223,9 +5226,9 @@
       "source_location": "L97",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "index",
-      "target": "index_edgerequestbodymaxsize",
-      "confidence_score": 1.0
+      "target": "index_edgerequestbodymaxsize"
     },
     {
       "relation": "contains",
@@ -5234,9 +5237,9 @@
       "source_location": "L91",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "index",
-      "target": "index_hostprovisioningcommand",
-      "confidence_score": 1.0
+      "target": "index_hostprovisioningcommand"
     },
     {
       "relation": "contains",
@@ -5245,9 +5248,9 @@
       "source_location": "L123",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "index",
-      "target": "index_identity",
-      "confidence_score": 1.0
+      "target": "index_identity"
     },
     {
       "relation": "contains",
@@ -5256,9 +5259,9 @@
       "source_location": "L118",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "index",
-      "target": "index_image",
-      "confidence_score": 1.0
+      "target": "index_image"
     },
     {
       "relation": "contains",
@@ -5267,9 +5270,9 @@
       "source_location": "L102",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "index",
-      "target": "index_imageenvpath",
-      "confidence_score": 1.0
+      "target": "index_imageenvpath"
     },
     {
       "relation": "contains",
@@ -5278,9 +5281,9 @@
       "source_location": "L112",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "index",
-      "target": "index_mediabucket",
-      "confidence_score": 1.0
+      "target": "index_mediabucket"
     },
     {
       "relation": "contains",
@@ -5289,9 +5292,9 @@
       "source_location": "L113",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "index",
-      "target": "index_mediapublicbaseurl",
-      "confidence_score": 1.0
+      "target": "index_mediapublicbaseurl"
     },
     {
       "relation": "contains",
@@ -5300,9 +5303,9 @@
       "source_location": "L81",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "index",
-      "target": "index_secretsenvfile",
-      "confidence_score": 1.0
+      "target": "index_secretsenvfile"
     },
     {
       "relation": "contains",
@@ -5311,9 +5314,9 @@
       "source_location": "L101",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "index",
-      "target": "index_secretsenvpath",
-      "confidence_score": 1.0
+      "target": "index_secretsenvpath"
     },
     {
       "relation": "contains",
@@ -5322,9 +5325,9 @@
       "source_location": "L100",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "index",
-      "target": "index_stackdirectory",
-      "confidence_score": 1.0
+      "target": "index_stackdirectory"
     },
     {
       "relation": "contains",
@@ -5333,9 +5336,9 @@
       "source_location": "L43",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "index",
-      "target": "index_tenant",
-      "confidence_score": 1.0
+      "target": "index_tenant"
     },
     {
       "relation": "contains",
@@ -5344,9 +5347,9 @@
       "source_location": "L11",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "package",
-      "target": "package_dependencies",
-      "confidence_score": 1.0
+      "target": "package_dependencies"
     },
     {
       "relation": "contains",
@@ -5355,9 +5358,9 @@
       "source_location": "L15",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "package",
-      "target": "package_devdependencies",
-      "confidence_score": 1.0
+      "target": "package_devdependencies"
     },
     {
       "relation": "contains",
@@ -5366,9 +5369,9 @@
       "source_location": "L4",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "package",
-      "target": "package_main",
-      "confidence_score": 1.0
+      "target": "package_main"
     },
     {
       "relation": "contains",
@@ -5377,9 +5380,9 @@
       "source_location": "L2",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "package",
-      "target": "package_name",
-      "confidence_score": 1.0
+      "target": "package_name"
     },
     {
       "relation": "contains",
@@ -5388,9 +5391,9 @@
       "source_location": "L5",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "package",
-      "target": "package_prettier",
-      "confidence_score": 1.0
+      "target": "package_prettier"
     },
     {
       "relation": "contains",
@@ -5399,9 +5402,9 @@
       "source_location": "L3",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "package",
-      "target": "package_private",
-      "confidence_score": 1.0
+      "target": "package_private"
     },
     {
       "relation": "contains",
@@ -5410,9 +5413,9 @@
       "source_location": "L6",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "package",
-      "target": "package_scripts",
-      "confidence_score": 1.0
+      "target": "package_scripts"
     },
     {
       "relation": "contains",
@@ -5421,9 +5424,9 @@
       "source_location": "L8",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "package_scripts",
-      "target": "package_scripts_format",
-      "confidence_score": 1.0
+      "target": "package_scripts_format"
     },
     {
       "relation": "contains",
@@ -5432,9 +5435,9 @@
       "source_location": "L9",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "package_scripts",
-      "target": "package_scripts_format_check",
-      "confidence_score": 1.0
+      "target": "package_scripts_format_check"
     },
     {
       "relation": "contains",
@@ -5443,9 +5446,9 @@
       "source_location": "L7",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "package_scripts",
-      "target": "package_scripts_typecheck",
-      "confidence_score": 1.0
+      "target": "package_scripts_typecheck"
     },
     {
       "relation": "contains",
@@ -5454,9 +5457,9 @@
       "source_location": "L12",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "package_dependencies",
-      "target": "package_dependencies_branchleft_ghost_platform_tenant",
-      "confidence_score": 1.0
+      "target": "package_dependencies_branchleft_ghost_platform_tenant"
     },
     {
       "relation": "contains",
@@ -5465,9 +5468,9 @@
       "source_location": "L13",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "package_dependencies",
-      "target": "package_dependencies_pulumi_pulumi",
-      "confidence_score": 1.0
+      "target": "package_dependencies_pulumi_pulumi"
     },
     {
       "relation": "imports",
@@ -5477,9 +5480,9 @@
       "weight": 1.0,
       "context": "import",
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "package_dependencies_branchleft_ghost_platform_tenant",
-      "target": "branchleft_ghost_platform_tenant",
-      "confidence_score": 1.0
+      "target": "branchleft_ghost_platform_tenant"
     },
     {
       "relation": "imports",
@@ -5489,9 +5492,9 @@
       "weight": 1.0,
       "context": "import",
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "package_dependencies_pulumi_pulumi",
-      "target": "pulumi_pulumi",
-      "confidence_score": 1.0
+      "target": "pulumi_pulumi"
     },
     {
       "relation": "contains",
@@ -5500,9 +5503,9 @@
       "source_location": "L16",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "package_devdependencies",
-      "target": "package_devdependencies_branchleft_prettier_config",
-      "confidence_score": 1.0
+      "target": "package_devdependencies_branchleft_prettier_config"
     },
     {
       "relation": "contains",
@@ -5511,9 +5514,9 @@
       "source_location": "L17",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "package_devdependencies",
-      "target": "package_devdependencies_branchleft_tsconfig",
-      "confidence_score": 1.0
+      "target": "package_devdependencies_branchleft_tsconfig"
     },
     {
       "relation": "contains",
@@ -5522,9 +5525,9 @@
       "source_location": "L19",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "package_devdependencies",
-      "target": "package_devdependencies_prettier",
-      "confidence_score": 1.0
+      "target": "package_devdependencies_prettier"
     },
     {
       "relation": "contains",
@@ -5533,9 +5536,9 @@
       "source_location": "L18",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "package_devdependencies",
-      "target": "package_devdependencies_types_node",
-      "confidence_score": 1.0
+      "target": "package_devdependencies_types_node"
     },
     {
       "relation": "contains",
@@ -5544,9 +5547,9 @@
       "source_location": "L20",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "package_devdependencies",
-      "target": "package_devdependencies_typescript",
-      "confidence_score": 1.0
+      "target": "package_devdependencies_typescript"
     },
     {
       "relation": "imports",
@@ -5556,9 +5559,9 @@
       "weight": 1.0,
       "context": "import",
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "package_devdependencies_branchleft_prettier_config",
-      "target": "branchleft_prettier_config",
-      "confidence_score": 1.0
+      "target": "branchleft_prettier_config"
     },
     {
       "relation": "imports",
@@ -5568,9 +5571,9 @@
       "weight": 1.0,
       "context": "import",
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "package_devdependencies_branchleft_tsconfig",
-      "target": "branchleft_tsconfig",
-      "confidence_score": 1.0
+      "target": "branchleft_tsconfig"
     },
     {
       "relation": "imports",
@@ -5580,9 +5583,9 @@
       "weight": 1.0,
       "context": "import",
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "package_devdependencies_types_node",
-      "target": "types_node",
-      "confidence_score": 1.0
+      "target": "types_node"
     },
     {
       "relation": "imports",
@@ -5592,9 +5595,9 @@
       "weight": 1.0,
       "context": "import",
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "package_devdependencies_prettier",
-      "target": "prettier",
-      "confidence_score": 1.0
+      "target": "prettier"
     },
     {
       "relation": "imports",
@@ -5604,15 +5607,16 @@
       "weight": 1.0,
       "context": "import",
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "package_devdependencies_typescript",
-      "target": "typescript",
-      "confidence_score": 1.0
+      "target": "typescript"
     },
     {
       "relation": "references",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "README.md",
+      "_origin": "semantic",
       "source": "readme_ghost_platform_tenant_template",
       "target": "ghost_platform_repo"
     },
@@ -5621,6 +5625,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "README.tenant.md",
+      "_origin": "semantic",
       "source": "readme_tenant_name",
       "target": "readme_ghost_platform_tenant_template"
     },
@@ -5629,18 +5634,43 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "RUNBOOK-bootstrap.md",
+      "_origin": "semantic",
       "source": "runbook_bootstrap",
       "target": "ghost_platform_repo"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": ".github/workflows/infra-ci.yml",
+      "source": "github_workflows_infra_ci",
+      "target": "ghost_platform_tenant_assert_no_tenant_deletes"
     },
     {
       "relation": "references",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
-      "source_file": "RUNBOOK-bootstrap.md",
-      "source": "runbook_bootstrap",
-      "target": "pulumi_slug_yaml"
+      "source_file": ".github/workflows/infra-ci.yml",
+      "source": "github_workflows_infra_ci",
+      "target": "ghost_tenant_component"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": ".github/workflows/infra-ci.yml",
+      "source": "github_workflows_infra_ci",
+      "target": "scripts_test_unit"
+    },
+    {
+      "relation": "references",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": ".github/workflows/infra-ci.yml",
+      "source": "scripts_test_unit",
+      "target": "ghost_platform_tenant_assert_no_tenant_deletes"
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "fc8ab0daa2d2976f7273d6a1ee3e38c9d0326d9e"
+  "built_at_commit": "1fb8630c018aa94174f009ceb48a4bc188f9f433"
 }
