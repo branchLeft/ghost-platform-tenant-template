@@ -242,20 +242,28 @@ catches a slug change, which Pulumi renders as a delete and a create, and with
 it the content volume rename that orphans this tenant's themes and settings on
 the host under the old name.
 
-> **The identity half of this guard does not fire today, and that is
-> reproduced, not suspected.** `GhostTenant` registers itself with empty inputs
-> (`super(..., {}, opts)`), so a change to `uid`, `appHostPrivateIp` or
-> `maxUserConnections` produces no step for `ghostPlatform:tenant:GhostTenant`
-> in the plan at all — the whole preview is `same pulumi:pulumi:Stack` — and the
-> guard's identity comparison matches zero steps and exits 0. Verified against
-> the published component: `uid` 30007 → 30099 previewed clean, applied, and
-> re-rendered `user: '30099:30099'` over a content volume owned `0700` by 30007.
-> What *is* enforced is the destructive-operation half: a `delete` or `replace`
-> in the plan is refused, which catches a slug change because that is a
-> delete-and-create. Fixing the identity half is
-> [branchLeft/workspace#280](https://github.com/branchLeft/workspace/issues/280),
-> against the component rather than this repo. Until it lands, treat `uid`,
-> `appHostPrivateIp` and the volume names as fields nothing mechanical protects.
+**What it also refuses, from component `3.0.0` onward:** a change to any
+identity field — `uid`, `stackName`, `contentVolume`, `adaptersVolume`,
+`databaseName` or `appHostPrivateIp`. Each is a data migration rather than an
+update, and each is now a real `update` step the guard compares rather than
+something it silently fails to see.
+
+> **This protection did not exist before `3.0.0`, and the history is worth
+> keeping.** Under `2.0.0` and earlier, `GhostTenant` registered itself with
+> empty inputs (`super(..., {}, opts)`), so a change to `uid` or
+> `appHostPrivateIp` produced no step for `ghostPlatform:tenant:GhostTenant` in
+> the plan at all, the guard's identity comparison matched zero steps, and it
+> exited 0. That was reproduced rather than suspected: `uid` 30007 → 30099
+> previewed clean, applied, and re-rendered `user: '30099:30099'` over a content
+> volume owned `0700` by 30007. Fixed in
+> [branchLeft/workspace#280](https://github.com/branchLeft/workspace/issues/280);
+> a tenant repo pinned below `3.0.0` still has the gap.
+
+**The preview above must keep `--show-sames` for this to work.** The `3.0.0`
+guard refuses a plan carrying no step at all for the component, and Pulumi omits
+an unchanged `ComponentResource` from `steps` without that flag — which is
+indistinguishable from the component having stopped registering its identity.
+Dropping the flag breaks every tenant change that touches no identity field.
 
 ```bash
 GUARD=node_modules/@branchleft/ghost-platform-tenant/scripts/assert-no-tenant-deletes.py

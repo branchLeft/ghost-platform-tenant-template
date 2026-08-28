@@ -365,12 +365,26 @@ jobs:
       # secret: Pulumi renders it as `[secret]` in `--json`, and the difference
       # between relying on that and not printing the plan at all is one upstream
       # change. `pulumi preview --diff` from a checkout is the debugging path.
-      # Only the destructive-operation half of this guard is live. The identity
-      # half matches nothing, because `GhostTenant` registers empty inputs and
-      # therefore produces no step of its own when only its inputs change --
-      # reproduced against the published component, tracked as
-      # branchLeft/workspace#280. Do not read this step as protecting `uid` or
-      # `appHostPrivateIp`; it does not.
+      # Both halves of this guard are live from component 3.0.0. The identity
+      # half compares `uid`, `stackName`, `contentVolume`, `adaptersVolume`,
+      # `databaseName` and `appHostPrivateIp` against the plan's own steps, so
+      # a change to any of them is refused rather than applied as a clean
+      # update. Under 2.0.0 it matched nothing: `GhostTenant` registered empty
+      # inputs, so it produced no step for a preview to compare and a changed
+      # `uid` reached `pulumi up` green.
+      #
+      # This is why the preview above must keep `--show-sames`. The 3.0.0 guard
+      # refuses a plan carrying no step at all for the component, and Pulumi
+      # omits an unchanged ComponentResource from `steps` without that flag --
+      # which is indistinguishable from the component having stopped
+      # registering its identity, and is the ambiguity the check exists to
+      # refuse. Removing the flag breaks every tenant change that touches no
+      # identity field.
+      #
+      # Expect one `update` step for the `GhostTenant` resource on the first
+      # apply after this bump, with no configuration change. Its registered
+      # inputs go from `{}` to the identity object; a ComponentResource has no
+      # provider to call, so the step is inert and the guard passes it.
       - name: Refuse to apply a plan carrying a delete or replace
         run: |
           set -euo pipefail
