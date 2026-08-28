@@ -343,7 +343,16 @@ jobs:
           PULUMI_BACKEND_URL: ${{ vars.PULUMI_BACKEND_URL }}
           AWS_ACCESS_KEY_ID: ${{ secrets.HETZNER_S3_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.HETZNER_S3_SECRET_ACCESS_KEY }}
-        run: pulumi preview --stack __TENANT_NAME__ --json > preview.json
+        # `--show-sames` is required by the guard, not a debugging aid. Pulumi
+        # omits an unchanged ComponentResource from `steps` entirely without
+        # it, which is indistinguishable from a `GhostTenant` that has stopped
+        # registering its identity -- the exact ambiguity the component's
+        # `component_is_present()` check exists to refuse. Every tenant change
+        # that touches no identity field (media or mail config, `siteUrl`,
+        # resource caps, an image digest bump) produces zero `GhostTenant`
+        # steps, so without this flag the guard refuses those plans outright
+        # once the pin reaches 3.0.0.
+        run: pulumi preview --stack __TENANT_NAME__ --json --show-sames > preview.json
 
       # `set -e` is load-bearing here, not boilerplate: the delete check is not
       # the last command in this script, and without errexit its non-zero exit
