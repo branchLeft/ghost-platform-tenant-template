@@ -209,36 +209,34 @@
       "scripts_test_generate_tenant_repo_validateslug_test_refuses_uppercase_underscores_and_a_leading_digit"
     ],
     "10": [
-      "ghost_platform_tenant_assert_no_tenant_deletes",
-      "ghost_tenant_component",
-      "github_workflows_infra_ci",
-      "pulumi_cli",
-      "scripts_test_unit"
+      "claude_md",
+      "node_modules_branchleft_ghost_platform_tenant_component",
+      "pulumi_yaml",
+      "readme_md",
+      "readme_tenant_md"
     ],
     "11": [
-      "ghost_platform_repo",
-      "readme_ghost_platform_tenant_template",
-      "readme_tenant_name",
-      "runbook_bootstrap"
-    ],
-    "12": [
       "scripts_assert_placeholders_substituted",
       "scripts_assert_placeholders_substituted_find_placeholders",
       "scripts_assert_placeholders_substituted_main",
       "scripts_assert_placeholders_substituted_py_path"
     ],
-    "13": [
-      "claude_md",
-      "ghost_platform_tenant_component",
-      "pulumi_yaml"
+    "12": [
+      "ghost_platform_tenant_delete_guard",
+      "github_workflows_infra_ci_yml",
+      "pulumi_stack_config"
     ],
-    "14": [
+    "13": [
       "branchleft_github_workflows_docs_lint",
       "github_workflows_docs_lint_docs_lint"
     ],
-    "15": [
+    "14": [
       "branchleft_standards_standards",
       "github_workflows_standards_standards"
+    ],
+    "15": [
+      "ghost_platform_repo",
+      "runbook_bootstrap"
     ],
     "16": [
       "hetzner_object_storage",
@@ -248,16 +246,25 @@
       "branchleft_deploy"
     ],
     "18": [
-      "github_workflows_graphify"
+      "ghost_tenant_component"
     ],
     "19": [
-      "google_cloud_platform"
+      "github_workflows_graphify"
     ],
     "20": [
-      "pattern"
+      "google_cloud_platform"
     ],
     "21": [
+      "pattern"
+    ],
+    "22": [
       "pre_commit_config_yaml"
+    ],
+    "23": [
+      "pulumi_cli"
+    ],
+    "24": [
+      "scripts_test_unit"
     ]
   },
   "cohesion": {
@@ -271,10 +278,10 @@
     "7": 0.15384615384615385,
     "8": 0.2727272727272727,
     "9": 0.25,
-    "10": 0.5,
-    "11": 0.5,
-    "12": 0.8333333333333334,
-    "13": 0.6666666666666666,
+    "10": 0.4,
+    "11": 0.8333333333333334,
+    "12": 0.6666666666666666,
+    "13": 1.0,
     "14": 1.0,
     "15": 1.0,
     "16": 1.0,
@@ -282,7 +289,10 @@
     "18": 1.0,
     "19": 1.0,
     "20": 1.0,
-    "21": 1.0
+    "21": 1.0,
+    "22": 1.0,
+    "23": 1.0,
+    "24": 1.0
   },
   "gods": [
     {
@@ -336,21 +346,9 @@
       "degree": 6
     }
   ],
-  "surprises": [
-    {
-      "source": "__TENANT_NAME__ \u2014 Ghost platform tenant stack",
-      "target": "ghost-platform-tenant-template",
-      "source_files": [
-        "README.tenant.md",
-        "README.md"
-      ],
-      "confidence": "EXTRACTED",
-      "relation": "cites",
-      "why": "connects across different repos/directories"
-    }
-  ],
+  "surprises": [],
   "tokens": {
-    "input": 6079,
-    "output": 1192
+    "input": 11682,
+    "output": 998
   }
 }
