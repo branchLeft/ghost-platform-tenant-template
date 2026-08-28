@@ -9,7 +9,7 @@
       "source_file": "",
       "source_location": "",
       "_origin": "ast",
-      "community": 20,
+      "community": 21,
       "norm_label": "pattern",
       "id": "pattern"
     },
@@ -691,7 +691,7 @@
       "label": "Graphify Workflow",
       "file_type": "code",
       "source_file": ".github/workflows/graphify.yml",
-      "community": 18,
+      "community": 19,
       "norm_label": "graphify workflow",
       "_origin": "semantic",
       "id": "github_workflows_graphify"
@@ -705,7 +705,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 14,
+      "community": 13,
       "norm_label": "docs-lint",
       "_origin": "semantic",
       "id": "github_workflows_docs_lint_docs_lint"
@@ -719,7 +719,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 14,
+      "community": 13,
       "norm_label": "branchleft/github-workflows/.github/workflows/docs-lint.yml@v1.0.6",
       "_origin": "semantic",
       "id": "branchleft_github_workflows_docs_lint"
@@ -733,7 +733,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 15,
+      "community": 14,
       "norm_label": "standards",
       "_origin": "semantic",
       "id": "github_workflows_standards_standards"
@@ -747,7 +747,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 15,
+      "community": 14,
       "norm_label": "branchleft/standards/.github/workflows/standards.yml@v0.4.0",
       "_origin": "semantic",
       "id": "branchleft_standards_standards"
@@ -761,7 +761,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 10,
+      "community": 23,
       "norm_label": "pulumi cli",
       "_origin": "semantic",
       "id": "pulumi_cli"
@@ -775,7 +775,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 19,
+      "community": 20,
       "norm_label": "google cloud platform",
       "_origin": "semantic",
       "id": "google_cloud_platform"
@@ -786,7 +786,7 @@
       "source_file": "scripts/assert-placeholders-substituted.py",
       "source_location": "L1",
       "_origin": "ast",
-      "community": 12,
+      "community": 11,
       "norm_label": "assert-placeholders-substituted.py",
       "id": "scripts_assert_placeholders_substituted"
     },
@@ -797,7 +797,7 @@
       "source_location": "L45",
       "_callable": true,
       "_origin": "ast",
-      "community": 12,
+      "community": 11,
       "norm_label": "find_placeholders()",
       "id": "scripts_assert_placeholders_substituted_find_placeholders"
     },
@@ -807,7 +807,7 @@
       "source_file": "",
       "source_location": "",
       "_origin": "ast",
-      "community": 12,
+      "community": 11,
       "norm_label": "path",
       "id": "scripts_assert_placeholders_substituted_py_path"
     },
@@ -818,7 +818,7 @@
       "source_location": "L50",
       "_callable": true,
       "_origin": "ast",
-      "community": 12,
+      "community": 11,
       "norm_label": "main()",
       "id": "scripts_assert_placeholders_substituted_main"
     },
@@ -1503,7 +1503,7 @@
       "label": ".pre-commit-config.yaml",
       "file_type": "code",
       "source_file": ".pre-commit-config.yaml",
-      "community": 21,
+      "community": 22,
       "norm_label": ".pre-commit-config.yaml",
       "_origin": "semantic",
       "id": "pre_commit_config_yaml"
@@ -1512,7 +1512,7 @@
       "label": "CLAUDE.md",
       "file_type": "document",
       "source_file": "CLAUDE.md",
-      "community": 13,
+      "community": 10,
       "norm_label": "claude.md",
       "_origin": "semantic",
       "id": "claude_md"
@@ -1521,19 +1521,18 @@
       "label": "Pulumi.yaml",
       "file_type": "code",
       "source_file": "Pulumi.yaml",
-      "community": 13,
+      "community": 10,
       "norm_label": "pulumi.yaml",
       "_origin": "semantic",
       "id": "pulumi_yaml"
     },
     {
       "label": "@branchleft/ghost-platform-tenant",
-      "file_type": "concept",
-      "source_file": null,
-      "community": 13,
-      "norm_label": "@branchleft/ghost-platform-tenant",
-      "_origin": "semantic",
-      "id": "ghost_platform_tenant_component"
+      "file_type": "code",
+      "source_file": "node_modules/@branchleft/ghost-platform-tenant",
+      "id": "node_modules_branchleft_ghost_platform_tenant_component",
+      "community": 10,
+      "norm_label": "@branchleft/ghost-platform-tenant"
     },
     {
       "label": "Pulumi Stack",
@@ -1934,278 +1933,10 @@
       "id": "index_apphost"
     },
     {
-      "label": "package.json",
-      "file_type": "code",
-      "source_file": "package.json",
-      "source_location": "L1",
-      "_origin": "ast",
-      "community": 1,
-      "norm_label": "package.json",
-      "id": "package"
-    },
-    {
-      "label": "name",
-      "file_type": "code",
-      "source_file": "package.json",
-      "source_location": "L2",
-      "_origin": "ast",
-      "community": 1,
-      "norm_label": "name",
-      "id": "package_name"
-    },
-    {
-      "label": "private",
-      "file_type": "code",
-      "source_file": "package.json",
-      "source_location": "L3",
-      "_origin": "ast",
-      "community": 1,
-      "norm_label": "private",
-      "id": "package_private"
-    },
-    {
-      "label": "main",
-      "file_type": "code",
-      "source_file": "package.json",
-      "source_location": "L4",
-      "_origin": "ast",
-      "community": 1,
-      "norm_label": "main",
-      "id": "package_main"
-    },
-    {
-      "label": "prettier",
-      "file_type": "code",
-      "source_file": "package.json",
-      "source_location": "L5",
-      "_origin": "ast",
-      "community": 1,
-      "norm_label": "prettier",
-      "id": "package_prettier"
-    },
-    {
-      "label": "scripts",
-      "file_type": "code",
-      "source_file": "package.json",
-      "source_location": "L6",
-      "_origin": "ast",
-      "community": 1,
-      "norm_label": "scripts",
-      "id": "package_scripts"
-    },
-    {
-      "label": "typecheck",
-      "file_type": "code",
-      "source_file": "package.json",
-      "source_location": "L7",
-      "_origin": "ast",
-      "community": 1,
-      "norm_label": "typecheck",
-      "id": "package_scripts_typecheck"
-    },
-    {
-      "label": "format",
-      "file_type": "code",
-      "source_file": "package.json",
-      "source_location": "L8",
-      "_origin": "ast",
-      "community": 1,
-      "norm_label": "format",
-      "id": "package_scripts_format"
-    },
-    {
-      "label": "format:check",
-      "file_type": "code",
-      "source_file": "package.json",
-      "source_location": "L9",
-      "_origin": "ast",
-      "community": 1,
-      "norm_label": "format:check",
-      "id": "package_scripts_format_check"
-    },
-    {
-      "label": "dependencies",
-      "file_type": "code",
-      "source_file": "package.json",
-      "source_location": "L11",
-      "_origin": "ast",
-      "community": 1,
-      "norm_label": "dependencies",
-      "id": "package_dependencies"
-    },
-    {
-      "label": "@branchleft/ghost-platform-tenant",
-      "file_type": "code",
-      "source_file": "package.json",
-      "source_location": "L12",
-      "_origin": "ast",
-      "community": 1,
-      "norm_label": "@branchleft/ghost-platform-tenant",
-      "id": "package_dependencies_branchleft_ghost_platform_tenant"
-    },
-    {
-      "label": "@branchleft/ghost-platform-tenant",
-      "file_type": "concept",
-      "source_file": "package.json",
-      "source_location": "L12",
-      "_origin": "ast",
-      "community": 1,
-      "norm_label": "@branchleft/ghost-platform-tenant",
-      "id": "branchleft_ghost_platform_tenant"
-    },
-    {
-      "label": "@pulumi/pulumi",
-      "file_type": "code",
-      "source_file": "package.json",
-      "source_location": "L13",
-      "_origin": "ast",
-      "community": 1,
-      "norm_label": "@pulumi/pulumi",
-      "id": "package_dependencies_pulumi_pulumi"
-    },
-    {
-      "label": "@pulumi/pulumi",
-      "file_type": "concept",
-      "source_file": "package.json",
-      "source_location": "L13",
-      "_origin": "ast",
-      "community": 1,
-      "norm_label": "@pulumi/pulumi",
-      "id": "pulumi_pulumi"
-    },
-    {
-      "label": "devDependencies",
-      "file_type": "code",
-      "source_file": "package.json",
-      "source_location": "L15",
-      "_origin": "ast",
-      "community": 1,
-      "norm_label": "devdependencies",
-      "id": "package_devdependencies"
-    },
-    {
-      "label": "@branchleft/prettier-config",
-      "file_type": "code",
-      "source_file": "package.json",
-      "source_location": "L16",
-      "_origin": "ast",
-      "community": 1,
-      "norm_label": "@branchleft/prettier-config",
-      "id": "package_devdependencies_branchleft_prettier_config"
-    },
-    {
-      "label": "@branchleft/prettier-config",
-      "file_type": "concept",
-      "source_file": "package.json",
-      "source_location": "L16",
-      "_origin": "ast",
-      "community": 1,
-      "norm_label": "@branchleft/prettier-config",
-      "id": "branchleft_prettier_config"
-    },
-    {
-      "label": "@branchleft/tsconfig",
-      "file_type": "code",
-      "source_file": "package.json",
-      "source_location": "L17",
-      "_origin": "ast",
-      "community": 1,
-      "norm_label": "@branchleft/tsconfig",
-      "id": "package_devdependencies_branchleft_tsconfig"
-    },
-    {
-      "label": "@branchleft/tsconfig",
-      "file_type": "concept",
-      "source_file": "package.json",
-      "source_location": "L17",
-      "_origin": "ast",
-      "community": 1,
-      "norm_label": "@branchleft/tsconfig",
-      "id": "branchleft_tsconfig"
-    },
-    {
-      "label": "@types/node",
-      "file_type": "code",
-      "source_file": "package.json",
-      "source_location": "L18",
-      "_origin": "ast",
-      "community": 1,
-      "norm_label": "@types/node",
-      "id": "package_devdependencies_types_node"
-    },
-    {
-      "label": "@types/node",
-      "file_type": "concept",
-      "source_file": "package.json",
-      "source_location": "L18",
-      "_origin": "ast",
-      "community": 1,
-      "norm_label": "@types/node",
-      "id": "types_node"
-    },
-    {
-      "label": "prettier",
-      "file_type": "code",
-      "source_file": "package.json",
-      "source_location": "L19",
-      "_origin": "ast",
-      "community": 1,
-      "norm_label": "prettier",
-      "id": "package_devdependencies_prettier"
-    },
-    {
-      "label": "prettier",
-      "file_type": "concept",
-      "source_file": "package.json",
-      "source_location": "L19",
-      "_origin": "ast",
-      "community": 1,
-      "norm_label": "prettier",
-      "id": "prettier"
-    },
-    {
-      "label": "typescript",
-      "file_type": "code",
-      "source_file": "package.json",
-      "source_location": "L20",
-      "_origin": "ast",
-      "community": 1,
-      "norm_label": "typescript",
-      "id": "package_devdependencies_typescript"
-    },
-    {
-      "label": "typescript",
-      "file_type": "concept",
-      "source_file": "package.json",
-      "source_location": "L20",
-      "_origin": "ast",
-      "community": 1,
-      "norm_label": "typescript",
-      "id": "typescript"
-    },
-    {
-      "label": "ghost-platform-tenant-template",
-      "file_type": "document",
-      "source_file": "README.md",
-      "community": 11,
-      "norm_label": "ghost-platform-tenant-template",
-      "_origin": "semantic",
-      "id": "readme_ghost_platform_tenant_template"
-    },
-    {
-      "label": "__TENANT_NAME__ \u2014 Ghost platform tenant stack",
-      "file_type": "document",
-      "source_file": "README.tenant.md",
-      "community": 11,
-      "norm_label": "__tenant_name__ \u2014 ghost platform tenant stack",
-      "_origin": "semantic",
-      "id": "readme_tenant_name"
-    },
-    {
       "label": "Runbook \u2014 a generated tenant repo",
       "file_type": "document",
       "source_file": "RUNBOOK-bootstrap.md",
-      "community": 11,
+      "community": 15,
       "norm_label": "runbook \u2014 a generated tenant repo",
       "_origin": "semantic",
       "id": "runbook_bootstrap"
@@ -2223,42 +1954,318 @@
       "label": "branchLeft/ghost-platform",
       "file_type": "document",
       "source_url": "https://github.com/branchLeft/ghost-platform",
-      "community": 11,
+      "community": 15,
       "norm_label": "branchleft/ghost-platform",
       "_origin": "semantic",
       "id": "ghost_platform_repo"
     },
     {
-      "label": "Infra CI Workflow",
-      "file_type": "code",
-      "source_file": ".github/workflows/infra-ci.yml",
-      "id": "github_workflows_infra_ci",
-      "community": 10,
-      "norm_label": "infra ci workflow"
-    },
-    {
-      "label": "ghost-platform-tenant/scripts/assert-no-tenant-deletes.py",
-      "file_type": "code",
-      "source_file": "node_modules/@branchleft/ghost-platform-tenant/scripts/assert-no-tenant-deletes.py",
-      "id": "ghost_platform_tenant_assert_no_tenant_deletes",
-      "community": 10,
-      "norm_label": "ghost-platform-tenant/scripts/assert-no-tenant-deletes.py"
-    },
-    {
       "label": "Script Unit Tests",
       "file_type": "code",
       "source_file": "scripts/",
-      "id": "scripts_test_unit",
-      "community": 10,
-      "norm_label": "script unit tests"
+      "community": 24,
+      "norm_label": "script unit tests",
+      "_origin": "semantic",
+      "id": "scripts_test_unit"
     },
     {
       "label": "GhostTenant Component",
       "file_type": "concept",
       "source_file": null,
-      "id": "ghost_tenant_component",
+      "community": 18,
+      "norm_label": "ghosttenant component",
+      "_origin": "semantic",
+      "id": "ghost_tenant_component"
+    },
+    {
+      "label": "package.json",
+      "file_type": "code",
+      "source_file": "package.json",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "package",
+      "community": 1,
+      "norm_label": "package.json"
+    },
+    {
+      "label": "name",
+      "file_type": "code",
+      "source_file": "package.json",
+      "source_location": "L2",
+      "_origin": "ast",
+      "id": "package_name",
+      "community": 1,
+      "norm_label": "name"
+    },
+    {
+      "label": "private",
+      "file_type": "code",
+      "source_file": "package.json",
+      "source_location": "L3",
+      "_origin": "ast",
+      "id": "package_private",
+      "community": 1,
+      "norm_label": "private"
+    },
+    {
+      "label": "main",
+      "file_type": "code",
+      "source_file": "package.json",
+      "source_location": "L4",
+      "_origin": "ast",
+      "id": "package_main",
+      "community": 1,
+      "norm_label": "main"
+    },
+    {
+      "label": "prettier",
+      "file_type": "code",
+      "source_file": "package.json",
+      "source_location": "L5",
+      "_origin": "ast",
+      "id": "package_prettier",
+      "community": 1,
+      "norm_label": "prettier"
+    },
+    {
+      "label": "scripts",
+      "file_type": "code",
+      "source_file": "package.json",
+      "source_location": "L6",
+      "_origin": "ast",
+      "id": "package_scripts",
+      "community": 1,
+      "norm_label": "scripts"
+    },
+    {
+      "label": "typecheck",
+      "file_type": "code",
+      "source_file": "package.json",
+      "source_location": "L7",
+      "_origin": "ast",
+      "id": "package_scripts_typecheck",
+      "community": 1,
+      "norm_label": "typecheck"
+    },
+    {
+      "label": "format",
+      "file_type": "code",
+      "source_file": "package.json",
+      "source_location": "L8",
+      "_origin": "ast",
+      "id": "package_scripts_format",
+      "community": 1,
+      "norm_label": "format"
+    },
+    {
+      "label": "format:check",
+      "file_type": "code",
+      "source_file": "package.json",
+      "source_location": "L9",
+      "_origin": "ast",
+      "id": "package_scripts_format_check",
+      "community": 1,
+      "norm_label": "format:check"
+    },
+    {
+      "label": "dependencies",
+      "file_type": "code",
+      "source_file": "package.json",
+      "source_location": "L11",
+      "_origin": "ast",
+      "id": "package_dependencies",
+      "community": 1,
+      "norm_label": "dependencies"
+    },
+    {
+      "label": "@branchleft/ghost-platform-tenant",
+      "file_type": "code",
+      "source_file": "package.json",
+      "source_location": "L12",
+      "_origin": "ast",
+      "id": "package_dependencies_branchleft_ghost_platform_tenant",
+      "community": 1,
+      "norm_label": "@branchleft/ghost-platform-tenant"
+    },
+    {
+      "label": "@branchleft/ghost-platform-tenant",
+      "file_type": "concept",
+      "source_file": "package.json",
+      "source_location": "L12",
+      "_origin": "ast",
+      "id": "branchleft_ghost_platform_tenant",
+      "community": 1,
+      "norm_label": "@branchleft/ghost-platform-tenant"
+    },
+    {
+      "label": "@pulumi/pulumi",
+      "file_type": "code",
+      "source_file": "package.json",
+      "source_location": "L13",
+      "_origin": "ast",
+      "id": "package_dependencies_pulumi_pulumi",
+      "community": 1,
+      "norm_label": "@pulumi/pulumi"
+    },
+    {
+      "label": "@pulumi/pulumi",
+      "file_type": "concept",
+      "source_file": "package.json",
+      "source_location": "L13",
+      "_origin": "ast",
+      "id": "pulumi_pulumi",
+      "community": 1,
+      "norm_label": "@pulumi/pulumi"
+    },
+    {
+      "label": "devDependencies",
+      "file_type": "code",
+      "source_file": "package.json",
+      "source_location": "L15",
+      "_origin": "ast",
+      "id": "package_devdependencies",
+      "community": 1,
+      "norm_label": "devdependencies"
+    },
+    {
+      "label": "@branchleft/prettier-config",
+      "file_type": "code",
+      "source_file": "package.json",
+      "source_location": "L16",
+      "_origin": "ast",
+      "id": "package_devdependencies_branchleft_prettier_config",
+      "community": 1,
+      "norm_label": "@branchleft/prettier-config"
+    },
+    {
+      "label": "@branchleft/prettier-config",
+      "file_type": "concept",
+      "source_file": "package.json",
+      "source_location": "L16",
+      "_origin": "ast",
+      "id": "branchleft_prettier_config",
+      "community": 1,
+      "norm_label": "@branchleft/prettier-config"
+    },
+    {
+      "label": "@branchleft/tsconfig",
+      "file_type": "code",
+      "source_file": "package.json",
+      "source_location": "L17",
+      "_origin": "ast",
+      "id": "package_devdependencies_branchleft_tsconfig",
+      "community": 1,
+      "norm_label": "@branchleft/tsconfig"
+    },
+    {
+      "label": "@branchleft/tsconfig",
+      "file_type": "concept",
+      "source_file": "package.json",
+      "source_location": "L17",
+      "_origin": "ast",
+      "id": "branchleft_tsconfig",
+      "community": 1,
+      "norm_label": "@branchleft/tsconfig"
+    },
+    {
+      "label": "@types/node",
+      "file_type": "code",
+      "source_file": "package.json",
+      "source_location": "L18",
+      "_origin": "ast",
+      "id": "package_devdependencies_types_node",
+      "community": 1,
+      "norm_label": "@types/node"
+    },
+    {
+      "label": "@types/node",
+      "file_type": "concept",
+      "source_file": "package.json",
+      "source_location": "L18",
+      "_origin": "ast",
+      "id": "types_node",
+      "community": 1,
+      "norm_label": "@types/node"
+    },
+    {
+      "label": "prettier",
+      "file_type": "code",
+      "source_file": "package.json",
+      "source_location": "L19",
+      "_origin": "ast",
+      "id": "package_devdependencies_prettier",
+      "community": 1,
+      "norm_label": "prettier"
+    },
+    {
+      "label": "prettier",
+      "file_type": "concept",
+      "source_file": "package.json",
+      "source_location": "L19",
+      "_origin": "ast",
+      "id": "prettier",
+      "community": 1,
+      "norm_label": "prettier"
+    },
+    {
+      "label": "typescript",
+      "file_type": "code",
+      "source_file": "package.json",
+      "source_location": "L20",
+      "_origin": "ast",
+      "id": "package_devdependencies_typescript",
+      "community": 1,
+      "norm_label": "typescript"
+    },
+    {
+      "label": "typescript",
+      "file_type": "concept",
+      "source_file": "package.json",
+      "source_location": "L20",
+      "_origin": "ast",
+      "id": "typescript",
+      "community": 1,
+      "norm_label": "typescript"
+    },
+    {
+      "label": "README.md",
+      "file_type": "document",
+      "source_file": "README.md",
+      "id": "readme_md",
       "community": 10,
-      "norm_label": "ghosttenant component"
+      "norm_label": "readme.md"
+    },
+    {
+      "label": "README.tenant.md",
+      "file_type": "document",
+      "source_file": "README.tenant.md",
+      "id": "readme_tenant_md",
+      "community": 10,
+      "norm_label": "readme.tenant.md"
+    },
+    {
+      "label": "Infra CI Workflow",
+      "file_type": "code",
+      "source_file": ".github/workflows/infra-ci.yml",
+      "id": "github_workflows_infra_ci_yml",
+      "community": 12,
+      "norm_label": "infra ci workflow"
+    },
+    {
+      "label": "assert-no-tenant-deletes.py",
+      "file_type": "code",
+      "source_file": "node_modules/@branchleft/ghost-platform-tenant/scripts/assert-no-tenant-deletes.py",
+      "id": "ghost_platform_tenant_delete_guard",
+      "community": 12,
+      "norm_label": "assert-no-tenant-deletes.py"
+    },
+    {
+      "label": "Pulumi.<slug>.yaml",
+      "file_type": "code",
+      "source_file": "Pulumi.<slug>.yaml",
+      "id": "pulumi_stack_config",
+      "community": 12,
+      "norm_label": "pulumi.<slug>.yaml"
     }
   ],
   "links": [
@@ -3395,14 +3402,6 @@
       "_origin": "semantic",
       "source": "github_workflows_standards_standards",
       "target": "branchleft_standards_standards"
-    },
-    {
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": ".github/workflows/infra-ci.yml",
-      "source": "github_workflows_infra_ci",
-      "target": "pulumi_cli"
     },
     {
       "relation": "contains",
@@ -4708,7 +4707,7 @@
       "source_file": "CLAUDE.md",
       "_origin": "semantic",
       "source": "claude_md",
-      "target": "ghost_platform_tenant_component"
+      "target": "node_modules_branchleft_ghost_platform_tenant_component"
     },
     {
       "relation": "references",
@@ -4717,7 +4716,23 @@
       "source_file": "Pulumi.yaml",
       "_origin": "semantic",
       "source": "pulumi_yaml",
-      "target": "ghost_platform_tenant_component"
+      "target": "node_modules_branchleft_ghost_platform_tenant_component"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "README.md",
+      "source": "readme_md",
+      "target": "node_modules_branchleft_ghost_platform_tenant_component"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "README.tenant.md",
+      "source": "readme_tenant_md",
+      "target": "node_modules_branchleft_ghost_platform_tenant_component"
     },
     {
       "relation": "shares_data_with",
@@ -5341,295 +5356,6 @@
       "target": "index_tenant"
     },
     {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "package.json",
-      "source_location": "L11",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "package",
-      "target": "package_dependencies"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "package.json",
-      "source_location": "L15",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "package",
-      "target": "package_devdependencies"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "package.json",
-      "source_location": "L4",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "package",
-      "target": "package_main"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "package.json",
-      "source_location": "L2",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "package",
-      "target": "package_name"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "package.json",
-      "source_location": "L5",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "package",
-      "target": "package_prettier"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "package.json",
-      "source_location": "L3",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "package",
-      "target": "package_private"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "package.json",
-      "source_location": "L6",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "package",
-      "target": "package_scripts"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "package.json",
-      "source_location": "L8",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "package_scripts",
-      "target": "package_scripts_format"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "package.json",
-      "source_location": "L9",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "package_scripts",
-      "target": "package_scripts_format_check"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "package.json",
-      "source_location": "L7",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "package_scripts",
-      "target": "package_scripts_typecheck"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "package.json",
-      "source_location": "L12",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "package_dependencies",
-      "target": "package_dependencies_branchleft_ghost_platform_tenant"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "package.json",
-      "source_location": "L13",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "package_dependencies",
-      "target": "package_dependencies_pulumi_pulumi"
-    },
-    {
-      "relation": "imports",
-      "confidence": "EXTRACTED",
-      "source_file": "package.json",
-      "source_location": "L12",
-      "weight": 1.0,
-      "context": "import",
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "package_dependencies_branchleft_ghost_platform_tenant",
-      "target": "branchleft_ghost_platform_tenant"
-    },
-    {
-      "relation": "imports",
-      "confidence": "EXTRACTED",
-      "source_file": "package.json",
-      "source_location": "L13",
-      "weight": 1.0,
-      "context": "import",
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "package_dependencies_pulumi_pulumi",
-      "target": "pulumi_pulumi"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "package.json",
-      "source_location": "L16",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "package_devdependencies",
-      "target": "package_devdependencies_branchleft_prettier_config"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "package.json",
-      "source_location": "L17",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "package_devdependencies",
-      "target": "package_devdependencies_branchleft_tsconfig"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "package.json",
-      "source_location": "L19",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "package_devdependencies",
-      "target": "package_devdependencies_prettier"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "package.json",
-      "source_location": "L18",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "package_devdependencies",
-      "target": "package_devdependencies_types_node"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "package.json",
-      "source_location": "L20",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "package_devdependencies",
-      "target": "package_devdependencies_typescript"
-    },
-    {
-      "relation": "imports",
-      "confidence": "EXTRACTED",
-      "source_file": "package.json",
-      "source_location": "L16",
-      "weight": 1.0,
-      "context": "import",
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "package_devdependencies_branchleft_prettier_config",
-      "target": "branchleft_prettier_config"
-    },
-    {
-      "relation": "imports",
-      "confidence": "EXTRACTED",
-      "source_file": "package.json",
-      "source_location": "L17",
-      "weight": 1.0,
-      "context": "import",
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "package_devdependencies_branchleft_tsconfig",
-      "target": "branchleft_tsconfig"
-    },
-    {
-      "relation": "imports",
-      "confidence": "EXTRACTED",
-      "source_file": "package.json",
-      "source_location": "L18",
-      "weight": 1.0,
-      "context": "import",
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "package_devdependencies_types_node",
-      "target": "types_node"
-    },
-    {
-      "relation": "imports",
-      "confidence": "EXTRACTED",
-      "source_file": "package.json",
-      "source_location": "L19",
-      "weight": 1.0,
-      "context": "import",
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "package_devdependencies_prettier",
-      "target": "prettier"
-    },
-    {
-      "relation": "imports",
-      "confidence": "EXTRACTED",
-      "source_file": "package.json",
-      "source_location": "L20",
-      "weight": 1.0,
-      "context": "import",
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "package_devdependencies_typescript",
-      "target": "typescript"
-    },
-    {
-      "relation": "references",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "README.md",
-      "_origin": "semantic",
-      "source": "readme_ghost_platform_tenant_template",
-      "target": "ghost_platform_repo"
-    },
-    {
-      "relation": "cites",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "README.tenant.md",
-      "_origin": "semantic",
-      "source": "readme_tenant_name",
-      "target": "readme_ghost_platform_tenant_template"
-    },
-    {
       "relation": "references",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
@@ -5639,38 +5365,293 @@
       "target": "ghost_platform_repo"
     },
     {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "package.json",
+      "source_location": "L11",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "package",
+      "target": "package_dependencies",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "package.json",
+      "source_location": "L15",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "package",
+      "target": "package_devdependencies",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "package.json",
+      "source_location": "L4",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "package",
+      "target": "package_main",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "package.json",
+      "source_location": "L2",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "package",
+      "target": "package_name",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "package.json",
+      "source_location": "L5",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "package",
+      "target": "package_prettier",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "package.json",
+      "source_location": "L3",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "package",
+      "target": "package_private",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "package.json",
+      "source_location": "L6",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "package",
+      "target": "package_scripts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "package.json",
+      "source_location": "L8",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "package_scripts",
+      "target": "package_scripts_format",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "package.json",
+      "source_location": "L9",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "package_scripts",
+      "target": "package_scripts_format_check",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "package.json",
+      "source_location": "L7",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "package_scripts",
+      "target": "package_scripts_typecheck",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "package.json",
+      "source_location": "L12",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "package_dependencies",
+      "target": "package_dependencies_branchleft_ghost_platform_tenant",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "package.json",
+      "source_location": "L13",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "package_dependencies",
+      "target": "package_dependencies_pulumi_pulumi",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "source_file": "package.json",
+      "source_location": "L12",
+      "weight": 1.0,
+      "context": "import",
+      "_origin": "ast",
+      "source": "package_dependencies_branchleft_ghost_platform_tenant",
+      "target": "branchleft_ghost_platform_tenant",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "source_file": "package.json",
+      "source_location": "L13",
+      "weight": 1.0,
+      "context": "import",
+      "_origin": "ast",
+      "source": "package_dependencies_pulumi_pulumi",
+      "target": "pulumi_pulumi",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "package.json",
+      "source_location": "L16",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "package_devdependencies",
+      "target": "package_devdependencies_branchleft_prettier_config",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "package.json",
+      "source_location": "L17",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "package_devdependencies",
+      "target": "package_devdependencies_branchleft_tsconfig",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "package.json",
+      "source_location": "L19",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "package_devdependencies",
+      "target": "package_devdependencies_prettier",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "package.json",
+      "source_location": "L18",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "package_devdependencies",
+      "target": "package_devdependencies_types_node",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "package.json",
+      "source_location": "L20",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "package_devdependencies",
+      "target": "package_devdependencies_typescript",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "source_file": "package.json",
+      "source_location": "L16",
+      "weight": 1.0,
+      "context": "import",
+      "_origin": "ast",
+      "source": "package_devdependencies_branchleft_prettier_config",
+      "target": "branchleft_prettier_config",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "source_file": "package.json",
+      "source_location": "L17",
+      "weight": 1.0,
+      "context": "import",
+      "_origin": "ast",
+      "source": "package_devdependencies_branchleft_tsconfig",
+      "target": "branchleft_tsconfig",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "source_file": "package.json",
+      "source_location": "L18",
+      "weight": 1.0,
+      "context": "import",
+      "_origin": "ast",
+      "source": "package_devdependencies_types_node",
+      "target": "types_node",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "source_file": "package.json",
+      "source_location": "L19",
+      "weight": 1.0,
+      "context": "import",
+      "_origin": "ast",
+      "source": "package_devdependencies_prettier",
+      "target": "prettier",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "source_file": "package.json",
+      "source_location": "L20",
+      "weight": 1.0,
+      "context": "import",
+      "_origin": "ast",
+      "source": "package_devdependencies_typescript",
+      "target": "typescript",
+      "confidence_score": 1.0
+    },
+    {
       "relation": "calls",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": ".github/workflows/infra-ci.yml",
-      "source": "github_workflows_infra_ci",
-      "target": "ghost_platform_tenant_assert_no_tenant_deletes"
+      "source": "github_workflows_infra_ci_yml",
+      "target": "ghost_platform_tenant_delete_guard"
     },
     {
       "relation": "references",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": ".github/workflows/infra-ci.yml",
-      "source": "github_workflows_infra_ci",
-      "target": "ghost_tenant_component"
-    },
-    {
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": ".github/workflows/infra-ci.yml",
-      "source": "github_workflows_infra_ci",
-      "target": "scripts_test_unit"
-    },
-    {
-      "relation": "references",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": ".github/workflows/infra-ci.yml",
-      "source": "scripts_test_unit",
-      "target": "ghost_platform_tenant_assert_no_tenant_deletes"
+      "source": "github_workflows_infra_ci_yml",
+      "target": "pulumi_stack_config"
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "1fb8630c018aa94174f009ceb48a4bc188f9f433"
+  "built_at_commit": "3c4c5cabd1e7358f7cf78630f1cbbff6791ee044"
 }

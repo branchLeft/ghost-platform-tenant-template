@@ -1,33 +1,33 @@
 {
   "config.ts": {
-    "mtime": 1787943189.79811,
+    "mtime": 1787945871.9527264,
     "ast_hash": "06985de1a216ee1e53e38810059d34f3",
     "semantic_hash": "06985de1a216ee1e53e38810059d34f3"
   },
   "index.ts": {
-    "mtime": 1787943189.7998383,
+    "mtime": 1787945871.9565585,
     "ast_hash": "0d5fe0cd1ea6c4216ac89b6caa37399c",
     "semantic_hash": "0d5fe0cd1ea6c4216ac89b6caa37399c"
   },
   "package.json": {
-    "mtime": 1787943189.7998383,
-    "ast_hash": "f04cf429be130ae2d203cf90f2ff4046",
-    "semantic_hash": "f04cf429be130ae2d203cf90f2ff4046"
+    "mtime": 1787945871.9565585,
+    "ast_hash": "e86a79517f772566aa154dd4ba581fdc",
+    "semantic_hash": "e86a79517f772566aa154dd4ba581fdc"
   },
   "scripts/assert-placeholders-substituted.py": {
-    "mtime": 1787943189.8003864,
+    "mtime": 1787945871.9580975,
     "ast_hash": "fd091ce9bd96d3178499de64db541968",
     "semantic_hash": "fd091ce9bd96d3178499de64db541968"
   },
   "tsconfig.json": {
-    "mtime": 1787943189.8003864,
+    "mtime": 1787945871.9580975,
     "ast_hash": "cc33d6b917e44286b3d29b2e92c8f3c9",
     "semantic_hash": "cc33d6b917e44286b3d29b2e92c8f3c9"
   },
   ".github/workflows/infra-ci.yml": {
-    "mtime": 1787943189.79811,
-    "ast_hash": "976739cc2ddbb67ef0079234e26a77fa",
-    "semantic_hash": "976739cc2ddbb67ef0079234e26a77fa"
+    "mtime": 1787945871.9527264,
+    "ast_hash": "148dcb5db7610e0483f54adc747f9056",
+    "semantic_hash": "148dcb5db7610e0483f54adc747f9056"
   },
   ".pre-commit-config.yaml": {
     "mtime": 1787612370.8525205,
@@ -45,14 +45,14 @@
     "semantic_hash": "3a0f0b55d9492d607382e419287fc5b3"
   },
   "README.md": {
-    "mtime": 1787726765.9382484,
-    "ast_hash": "0fe9fd6817d2f66e31c6c321cb37336a",
-    "semantic_hash": "0fe9fd6817d2f66e31c6c321cb37336a"
+    "mtime": 1787945871.9527264,
+    "ast_hash": "6040fc29f564e415dd4b978526aac638",
+    "semantic_hash": "6040fc29f564e415dd4b978526aac638"
   },
   "README.tenant.md": {
-    "mtime": 1787726765.9382484,
-    "ast_hash": "a7fc585a51066d552a91f94e999752d8",
-    "semantic_hash": "a7fc585a51066d552a91f94e999752d8"
+    "mtime": 1787945871.9527264,
+    "ast_hash": "f203131c445a4e2666067d5c20cfaeee",
+    "semantic_hash": "f203131c445a4e2666067d5c20cfaeee"
   },
   "RUNBOOK-bootstrap.md": {
     "mtime": 1787726765.9382484,
@@ -60,12 +60,12 @@
     "semantic_hash": "cf967d3c3dc7f7b9b07f81734ba3a24d"
   },
   "scripts/assert-no-committed-pulumi-secrets.py": {
-    "mtime": 1787943189.8003864,
+    "mtime": 1787945871.9565585,
     "ast_hash": "59821ec3dc0333bb02bf93cd80ab2b26",
     "semantic_hash": "59821ec3dc0333bb02bf93cd80ab2b26"
   },
   "scripts/test_assert_no_committed_pulumi_secrets.py": {
-    "mtime": 1787943189.8003864,
+    "mtime": 1787945871.9580975,
     "ast_hash": "5d164495f623bbda5dff69c2885aec99",
     "semantic_hash": "5d164495f623bbda5dff69c2885aec99"
   },
@@ -85,17 +85,17 @@
     "semantic_hash": "a3a40d6065349b725b09e50b5f9ef764"
   },
   "scripts/generate-tenant-repo.py": {
-    "mtime": 1787943189.8003864,
+    "mtime": 1787945871.9580975,
     "ast_hash": "7372fd06638b0bef3ce5b9dda024bbeb",
     "semantic_hash": "7372fd06638b0bef3ce5b9dda024bbeb"
   },
   "scripts/test_assert_placeholders_substituted.py": {
-    "mtime": 1787943189.8003864,
+    "mtime": 1787945871.9580975,
     "ast_hash": "21b425d968c609fd082cbdefb4172eb2",
     "semantic_hash": "21b425d968c609fd082cbdefb4172eb2"
   },
   "scripts/test_generate_tenant_repo.py": {
-    "mtime": 1787943189.8003864,
+    "mtime": 1787945871.9580975,
     "ast_hash": "f39f3a3c9e64840aa5507902d783ee2b",
     "semantic_hash": "f39f3a3c9e64840aa5507902d783ee2b"
   }
