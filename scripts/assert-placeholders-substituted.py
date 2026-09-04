@@ -68,8 +68,12 @@ TEMPLATE_PLACEHOLDER_FILES: dict[str, list[str]] = {
 # rewrites it to `**word**` wherever it is not inside a code span -- so a
 # placeholder living in prose, rather than in YAML, can be silently mangled
 # into a form the substitution flow never matches. Restricted to the known
-# names above, not `[A-Z][A-Z0-9_]*`, so ordinary bold markdown --
-# `**Note**`, `**Warning**` -- is never mistaken for a corrupted placeholder.
+# names above, not `[A-Z][A-Z0-9_]*`, so ordinary bold markdown naming
+# anything else -- `**Note**`, `**Warning**` -- is never mistaken for a
+# corrupted placeholder. Bolding one of *these* names on purpose -- prose
+# documenting the placeholder itself, e.g. in a bold heading -- is not
+# distinguishable from Prettier's rewrite and fails the same way; there is no
+# third state to tell "written as bold prose" from "mangled" apart by.
 MANGLED_PATTERN = re.compile(
     r"\*\*(?:" + "|".join(TEMPLATE_PLACEHOLDER_FILES) + r")\*\*"
 )

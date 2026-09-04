@@ -75,11 +75,11 @@ class Main(unittest.TestCase):
         # is how a placeholder reaches a host.
         self.assertEqual(module.main(["prog", "no/such/file.yml"]), 1)
 
-    def test_the_issues_own_demonstration_is_now_caught(self) -> None:
-        # branchLeft/workspace#117's reproduction: `sed` rewriting
-        # `__TENANT_NAME__` to `**TENANT_NAME**` the way Prettier would, then
-        # handing the result straight to the default (no-flag) invocation --
-        # the exact command line the issue ran. It used to exit 0.
+    def test_a_placeholder_mangled_the_way_prettier_would_is_now_caught(self) -> None:
+        # `sed` stands in for Prettier here, rewriting `__TENANT_NAME__` to
+        # `**TENANT_NAME**` -- the bold-emphasis form -- before handing the
+        # result straight to the default (no-flag) invocation. This form used
+        # to read as a clean file and exit 0.
         with tempfile.TemporaryDirectory() as tmp:
             path = pathlib.Path(tmp) / "README.tenant.md"
             path.write_text(
