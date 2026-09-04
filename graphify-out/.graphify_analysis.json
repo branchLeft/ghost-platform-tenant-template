@@ -41,6 +41,37 @@
       "index_tenant"
     ],
     "1": [
+      "scripts_test_assert_placeholders_substituted",
+      "scripts_test_assert_placeholders_substituted_checkmangled",
+      "scripts_test_assert_placeholders_substituted_checkmangled_test_a_mangled_placeholder_fails",
+      "scripts_test_assert_placeholders_substituted_checkmangled_test_a_missing_file_is_skipped_rather_than_failed",
+      "scripts_test_assert_placeholders_substituted_checkmangled_test_main_mangled_flag_catches_the_issues_demonstration",
+      "scripts_test_assert_placeholders_substituted_checkmangled_test_main_mangled_flag_passes_ordinary_bold_markdown",
+      "scripts_test_assert_placeholders_substituted_checkmangled_test_ordinary_bold_markdown_passes",
+      "scripts_test_assert_placeholders_substituted_checktemplate",
+      "scripts_test_assert_placeholders_substituted_checktemplate_test_fails_on_a_missing_file",
+      "scripts_test_assert_placeholders_substituted_checktemplate_test_fails_when_a_placeholder_was_mangled",
+      "scripts_test_assert_placeholders_substituted_checktemplate_test_fails_when_a_placeholder_was_substituted_away",
+      "scripts_test_assert_placeholders_substituted_checktemplate_test_passes_when_every_placeholder_is_present_and_intact",
+      "scripts_test_assert_placeholders_substituted_checktemplate_test_this_repos_own_template_files_pass",
+      "scripts_test_assert_placeholders_substituted_defaultfiles",
+      "scripts_test_assert_placeholders_substituted_defaultfiles_test_default_files_covers_every_placeholder_in_the_tree",
+      "scripts_test_assert_placeholders_substituted_defaultfiles_test_every_named_file_exists_in_this_repo",
+      "scripts_test_assert_placeholders_substituted_defaultfiles_test_the_template_itself_still_carries_every_placeholder",
+      "scripts_test_assert_placeholders_substituted_findmangled",
+      "scripts_test_assert_placeholders_substituted_findmangled_test_detects_each_known_placeholder_mangled",
+      "scripts_test_assert_placeholders_substituted_findmangled_test_ordinary_bold_markdown_is_not_a_mangled_placeholder",
+      "scripts_test_assert_placeholders_substituted_findplaceholders",
+      "scripts_test_assert_placeholders_substituted_findplaceholders_test_lowercase_and_single_underscore_forms_are_not_placeholders",
+      "scripts_test_assert_placeholders_substituted_findplaceholders_test_reports_each_distinct_placeholder_once_sorted",
+      "scripts_test_assert_placeholders_substituted_main",
+      "scripts_test_assert_placeholders_substituted_main_test_a_missing_file_exits_one_rather_than_passing",
+      "scripts_test_assert_placeholders_substituted_main_test_a_placeholder_mangled_the_way_prettier_would_is_now_caught",
+      "scripts_test_assert_placeholders_substituted_main_test_a_surviving_placeholder_exits_one",
+      "scripts_test_assert_placeholders_substituted_main_test_clean_files_exit_zero",
+      "scripts_test_assert_placeholders_substituted_rationale_1"
+    ],
+    "2": [
       "branchleft_ghost_platform_tenant",
       "branchleft_prettier_config",
       "branchleft_tsconfig",
@@ -67,7 +98,7 @@
       "types_node",
       "typescript"
     ],
-    "2": [
+    "3": [
       "scripts_test_assert_no_committed_pulumi_secrets",
       "scripts_test_assert_no_committed_pulumi_secrets_fileselection",
       "scripts_test_assert_no_committed_pulumi_secrets_fileselection_test_scan_tree_recurses_and_skips_vendored_trees",
@@ -94,7 +125,7 @@
       "scripts_test_assert_no_committed_pulumi_secrets_rationale_43",
       "scripts_test_assert_no_committed_pulumi_secrets_rationale_84"
     ],
-    "3": [
+    "4": [
       "scripts_test_generate_tenant_repo",
       "scripts_test_generate_tenant_repo_copy_repo",
       "scripts_test_generate_tenant_repo_generate",
@@ -121,7 +152,32 @@
       "scripts_test_generate_tenant_repo_substitutions_test_tenant_name_is_the_bare_slug",
       "scripts_test_generate_tenant_repo_tracked_files"
     ],
-    "4": [
+    "5": [
+      "path",
+      "scripts_assert_no_committed_pulumi_secrets",
+      "scripts_assert_no_committed_pulumi_secrets_check",
+      "scripts_assert_no_committed_pulumi_secrets_find_stack_configs",
+      "scripts_assert_no_committed_pulumi_secrets_is_commented",
+      "scripts_assert_no_committed_pulumi_secrets_is_stack_config",
+      "scripts_assert_no_committed_pulumi_secrets_main",
+      "scripts_assert_no_committed_pulumi_secrets_offending_lines",
+      "scripts_assert_no_committed_pulumi_secrets_quiet_check",
+      "scripts_assert_no_committed_pulumi_secrets_rationale_124",
+      "scripts_assert_no_committed_pulumi_secrets_rationale_133",
+      "scripts_assert_no_committed_pulumi_secrets_rationale_236",
+      "scripts_assert_no_committed_pulumi_secrets_self_test",
+      "scripts_assert_placeholders_substituted",
+      "scripts_assert_placeholders_substituted_check_mangled",
+      "scripts_assert_placeholders_substituted_check_substituted",
+      "scripts_assert_placeholders_substituted_check_template",
+      "scripts_assert_placeholders_substituted_find_mangled",
+      "scripts_assert_placeholders_substituted_find_placeholders",
+      "scripts_assert_placeholders_substituted_main",
+      "scripts_assert_placeholders_substituted_rationale_131",
+      "scripts_assert_placeholders_substituted_rationale_158",
+      "scripts_assert_placeholders_substituted_rationale_93"
+    ],
+    "6": [
       "exception",
       "scripts_generate_tenant_repo",
       "scripts_generate_tenant_repo_apply_renames",
@@ -139,22 +195,7 @@
       "scripts_generate_tenant_repo_sweep",
       "scripts_generate_tenant_repo_validate_slug"
     ],
-    "5": [
-      "path",
-      "scripts_assert_no_committed_pulumi_secrets",
-      "scripts_assert_no_committed_pulumi_secrets_check",
-      "scripts_assert_no_committed_pulumi_secrets_find_stack_configs",
-      "scripts_assert_no_committed_pulumi_secrets_is_commented",
-      "scripts_assert_no_committed_pulumi_secrets_is_stack_config",
-      "scripts_assert_no_committed_pulumi_secrets_main",
-      "scripts_assert_no_committed_pulumi_secrets_offending_lines",
-      "scripts_assert_no_committed_pulumi_secrets_quiet_check",
-      "scripts_assert_no_committed_pulumi_secrets_rationale_124",
-      "scripts_assert_no_committed_pulumi_secrets_rationale_133",
-      "scripts_assert_no_committed_pulumi_secrets_rationale_236",
-      "scripts_assert_no_committed_pulumi_secrets_self_test"
-    ],
-    "6": [
+    "7": [
       "ref_branchleft_tsconfig_pulumi_json",
       "ref_branchleft_tsconfig_strict_1_json",
       "ref_claude",
@@ -168,21 +209,6 @@
       "tsconfig_exclude",
       "tsconfig_extends",
       "tsconfig_include"
-    ],
-    "7": [
-      "scripts_test_assert_placeholders_substituted",
-      "scripts_test_assert_placeholders_substituted_defaultfiles",
-      "scripts_test_assert_placeholders_substituted_defaultfiles_test_default_files_covers_every_placeholder_in_the_tree",
-      "scripts_test_assert_placeholders_substituted_defaultfiles_test_every_named_file_exists_in_this_repo",
-      "scripts_test_assert_placeholders_substituted_defaultfiles_test_the_template_itself_still_carries_every_placeholder",
-      "scripts_test_assert_placeholders_substituted_findplaceholders",
-      "scripts_test_assert_placeholders_substituted_findplaceholders_test_lowercase_and_single_underscore_forms_are_not_placeholders",
-      "scripts_test_assert_placeholders_substituted_findplaceholders_test_reports_each_distinct_placeholder_once_sorted",
-      "scripts_test_assert_placeholders_substituted_main",
-      "scripts_test_assert_placeholders_substituted_main_test_a_missing_file_exits_one_rather_than_passing",
-      "scripts_test_assert_placeholders_substituted_main_test_a_surviving_placeholder_exits_one",
-      "scripts_test_assert_placeholders_substituted_main_test_clean_files_exit_zero",
-      "scripts_test_assert_placeholders_substituted_rationale_1"
     ],
     "8": [
       "scripts_test_assert_no_committed_pulumi_secrets_exitstatus",
@@ -209,78 +235,73 @@
       "scripts_test_generate_tenant_repo_validateslug_test_refuses_uppercase_underscores_and_a_leading_digit"
     ],
     "10": [
-      "claude_md",
-      "node_modules_branchleft_ghost_platform_tenant_component",
-      "pulumi_yaml",
-      "readme_md",
-      "readme_tenant_md"
+      "ghost_tenant_component",
+      "github_workflows_infra_ci",
+      "node_modules_branchleft_ghost_platform_tenant_scripts_assert_no_tenant_deletes",
+      "pulumi_cli",
+      "scripts_test_unit"
     ],
     "11": [
-      "scripts_assert_placeholders_substituted",
-      "scripts_assert_placeholders_substituted_find_placeholders",
-      "scripts_assert_placeholders_substituted_main",
-      "scripts_assert_placeholders_substituted_py_path"
-    ],
-    "12": [
-      "ghost_platform_tenant_delete_guard",
-      "github_workflows_infra_ci_yml",
-      "pulumi_stack_config"
-    ],
-    "13": [
       "branchleft_github_workflows_docs_lint",
       "github_workflows_docs_lint_docs_lint"
     ],
-    "14": [
+    "12": [
       "branchleft_standards_standards",
       "github_workflows_standards_standards"
     ],
-    "15": [
+    "13": [
       "ghost_platform_repo",
       "runbook_bootstrap"
     ],
-    "16": [
+    "14": [
       "hetzner_object_storage",
       "pulumi_stack"
     ],
-    "17": [
+    "15": [
       "branchleft_deploy"
     ],
-    "18": [
-      "ghost_tenant_component"
+    "16": [
+      "claude_md"
     ],
-    "19": [
+    "17": [
       "github_workflows_graphify"
     ],
-    "20": [
+    "18": [
       "google_cloud_platform"
     ],
-    "21": [
+    "19": [
       "pattern"
     ],
-    "22": [
+    "20": [
       "pre_commit_config_yaml"
     ],
+    "21": [
+      "pulumi_yaml"
+    ],
+    "22": [
+      "readme_md"
+    ],
     "23": [
-      "pulumi_cli"
+      "readme_tenant_md"
     ],
     "24": [
-      "scripts_test_unit"
+      "scripts_assert_placeholders_substituted_py_path"
     ]
   },
   "cohesion": {
     "0": 0.07681365576102418,
-    "1": 0.08,
-    "2": 0.12666666666666668,
-    "3": 0.17666666666666667,
-    "4": 0.2833333333333333,
-    "5": 0.358974358974359,
-    "6": 0.15384615384615385,
+    "1": 0.06896551724137931,
+    "2": 0.08,
+    "3": 0.12666666666666668,
+    "4": 0.17666666666666667,
+    "5": 0.19367588932806323,
+    "6": 0.2833333333333333,
     "7": 0.15384615384615385,
     "8": 0.2727272727272727,
     "9": 0.25,
-    "10": 0.4,
-    "11": 0.8333333333333334,
-    "12": 0.6666666666666666,
+    "10": 0.5,
+    "11": 1.0,
+    "12": 1.0,
     "13": 1.0,
     "14": 1.0,
     "15": 1.0,
@@ -348,7 +369,7 @@
   ],
   "surprises": [],
   "tokens": {
-    "input": 11682,
-    "output": 998
+    "input": 6047,
+    "output": 808
   }
 }

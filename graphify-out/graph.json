@@ -9,7 +9,7 @@
       "source_file": "",
       "source_location": "",
       "_origin": "ast",
-      "community": 21,
+      "community": 19,
       "norm_label": "pattern",
       "id": "pattern"
     },
@@ -29,7 +29,7 @@
       "source_file": "tsconfig.json",
       "source_location": "L1",
       "_origin": "ast",
-      "community": 6,
+      "community": 7,
       "norm_label": "tsconfig.json",
       "id": "tsconfig"
     },
@@ -39,7 +39,7 @@
       "source_file": "tsconfig.json",
       "source_location": "L2",
       "_origin": "ast",
-      "community": 6,
+      "community": 7,
       "norm_label": "extends",
       "id": "tsconfig_extends"
     },
@@ -49,7 +49,7 @@
       "source_file": "tsconfig.json",
       "source_location": "L2",
       "_origin": "ast",
-      "community": 6,
+      "community": 7,
       "norm_label": "@branchleft/tsconfig/strict-1.json",
       "id": "ref_branchleft_tsconfig_strict_1_json"
     },
@@ -59,7 +59,7 @@
       "source_file": "tsconfig.json",
       "source_location": "L2",
       "_origin": "ast",
-      "community": 6,
+      "community": 7,
       "norm_label": "@branchleft/tsconfig/pulumi.json",
       "id": "ref_branchleft_tsconfig_pulumi_json"
     },
@@ -69,7 +69,7 @@
       "source_file": "tsconfig.json",
       "source_location": "L3",
       "_origin": "ast",
-      "community": 6,
+      "community": 7,
       "norm_label": "compileroptions",
       "id": "tsconfig_compileroptions"
     },
@@ -79,7 +79,7 @@
       "source_file": "tsconfig.json",
       "source_location": "L4",
       "_origin": "ast",
-      "community": 6,
+      "community": 7,
       "norm_label": "pretty",
       "id": "tsconfig_compileroptions_pretty"
     },
@@ -89,7 +89,7 @@
       "source_file": "tsconfig.json",
       "source_location": "L10",
       "_origin": "ast",
-      "community": 6,
+      "community": 7,
       "norm_label": "include",
       "id": "tsconfig_include"
     },
@@ -99,7 +99,7 @@
       "source_file": "tsconfig.json",
       "source_location": "L10",
       "_origin": "ast",
-      "community": 6,
+      "community": 7,
       "norm_label": "**/*.ts",
       "id": "ref_ts"
     },
@@ -109,7 +109,7 @@
       "source_file": "tsconfig.json",
       "source_location": "L11",
       "_origin": "ast",
-      "community": 6,
+      "community": 7,
       "norm_label": "exclude",
       "id": "tsconfig_exclude"
     },
@@ -119,7 +119,7 @@
       "source_file": "tsconfig.json",
       "source_location": "L11",
       "_origin": "ast",
-      "community": 6,
+      "community": 7,
       "norm_label": "node_modules",
       "id": "ref_node_modules"
     },
@@ -129,7 +129,7 @@
       "source_file": "tsconfig.json",
       "source_location": "L11",
       "_origin": "ast",
-      "community": 6,
+      "community": 7,
       "norm_label": "vendor",
       "id": "ref_vendor"
     },
@@ -139,7 +139,7 @@
       "source_file": "tsconfig.json",
       "source_location": "L11",
       "_origin": "ast",
-      "community": 6,
+      "community": 7,
       "norm_label": ".claude",
       "id": "ref_claude"
     },
@@ -149,7 +149,7 @@
       "source_file": "tsconfig.json",
       "source_location": "L11",
       "_origin": "ast",
-      "community": 6,
+      "community": 7,
       "norm_label": ".worktrees",
       "id": "ref_worktrees"
     },
@@ -287,7 +287,7 @@
       "source_file": "scripts/test_assert_no_committed_pulumi_secrets.py",
       "source_location": "L1",
       "_origin": "ast",
-      "community": 2,
+      "community": 3,
       "norm_label": "test_assert_no_committed_pulumi_secrets.py",
       "id": "scripts_test_assert_no_committed_pulumi_secrets"
     },
@@ -298,7 +298,7 @@
       "source_location": "L25",
       "_callable": true,
       "_origin": "ast",
-      "community": 2,
+      "community": 3,
       "norm_label": "_load_module()",
       "id": "scripts_test_assert_no_committed_pulumi_secrets_load_module"
     },
@@ -309,7 +309,7 @@
       "source_location": "L38",
       "_callable": true,
       "_origin": "ast",
-      "community": 2,
+      "community": 3,
       "norm_label": "lines_flagged()",
       "id": "scripts_test_assert_no_committed_pulumi_secrets_lines_flagged"
     },
@@ -321,7 +321,7 @@
       "_callable": true,
       "_callable_class": true,
       "_origin": "ast",
-      "community": 2,
+      "community": 3,
       "norm_label": "matchercatchesasalt",
       "id": "scripts_test_assert_no_committed_pulumi_secrets_matchercatchesasalt"
     },
@@ -332,7 +332,7 @@
       "source_location": "L45",
       "_callable": true,
       "_origin": "ast",
-      "community": 2,
+      "community": 3,
       "norm_label": ".test_plain_key_at_column_zero()",
       "id": "scripts_test_assert_no_committed_pulumi_secrets_matchercatchesasalt_test_plain_key_at_column_zero"
     },
@@ -343,7 +343,7 @@
       "source_location": "L48",
       "_callable": true,
       "_origin": "ast",
-      "community": 2,
+      "community": 3,
       "norm_label": ".test_indented_key()",
       "id": "scripts_test_assert_no_committed_pulumi_secrets_matchercatchesasalt_test_indented_key"
     },
@@ -354,7 +354,7 @@
       "source_location": "L51",
       "_callable": true,
       "_origin": "ast",
-      "community": 2,
+      "community": 3,
       "norm_label": ".test_key_as_a_list_item()",
       "id": "scripts_test_assert_no_committed_pulumi_secrets_matchercatchesasalt_test_key_as_a_list_item"
     },
@@ -365,7 +365,7 @@
       "source_location": "L54",
       "_callable": true,
       "_origin": "ast",
-      "community": 2,
+      "community": 3,
       "norm_label": ".test_case_is_ignored()",
       "id": "scripts_test_assert_no_committed_pulumi_secrets_matchercatchesasalt_test_case_is_ignored"
     },
@@ -376,7 +376,7 @@
       "source_location": "L61",
       "_callable": true,
       "_origin": "ast",
-      "community": 2,
+      "community": 3,
       "norm_label": ".test_quoted_keys()",
       "id": "scripts_test_assert_no_committed_pulumi_secrets_matchercatchesasalt_test_quoted_keys"
     },
@@ -387,7 +387,7 @@
       "source_location": "L68",
       "_callable": true,
       "_origin": "ast",
-      "community": 2,
+      "community": 3,
       "norm_label": ".test_hash_inside_the_value_is_not_a_comment()",
       "id": "scripts_test_assert_no_committed_pulumi_secrets_matchercatchesasalt_test_hash_inside_the_value_is_not_a_comment"
     },
@@ -398,7 +398,7 @@
       "source_location": "L71",
       "_callable": true,
       "_origin": "ast",
-      "community": 2,
+      "community": 3,
       "norm_label": ".test_leading_byte_order_mark_does_not_hide_line_one()",
       "id": "scripts_test_assert_no_committed_pulumi_secrets_matchercatchesasalt_test_leading_byte_order_mark_does_not_hide_line_one"
     },
@@ -409,7 +409,7 @@
       "source_location": "L74",
       "_callable": true,
       "_origin": "ast",
-      "community": 2,
+      "community": 3,
       "norm_label": ".test_a_salt_beside_a_ciphertext_is_still_caught()",
       "id": "scripts_test_assert_no_committed_pulumi_secrets_matchercatchesasalt_test_a_salt_beside_a_ciphertext_is_still_caught"
     },
@@ -420,7 +420,7 @@
       "source_location": "L78",
       "_callable": true,
       "_origin": "ast",
-      "community": 2,
+      "community": 3,
       "norm_label": ".test_every_offending_line_is_reported_not_just_the_first()",
       "id": "scripts_test_assert_no_committed_pulumi_secrets_matchercatchesasalt_test_every_offending_line_is_reported_not_just_the_first"
     },
@@ -432,7 +432,7 @@
       "_callable": true,
       "_callable_class": true,
       "_origin": "ast",
-      "community": 2,
+      "community": 3,
       "norm_label": "matcherdoesnotcrywolf",
       "id": "scripts_test_assert_no_committed_pulumi_secrets_matcherdoesnotcrywolf"
     },
@@ -443,7 +443,7 @@
       "source_location": "L87",
       "_callable": true,
       "_origin": "ast",
-      "community": 2,
+      "community": 3,
       "norm_label": ".test_a_ciphertext_with_no_salt_is_allowed()",
       "id": "scripts_test_assert_no_committed_pulumi_secrets_matcherdoesnotcrywolf_test_a_ciphertext_with_no_salt_is_allowed"
     },
@@ -454,7 +454,7 @@
       "source_location": "L94",
       "_callable": true,
       "_origin": "ast",
-      "community": 2,
+      "community": 3,
       "norm_label": ".test_a_key_merely_containing_the_word()",
       "id": "scripts_test_assert_no_committed_pulumi_secrets_matcherdoesnotcrywolf_test_a_key_merely_containing_the_word"
     },
@@ -465,7 +465,7 @@
       "source_location": "L99",
       "_callable": true,
       "_origin": "ast",
-      "community": 2,
+      "community": 3,
       "norm_label": ".test_a_commented_line()",
       "id": "scripts_test_assert_no_committed_pulumi_secrets_matcherdoesnotcrywolf_test_a_commented_line"
     },
@@ -476,7 +476,7 @@
       "source_location": "L103",
       "_callable": true,
       "_origin": "ast",
-      "community": 2,
+      "community": 3,
       "norm_label": ".test_the_word_appearing_in_a_value()",
       "id": "scripts_test_assert_no_committed_pulumi_secrets_matcherdoesnotcrywolf_test_the_word_appearing_in_a_value"
     },
@@ -487,7 +487,7 @@
       "source_location": "L106",
       "_callable": true,
       "_origin": "ast",
-      "community": 2,
+      "community": 3,
       "norm_label": ".test_a_clean_config()",
       "id": "scripts_test_assert_no_committed_pulumi_secrets_matcherdoesnotcrywolf_test_a_clean_config"
     },
@@ -499,7 +499,7 @@
       "_callable": true,
       "_callable_class": true,
       "_origin": "ast",
-      "community": 2,
+      "community": 3,
       "norm_label": "fileselection",
       "id": "scripts_test_assert_no_committed_pulumi_secrets_fileselection"
     },
@@ -510,7 +510,7 @@
       "source_location": "L111",
       "_callable": true,
       "_origin": "ast",
-      "community": 2,
+      "community": 3,
       "norm_label": ".test_stack_configs_are_matched_and_project_files_are_not()",
       "id": "scripts_test_assert_no_committed_pulumi_secrets_fileselection_test_stack_configs_are_matched_and_project_files_are_not"
     },
@@ -521,7 +521,7 @@
       "source_location": "L123",
       "_callable": true,
       "_origin": "ast",
-      "community": 2,
+      "community": 3,
       "norm_label": ".test_scan_tree_recurses_and_skips_vendored_trees()",
       "id": "scripts_test_assert_no_committed_pulumi_secrets_fileselection_test_scan_tree_recurses_and_skips_vendored_trees"
     },
@@ -653,7 +653,7 @@
       "source_file": "scripts/test_assert_no_committed_pulumi_secrets.py",
       "source_location": "L26",
       "_origin": "ast",
-      "community": 2,
+      "community": 3,
       "norm_label": "import the script by path: its filename has hyphens, so it is not a legal...",
       "id": "scripts_test_assert_no_committed_pulumi_secrets_rationale_26"
     },
@@ -663,7 +663,7 @@
       "source_file": "scripts/test_assert_no_committed_pulumi_secrets.py",
       "source_location": "L43",
       "_origin": "ast",
-      "community": 2,
+      "community": 3,
       "norm_label": "every shape pulumi writes, and the shapes an edit could turn it into.",
       "id": "scripts_test_assert_no_committed_pulumi_secrets_rationale_43"
     },
@@ -673,7 +673,7 @@
       "source_file": "scripts/test_assert_no_committed_pulumi_secrets.py",
       "source_location": "L84",
       "_origin": "ast",
-      "community": 2,
+      "community": 3,
       "norm_label": "a guard people start bypassing protects nothing, so the false-positive side is...",
       "id": "scripts_test_assert_no_committed_pulumi_secrets_rationale_84"
     },
@@ -691,7 +691,7 @@
       "label": "Graphify Workflow",
       "file_type": "code",
       "source_file": ".github/workflows/graphify.yml",
-      "community": 19,
+      "community": 17,
       "norm_label": "graphify workflow",
       "_origin": "semantic",
       "id": "github_workflows_graphify"
@@ -705,7 +705,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 13,
+      "community": 11,
       "norm_label": "docs-lint",
       "_origin": "semantic",
       "id": "github_workflows_docs_lint_docs_lint"
@@ -719,7 +719,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 13,
+      "community": 11,
       "norm_label": "branchleft/github-workflows/.github/workflows/docs-lint.yml@v1.0.6",
       "_origin": "semantic",
       "id": "branchleft_github_workflows_docs_lint"
@@ -733,7 +733,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 14,
+      "community": 12,
       "norm_label": "standards",
       "_origin": "semantic",
       "id": "github_workflows_standards_standards"
@@ -747,7 +747,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 14,
+      "community": 12,
       "norm_label": "branchleft/standards/.github/workflows/standards.yml@v0.4.0",
       "_origin": "semantic",
       "id": "branchleft_standards_standards"
@@ -761,7 +761,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 23,
+      "community": 10,
       "norm_label": "pulumi cli",
       "_origin": "semantic",
       "id": "pulumi_cli"
@@ -775,31 +775,10 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 20,
+      "community": 18,
       "norm_label": "google cloud platform",
       "_origin": "semantic",
       "id": "google_cloud_platform"
-    },
-    {
-      "label": "assert-placeholders-substituted.py",
-      "file_type": "code",
-      "source_file": "scripts/assert-placeholders-substituted.py",
-      "source_location": "L1",
-      "_origin": "ast",
-      "community": 11,
-      "norm_label": "assert-placeholders-substituted.py",
-      "id": "scripts_assert_placeholders_substituted"
-    },
-    {
-      "label": "find_placeholders()",
-      "file_type": "code",
-      "source_file": "scripts/assert-placeholders-substituted.py",
-      "source_location": "L45",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 11,
-      "norm_label": "find_placeholders()",
-      "id": "scripts_assert_placeholders_substituted_find_placeholders"
     },
     {
       "label": "Path",
@@ -807,20 +786,9 @@
       "source_file": "",
       "source_location": "",
       "_origin": "ast",
-      "community": 11,
+      "community": 24,
       "norm_label": "path",
       "id": "scripts_assert_placeholders_substituted_py_path"
-    },
-    {
-      "label": "main()",
-      "file_type": "code",
-      "source_file": "scripts/assert-placeholders-substituted.py",
-      "source_location": "L50",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 11,
-      "norm_label": "main()",
-      "id": "scripts_assert_placeholders_substituted_main"
     },
     {
       "label": "generate-tenant-repo.py",
@@ -828,7 +796,7 @@
       "source_file": "scripts/generate-tenant-repo.py",
       "source_location": "L1",
       "_origin": "ast",
-      "community": 4,
+      "community": 6,
       "norm_label": "generate-tenant-repo.py",
       "id": "scripts_generate_tenant_repo"
     },
@@ -840,7 +808,7 @@
       "_callable": true,
       "_callable_class": true,
       "_origin": "ast",
-      "community": 4,
+      "community": 6,
       "norm_label": "generateerror",
       "id": "scripts_generate_tenant_repo_generateerror"
     },
@@ -850,7 +818,7 @@
       "source_file": "",
       "source_location": "",
       "_origin": "ast",
-      "community": 4,
+      "community": 6,
       "norm_label": "exception",
       "id": "exception"
     },
@@ -861,7 +829,7 @@
       "source_location": "L121",
       "_callable": true,
       "_origin": "ast",
-      "community": 4,
+      "community": 6,
       "norm_label": "validate_slug()",
       "id": "scripts_generate_tenant_repo_validate_slug"
     },
@@ -872,7 +840,7 @@
       "source_location": "L141",
       "_callable": true,
       "_origin": "ast",
-      "community": 4,
+      "community": 6,
       "norm_label": "substitutions()",
       "id": "scripts_generate_tenant_repo_substitutions"
     },
@@ -883,7 +851,7 @@
       "source_location": "L150",
       "_callable": true,
       "_origin": "ast",
-      "community": 4,
+      "community": 6,
       "norm_label": "remove_template_only()",
       "id": "scripts_generate_tenant_repo_remove_template_only"
     },
@@ -893,7 +861,7 @@
       "source_file": "",
       "source_location": "",
       "_origin": "ast",
-      "community": 4,
+      "community": 6,
       "norm_label": "path",
       "id": "scripts_generate_tenant_repo_py_path"
     },
@@ -904,7 +872,7 @@
       "source_location": "L164",
       "_callable": true,
       "_origin": "ast",
-      "community": 4,
+      "community": 6,
       "norm_label": "strip_template_only_blocks()",
       "id": "scripts_generate_tenant_repo_strip_template_only_blocks"
     },
@@ -915,7 +883,7 @@
       "source_location": "L189",
       "_callable": true,
       "_origin": "ast",
-      "community": 4,
+      "community": 6,
       "norm_label": "apply_substitutions()",
       "id": "scripts_generate_tenant_repo_apply_substitutions"
     },
@@ -926,7 +894,7 @@
       "source_location": "L208",
       "_callable": true,
       "_origin": "ast",
-      "community": 4,
+      "community": 6,
       "norm_label": "apply_renames()",
       "id": "scripts_generate_tenant_repo_apply_renames"
     },
@@ -937,7 +905,7 @@
       "source_location": "L222",
       "_callable": true,
       "_origin": "ast",
-      "community": 4,
+      "community": 6,
       "norm_label": "sweep()",
       "id": "scripts_generate_tenant_repo_sweep"
     },
@@ -948,7 +916,7 @@
       "source_location": "L245",
       "_callable": true,
       "_origin": "ast",
-      "community": 4,
+      "community": 6,
       "norm_label": "generate()",
       "id": "scripts_generate_tenant_repo_generate"
     },
@@ -959,7 +927,7 @@
       "source_location": "L263",
       "_callable": true,
       "_origin": "ast",
-      "community": 4,
+      "community": 6,
       "norm_label": "main()",
       "id": "scripts_generate_tenant_repo_main"
     },
@@ -969,7 +937,7 @@
       "source_file": "scripts/generate-tenant-repo.py",
       "source_location": "L118",
       "_origin": "ast",
-      "community": 4,
+      "community": 6,
       "norm_label": "raised for anything a caller could have avoided, or that the tree refused.",
       "id": "scripts_generate_tenant_repo_rationale_118"
     },
@@ -979,7 +947,7 @@
       "source_file": "scripts/generate-tenant-repo.py",
       "source_location": "L151",
       "_origin": "ast",
-      "community": 4,
+      "community": 6,
       "norm_label": "delete what belongs to the template. idempotent: a missing path is fine.",
       "id": "scripts_generate_tenant_repo_rationale_151"
     },
@@ -989,153 +957,9 @@
       "source_file": "scripts/generate-tenant-repo.py",
       "source_location": "L223",
       "_origin": "ast",
-      "community": 4,
+      "community": 6,
       "norm_label": "return every `path:line` still carrying a placeholder token.",
       "id": "scripts_generate_tenant_repo_rationale_223"
-    },
-    {
-      "label": "test_assert_placeholders_substituted.py",
-      "file_type": "code",
-      "source_file": "scripts/test_assert_placeholders_substituted.py",
-      "source_location": "L1",
-      "_origin": "ast",
-      "community": 7,
-      "norm_label": "test_assert_placeholders_substituted.py",
-      "id": "scripts_test_assert_placeholders_substituted"
-    },
-    {
-      "label": "FindPlaceholders",
-      "file_type": "code",
-      "source_file": "scripts/test_assert_placeholders_substituted.py",
-      "source_location": "L44",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 7,
-      "norm_label": "findplaceholders",
-      "id": "scripts_test_assert_placeholders_substituted_findplaceholders"
-    },
-    {
-      "label": ".test_reports_each_distinct_placeholder_once_sorted()",
-      "file_type": "code",
-      "source_file": "scripts/test_assert_placeholders_substituted.py",
-      "source_location": "L45",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 7,
-      "norm_label": ".test_reports_each_distinct_placeholder_once_sorted()",
-      "id": "scripts_test_assert_placeholders_substituted_findplaceholders_test_reports_each_distinct_placeholder_once_sorted"
-    },
-    {
-      "label": ".test_lowercase_and_single_underscore_forms_are_not_placeholders()",
-      "file_type": "code",
-      "source_file": "scripts/test_assert_placeholders_substituted.py",
-      "source_location": "L51",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 7,
-      "norm_label": ".test_lowercase_and_single_underscore_forms_are_not_placeholders()",
-      "id": "scripts_test_assert_placeholders_substituted_findplaceholders_test_lowercase_and_single_underscore_forms_are_not_placeholders"
-    },
-    {
-      "label": "Main",
-      "file_type": "code",
-      "source_file": "scripts/test_assert_placeholders_substituted.py",
-      "source_location": "L58",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 7,
-      "norm_label": "main",
-      "id": "scripts_test_assert_placeholders_substituted_main"
-    },
-    {
-      "label": ".test_clean_files_exit_zero()",
-      "file_type": "code",
-      "source_file": "scripts/test_assert_placeholders_substituted.py",
-      "source_location": "L59",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 7,
-      "norm_label": ".test_clean_files_exit_zero()",
-      "id": "scripts_test_assert_placeholders_substituted_main_test_clean_files_exit_zero"
-    },
-    {
-      "label": ".test_a_surviving_placeholder_exits_one()",
-      "file_type": "code",
-      "source_file": "scripts/test_assert_placeholders_substituted.py",
-      "source_location": "L65",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 7,
-      "norm_label": ".test_a_surviving_placeholder_exits_one()",
-      "id": "scripts_test_assert_placeholders_substituted_main_test_a_surviving_placeholder_exits_one"
-    },
-    {
-      "label": ".test_a_missing_file_exits_one_rather_than_passing()",
-      "file_type": "code",
-      "source_file": "scripts/test_assert_placeholders_substituted.py",
-      "source_location": "L71",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 7,
-      "norm_label": ".test_a_missing_file_exits_one_rather_than_passing()",
-      "id": "scripts_test_assert_placeholders_substituted_main_test_a_missing_file_exits_one_rather_than_passing"
-    },
-    {
-      "label": "DefaultFiles",
-      "file_type": "code",
-      "source_file": "scripts/test_assert_placeholders_substituted.py",
-      "source_location": "L78",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 7,
-      "norm_label": "defaultfiles",
-      "id": "scripts_test_assert_placeholders_substituted_defaultfiles"
-    },
-    {
-      "label": ".test_every_named_file_exists_in_this_repo()",
-      "file_type": "code",
-      "source_file": "scripts/test_assert_placeholders_substituted.py",
-      "source_location": "L79",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 7,
-      "norm_label": ".test_every_named_file_exists_in_this_repo()",
-      "id": "scripts_test_assert_placeholders_substituted_defaultfiles_test_every_named_file_exists_in_this_repo"
-    },
-    {
-      "label": ".test_the_template_itself_still_carries_every_placeholder()",
-      "file_type": "code",
-      "source_file": "scripts/test_assert_placeholders_substituted.py",
-      "source_location": "L83",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 7,
-      "norm_label": ".test_the_template_itself_still_carries_every_placeholder()",
-      "id": "scripts_test_assert_placeholders_substituted_defaultfiles_test_the_template_itself_still_carries_every_placeholder"
-    },
-    {
-      "label": ".test_default_files_covers_every_placeholder_in_the_tree()",
-      "file_type": "code",
-      "source_file": "scripts/test_assert_placeholders_substituted.py",
-      "source_location": "L95",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 7,
-      "norm_label": ".test_default_files_covers_every_placeholder_in_the_tree()",
-      "id": "scripts_test_assert_placeholders_substituted_defaultfiles_test_default_files_covers_every_placeholder_in_the_tree"
-    },
-    {
-      "label": "Unit tests for assert-placeholders-substituted.py. The interesting test is not\u2026",
-      "file_type": "rationale",
-      "source_file": "scripts/test_assert_placeholders_substituted.py",
-      "source_location": "L1",
-      "_origin": "ast",
-      "community": 7,
-      "norm_label": "unit tests for assert-placeholders-substituted.py. the interesting test is not...",
-      "id": "scripts_test_assert_placeholders_substituted_rationale_1"
     },
     {
       "label": "test_generate_tenant_repo.py",
@@ -1143,7 +967,7 @@
       "source_file": "scripts/test_generate_tenant_repo.py",
       "source_location": "L1",
       "_origin": "ast",
-      "community": 3,
+      "community": 4,
       "norm_label": "test_generate_tenant_repo.py",
       "id": "scripts_test_generate_tenant_repo"
     },
@@ -1154,7 +978,7 @@
       "source_location": "L31",
       "_callable": true,
       "_origin": "ast",
-      "community": 3,
+      "community": 4,
       "norm_label": "tracked_files()",
       "id": "scripts_test_generate_tenant_repo_tracked_files"
     },
@@ -1176,7 +1000,7 @@
       "source_location": "L57",
       "_callable": true,
       "_origin": "ast",
-      "community": 3,
+      "community": 4,
       "norm_label": "copy_repo()",
       "id": "scripts_test_generate_tenant_repo_copy_repo"
     },
@@ -1186,7 +1010,7 @@
       "source_file": "",
       "source_location": "",
       "_origin": "ast",
-      "community": 3,
+      "community": 4,
       "norm_label": "path",
       "id": "scripts_test_generate_tenant_repo_py_path"
     },
@@ -1265,7 +1089,7 @@
       "_callable": true,
       "_callable_class": true,
       "_origin": "ast",
-      "community": 3,
+      "community": 4,
       "norm_label": "substitutions",
       "id": "scripts_test_generate_tenant_repo_substitutions"
     },
@@ -1276,7 +1100,7 @@
       "source_location": "L124",
       "_callable": true,
       "_origin": "ast",
-      "community": 3,
+      "community": 4,
       "norm_label": ".test_project_name_is_the_slug_plus_infra()",
       "id": "scripts_test_generate_tenant_repo_substitutions_test_project_name_is_the_slug_plus_infra"
     },
@@ -1287,7 +1111,7 @@
       "source_location": "L129",
       "_callable": true,
       "_origin": "ast",
-      "community": 3,
+      "community": 4,
       "norm_label": ".test_tenant_name_is_the_bare_slug()",
       "id": "scripts_test_generate_tenant_repo_substitutions_test_tenant_name_is_the_bare_slug"
     },
@@ -1299,7 +1123,7 @@
       "_callable": true,
       "_callable_class": true,
       "_origin": "ast",
-      "community": 3,
+      "community": 4,
       "norm_label": "generate",
       "id": "scripts_test_generate_tenant_repo_generate"
     },
@@ -1310,7 +1134,7 @@
       "source_location": "L134",
       "_callable": true,
       "_origin": "ast",
-      "community": 3,
+      "community": 4,
       "norm_label": ".test_generating_this_repos_own_tree_leaves_no_token()",
       "id": "scripts_test_generate_tenant_repo_generate_test_generating_this_repos_own_tree_leaves_no_token"
     },
@@ -1321,7 +1145,7 @@
       "source_location": "L140",
       "_callable": true,
       "_origin": "ast",
-      "community": 3,
+      "community": 4,
       "norm_label": ".test_the_tenant_readme_replaces_the_template_one()",
       "id": "scripts_test_generate_tenant_repo_generate_test_the_tenant_readme_replaces_the_template_one"
     },
@@ -1332,7 +1156,7 @@
       "source_location": "L148",
       "_callable": true,
       "_origin": "ast",
-      "community": 3,
+      "community": 4,
       "norm_label": ".test_the_generated_repo_passes_its_own_ci()",
       "id": "scripts_test_generate_tenant_repo_generate_test_the_generated_repo_passes_its_own_ci"
     },
@@ -1343,7 +1167,7 @@
       "source_location": "L177",
       "_callable": true,
       "_origin": "ast",
-      "community": 3,
+      "community": 4,
       "norm_label": ".test_template_only_artefacts_do_not_reach_a_tenant()",
       "id": "scripts_test_generate_tenant_repo_generate_test_template_only_artefacts_do_not_reach_a_tenant"
     },
@@ -1354,7 +1178,7 @@
       "source_location": "L184",
       "_callable": true,
       "_origin": "ast",
-      "community": 3,
+      "community": 4,
       "norm_label": ".test_the_generated_claude_md_does_not_point_at_a_deleted_graph()",
       "id": "scripts_test_generate_tenant_repo_generate_test_the_generated_claude_md_does_not_point_at_a_deleted_graph"
     },
@@ -1365,7 +1189,7 @@
       "source_location": "L197",
       "_callable": true,
       "_origin": "ast",
-      "community": 3,
+      "community": 4,
       "norm_label": ".test_the_pulumi_project_name_is_substituted()",
       "id": "scripts_test_generate_tenant_repo_generate_test_the_pulumi_project_name_is_substituted"
     },
@@ -1376,7 +1200,7 @@
       "source_location": "L205",
       "_callable": true,
       "_origin": "ast",
-      "community": 3,
+      "community": 4,
       "norm_label": ".test_a_missing_tenant_readme_refuses_rather_than_skipping()",
       "id": "scripts_test_generate_tenant_repo_generate_test_a_missing_tenant_readme_refuses_rather_than_skipping"
     },
@@ -1387,7 +1211,7 @@
       "source_location": "L212",
       "_callable": true,
       "_origin": "ast",
-      "community": 3,
+      "community": 4,
       "norm_label": ".test_a_placeholder_in_an_unlisted_file_fails_generation()",
       "id": "scripts_test_generate_tenant_repo_generate_test_a_placeholder_in_an_unlisted_file_fails_generation"
     },
@@ -1398,7 +1222,7 @@
       "source_location": "L224",
       "_callable": true,
       "_origin": "ast",
-      "community": 3,
+      "community": 4,
       "norm_label": ".test_a_listed_file_that_moved_refuses_rather_than_skipping()",
       "id": "scripts_test_generate_tenant_repo_generate_test_a_listed_file_that_moved_refuses_rather_than_skipping"
     },
@@ -1409,7 +1233,7 @@
       "source_location": "L232",
       "_callable": true,
       "_origin": "ast",
-      "community": 3,
+      "community": 4,
       "norm_label": ".test_a_reserved_slug_is_refused_before_anything_is_written()",
       "id": "scripts_test_generate_tenant_repo_generate_test_a_reserved_slug_is_refused_before_anything_is_written"
     },
@@ -1420,7 +1244,7 @@
       "source_location": "L239",
       "_callable": true,
       "_origin": "ast",
-      "community": 3,
+      "community": 4,
       "norm_label": ".test_a_failure_before_the_rename_leaves_a_re_runnable_tree()",
       "id": "scripts_test_generate_tenant_repo_generate_test_a_failure_before_the_rename_leaves_a_re_runnable_tree"
     },
@@ -1431,7 +1255,7 @@
       "source_location": "L250",
       "_callable": true,
       "_origin": "ast",
-      "community": 3,
+      "community": 4,
       "norm_label": ".test_a_placeholder_in_a_markdown_heading_is_not_mistaken_for_a_comment()",
       "id": "scripts_test_generate_tenant_repo_generate_test_a_placeholder_in_a_markdown_heading_is_not_mistaken_for_a_comment"
     },
@@ -1443,7 +1267,7 @@
       "_callable": true,
       "_callable_class": true,
       "_origin": "ast",
-      "community": 3,
+      "community": 4,
       "norm_label": "main",
       "id": "scripts_test_generate_tenant_repo_main"
     },
@@ -1454,7 +1278,7 @@
       "source_location": "L263",
       "_callable": true,
       "_origin": "ast",
-      "community": 3,
+      "community": 4,
       "norm_label": ".test_exit_zero_on_a_clean_generation()",
       "id": "scripts_test_generate_tenant_repo_main_test_exit_zero_on_a_clean_generation"
     },
@@ -1465,7 +1289,7 @@
       "source_location": "L268",
       "_callable": true,
       "_origin": "ast",
-      "community": 3,
+      "community": 4,
       "norm_label": ".test_exit_one_on_a_refusal()",
       "id": "scripts_test_generate_tenant_repo_main_test_exit_one_on_a_refusal"
     },
@@ -1475,7 +1299,7 @@
       "source_file": "scripts/test_generate_tenant_repo.py",
       "source_location": "L1",
       "_origin": "ast",
-      "community": 3,
+      "community": 4,
       "norm_label": "unit tests for generate-tenant-repo.py. the load-bearing one is...",
       "id": "scripts_test_generate_tenant_repo_rationale_1"
     },
@@ -1495,7 +1319,7 @@
       "source_file": "scripts/test_generate_tenant_repo.py",
       "source_location": "L149",
       "_origin": "ast",
-      "community": 3,
+      "community": 4,
       "norm_label": "the finding this test exists for: every tenant repo was red from birth. the...",
       "id": "scripts_test_generate_tenant_repo_rationale_149"
     },
@@ -1503,7 +1327,7 @@
       "label": ".pre-commit-config.yaml",
       "file_type": "code",
       "source_file": ".pre-commit-config.yaml",
-      "community": 22,
+      "community": 20,
       "norm_label": ".pre-commit-config.yaml",
       "_origin": "semantic",
       "id": "pre_commit_config_yaml"
@@ -1512,7 +1336,7 @@
       "label": "CLAUDE.md",
       "file_type": "document",
       "source_file": "CLAUDE.md",
-      "community": 10,
+      "community": 16,
       "norm_label": "claude.md",
       "_origin": "semantic",
       "id": "claude_md"
@@ -1521,24 +1345,16 @@
       "label": "Pulumi.yaml",
       "file_type": "code",
       "source_file": "Pulumi.yaml",
-      "community": 10,
+      "community": 21,
       "norm_label": "pulumi.yaml",
       "_origin": "semantic",
       "id": "pulumi_yaml"
     },
     {
-      "label": "@branchleft/ghost-platform-tenant",
-      "file_type": "code",
-      "source_file": "node_modules/@branchleft/ghost-platform-tenant",
-      "id": "node_modules_branchleft_ghost_platform_tenant_component",
-      "community": 10,
-      "norm_label": "@branchleft/ghost-platform-tenant"
-    },
-    {
       "label": "Pulumi Stack",
       "file_type": "concept",
       "source_file": "Pulumi.yaml",
-      "community": 16,
+      "community": 14,
       "norm_label": "pulumi stack",
       "_origin": "semantic",
       "id": "pulumi_stack"
@@ -1547,7 +1363,7 @@
       "label": "Hetzner Object Storage",
       "file_type": "concept",
       "source_file": null,
-      "community": 16,
+      "community": 14,
       "norm_label": "hetzner object storage",
       "_origin": "semantic",
       "id": "hetzner_object_storage"
@@ -1936,7 +1752,7 @@
       "label": "Runbook \u2014 a generated tenant repo",
       "file_type": "document",
       "source_file": "RUNBOOK-bootstrap.md",
-      "community": 15,
+      "community": 13,
       "norm_label": "runbook \u2014 a generated tenant repo",
       "_origin": "semantic",
       "id": "runbook_bootstrap"
@@ -1945,7 +1761,7 @@
       "label": "branchleft-deploy",
       "file_type": "code",
       "source_file": null,
-      "community": 17,
+      "community": 15,
       "norm_label": "branchleft-deploy",
       "_origin": "semantic",
       "id": "branchleft_deploy"
@@ -1954,7 +1770,7 @@
       "label": "branchLeft/ghost-platform",
       "file_type": "document",
       "source_url": "https://github.com/branchLeft/ghost-platform",
-      "community": 15,
+      "community": 13,
       "norm_label": "branchleft/ghost-platform",
       "_origin": "semantic",
       "id": "ghost_platform_repo"
@@ -1963,7 +1779,7 @@
       "label": "Script Unit Tests",
       "file_type": "code",
       "source_file": "scripts/",
-      "community": 24,
+      "community": 10,
       "norm_label": "script unit tests",
       "_origin": "semantic",
       "id": "scripts_test_unit"
@@ -1972,7 +1788,7 @@
       "label": "GhostTenant Component",
       "file_type": "concept",
       "source_file": null,
-      "community": 18,
+      "community": 10,
       "norm_label": "ghosttenant component",
       "_origin": "semantic",
       "id": "ghost_tenant_component"
@@ -1983,9 +1799,9 @@
       "source_file": "package.json",
       "source_location": "L1",
       "_origin": "ast",
-      "id": "package",
-      "community": 1,
-      "norm_label": "package.json"
+      "community": 2,
+      "norm_label": "package.json",
+      "id": "package"
     },
     {
       "label": "name",
@@ -1993,9 +1809,9 @@
       "source_file": "package.json",
       "source_location": "L2",
       "_origin": "ast",
-      "id": "package_name",
-      "community": 1,
-      "norm_label": "name"
+      "community": 2,
+      "norm_label": "name",
+      "id": "package_name"
     },
     {
       "label": "private",
@@ -2003,9 +1819,9 @@
       "source_file": "package.json",
       "source_location": "L3",
       "_origin": "ast",
-      "id": "package_private",
-      "community": 1,
-      "norm_label": "private"
+      "community": 2,
+      "norm_label": "private",
+      "id": "package_private"
     },
     {
       "label": "main",
@@ -2013,9 +1829,9 @@
       "source_file": "package.json",
       "source_location": "L4",
       "_origin": "ast",
-      "id": "package_main",
-      "community": 1,
-      "norm_label": "main"
+      "community": 2,
+      "norm_label": "main",
+      "id": "package_main"
     },
     {
       "label": "prettier",
@@ -2023,9 +1839,9 @@
       "source_file": "package.json",
       "source_location": "L5",
       "_origin": "ast",
-      "id": "package_prettier",
-      "community": 1,
-      "norm_label": "prettier"
+      "community": 2,
+      "norm_label": "prettier",
+      "id": "package_prettier"
     },
     {
       "label": "scripts",
@@ -2033,9 +1849,9 @@
       "source_file": "package.json",
       "source_location": "L6",
       "_origin": "ast",
-      "id": "package_scripts",
-      "community": 1,
-      "norm_label": "scripts"
+      "community": 2,
+      "norm_label": "scripts",
+      "id": "package_scripts"
     },
     {
       "label": "typecheck",
@@ -2043,9 +1859,9 @@
       "source_file": "package.json",
       "source_location": "L7",
       "_origin": "ast",
-      "id": "package_scripts_typecheck",
-      "community": 1,
-      "norm_label": "typecheck"
+      "community": 2,
+      "norm_label": "typecheck",
+      "id": "package_scripts_typecheck"
     },
     {
       "label": "format",
@@ -2053,9 +1869,9 @@
       "source_file": "package.json",
       "source_location": "L8",
       "_origin": "ast",
-      "id": "package_scripts_format",
-      "community": 1,
-      "norm_label": "format"
+      "community": 2,
+      "norm_label": "format",
+      "id": "package_scripts_format"
     },
     {
       "label": "format:check",
@@ -2063,9 +1879,9 @@
       "source_file": "package.json",
       "source_location": "L9",
       "_origin": "ast",
-      "id": "package_scripts_format_check",
-      "community": 1,
-      "norm_label": "format:check"
+      "community": 2,
+      "norm_label": "format:check",
+      "id": "package_scripts_format_check"
     },
     {
       "label": "dependencies",
@@ -2073,9 +1889,9 @@
       "source_file": "package.json",
       "source_location": "L11",
       "_origin": "ast",
-      "id": "package_dependencies",
-      "community": 1,
-      "norm_label": "dependencies"
+      "community": 2,
+      "norm_label": "dependencies",
+      "id": "package_dependencies"
     },
     {
       "label": "@branchleft/ghost-platform-tenant",
@@ -2083,9 +1899,9 @@
       "source_file": "package.json",
       "source_location": "L12",
       "_origin": "ast",
-      "id": "package_dependencies_branchleft_ghost_platform_tenant",
-      "community": 1,
-      "norm_label": "@branchleft/ghost-platform-tenant"
+      "community": 2,
+      "norm_label": "@branchleft/ghost-platform-tenant",
+      "id": "package_dependencies_branchleft_ghost_platform_tenant"
     },
     {
       "label": "@branchleft/ghost-platform-tenant",
@@ -2093,9 +1909,9 @@
       "source_file": "package.json",
       "source_location": "L12",
       "_origin": "ast",
-      "id": "branchleft_ghost_platform_tenant",
-      "community": 1,
-      "norm_label": "@branchleft/ghost-platform-tenant"
+      "community": 2,
+      "norm_label": "@branchleft/ghost-platform-tenant",
+      "id": "branchleft_ghost_platform_tenant"
     },
     {
       "label": "@pulumi/pulumi",
@@ -2103,9 +1919,9 @@
       "source_file": "package.json",
       "source_location": "L13",
       "_origin": "ast",
-      "id": "package_dependencies_pulumi_pulumi",
-      "community": 1,
-      "norm_label": "@pulumi/pulumi"
+      "community": 2,
+      "norm_label": "@pulumi/pulumi",
+      "id": "package_dependencies_pulumi_pulumi"
     },
     {
       "label": "@pulumi/pulumi",
@@ -2113,9 +1929,9 @@
       "source_file": "package.json",
       "source_location": "L13",
       "_origin": "ast",
-      "id": "pulumi_pulumi",
-      "community": 1,
-      "norm_label": "@pulumi/pulumi"
+      "community": 2,
+      "norm_label": "@pulumi/pulumi",
+      "id": "pulumi_pulumi"
     },
     {
       "label": "devDependencies",
@@ -2123,9 +1939,9 @@
       "source_file": "package.json",
       "source_location": "L15",
       "_origin": "ast",
-      "id": "package_devdependencies",
-      "community": 1,
-      "norm_label": "devdependencies"
+      "community": 2,
+      "norm_label": "devdependencies",
+      "id": "package_devdependencies"
     },
     {
       "label": "@branchleft/prettier-config",
@@ -2133,9 +1949,9 @@
       "source_file": "package.json",
       "source_location": "L16",
       "_origin": "ast",
-      "id": "package_devdependencies_branchleft_prettier_config",
-      "community": 1,
-      "norm_label": "@branchleft/prettier-config"
+      "community": 2,
+      "norm_label": "@branchleft/prettier-config",
+      "id": "package_devdependencies_branchleft_prettier_config"
     },
     {
       "label": "@branchleft/prettier-config",
@@ -2143,9 +1959,9 @@
       "source_file": "package.json",
       "source_location": "L16",
       "_origin": "ast",
-      "id": "branchleft_prettier_config",
-      "community": 1,
-      "norm_label": "@branchleft/prettier-config"
+      "community": 2,
+      "norm_label": "@branchleft/prettier-config",
+      "id": "branchleft_prettier_config"
     },
     {
       "label": "@branchleft/tsconfig",
@@ -2153,9 +1969,9 @@
       "source_file": "package.json",
       "source_location": "L17",
       "_origin": "ast",
-      "id": "package_devdependencies_branchleft_tsconfig",
-      "community": 1,
-      "norm_label": "@branchleft/tsconfig"
+      "community": 2,
+      "norm_label": "@branchleft/tsconfig",
+      "id": "package_devdependencies_branchleft_tsconfig"
     },
     {
       "label": "@branchleft/tsconfig",
@@ -2163,9 +1979,9 @@
       "source_file": "package.json",
       "source_location": "L17",
       "_origin": "ast",
-      "id": "branchleft_tsconfig",
-      "community": 1,
-      "norm_label": "@branchleft/tsconfig"
+      "community": 2,
+      "norm_label": "@branchleft/tsconfig",
+      "id": "branchleft_tsconfig"
     },
     {
       "label": "@types/node",
@@ -2173,9 +1989,9 @@
       "source_file": "package.json",
       "source_location": "L18",
       "_origin": "ast",
-      "id": "package_devdependencies_types_node",
-      "community": 1,
-      "norm_label": "@types/node"
+      "community": 2,
+      "norm_label": "@types/node",
+      "id": "package_devdependencies_types_node"
     },
     {
       "label": "@types/node",
@@ -2183,9 +1999,9 @@
       "source_file": "package.json",
       "source_location": "L18",
       "_origin": "ast",
-      "id": "types_node",
-      "community": 1,
-      "norm_label": "@types/node"
+      "community": 2,
+      "norm_label": "@types/node",
+      "id": "types_node"
     },
     {
       "label": "prettier",
@@ -2193,9 +2009,9 @@
       "source_file": "package.json",
       "source_location": "L19",
       "_origin": "ast",
-      "id": "package_devdependencies_prettier",
-      "community": 1,
-      "norm_label": "prettier"
+      "community": 2,
+      "norm_label": "prettier",
+      "id": "package_devdependencies_prettier"
     },
     {
       "label": "prettier",
@@ -2203,9 +2019,9 @@
       "source_file": "package.json",
       "source_location": "L19",
       "_origin": "ast",
-      "id": "prettier",
-      "community": 1,
-      "norm_label": "prettier"
+      "community": 2,
+      "norm_label": "prettier",
+      "id": "prettier"
     },
     {
       "label": "typescript",
@@ -2213,9 +2029,9 @@
       "source_file": "package.json",
       "source_location": "L20",
       "_origin": "ast",
-      "id": "package_devdependencies_typescript",
-      "community": 1,
-      "norm_label": "typescript"
+      "community": 2,
+      "norm_label": "typescript",
+      "id": "package_devdependencies_typescript"
     },
     {
       "label": "typescript",
@@ -2223,49 +2039,472 @@
       "source_file": "package.json",
       "source_location": "L20",
       "_origin": "ast",
-      "id": "typescript",
-      "community": 1,
-      "norm_label": "typescript"
+      "community": 2,
+      "norm_label": "typescript",
+      "id": "typescript"
     },
     {
       "label": "README.md",
       "file_type": "document",
       "source_file": "README.md",
-      "id": "readme_md",
-      "community": 10,
-      "norm_label": "readme.md"
+      "community": 22,
+      "norm_label": "readme.md",
+      "_origin": "semantic",
+      "id": "readme_md"
     },
     {
       "label": "README.tenant.md",
       "file_type": "document",
       "source_file": "README.tenant.md",
-      "id": "readme_tenant_md",
-      "community": 10,
-      "norm_label": "readme.tenant.md"
+      "community": 23,
+      "norm_label": "readme.tenant.md",
+      "_origin": "semantic",
+      "id": "readme_tenant_md"
+    },
+    {
+      "label": "assert-placeholders-substituted.py",
+      "file_type": "code",
+      "source_file": "scripts/assert-placeholders-substituted.py",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "scripts_assert_placeholders_substituted",
+      "community": 5,
+      "norm_label": "assert-placeholders-substituted.py"
+    },
+    {
+      "label": "find_placeholders()",
+      "file_type": "code",
+      "source_file": "scripts/assert-placeholders-substituted.py",
+      "source_location": "L82",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "scripts_assert_placeholders_substituted_find_placeholders",
+      "community": 5,
+      "norm_label": "find_placeholders()"
+    },
+    {
+      "label": "find_mangled()",
+      "file_type": "code",
+      "source_file": "scripts/assert-placeholders-substituted.py",
+      "source_location": "L87",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "scripts_assert_placeholders_substituted_find_mangled",
+      "community": 5,
+      "norm_label": "find_mangled()"
+    },
+    {
+      "label": "check_substituted()",
+      "file_type": "code",
+      "source_file": "scripts/assert-placeholders-substituted.py",
+      "source_location": "L92",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "scripts_assert_placeholders_substituted_check_substituted",
+      "community": 5,
+      "norm_label": "check_substituted()"
+    },
+    {
+      "label": "check_mangled()",
+      "file_type": "code",
+      "source_file": "scripts/assert-placeholders-substituted.py",
+      "source_location": "L130",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "scripts_assert_placeholders_substituted_check_mangled",
+      "community": 5,
+      "norm_label": "check_mangled()"
+    },
+    {
+      "label": "check_template()",
+      "file_type": "code",
+      "source_file": "scripts/assert-placeholders-substituted.py",
+      "source_location": "L157",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "scripts_assert_placeholders_substituted_check_template",
+      "community": 5,
+      "norm_label": "check_template()"
+    },
+    {
+      "label": "main()",
+      "file_type": "code",
+      "source_file": "scripts/assert-placeholders-substituted.py",
+      "source_location": "L201",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "scripts_assert_placeholders_substituted_main",
+      "community": 5,
+      "norm_label": "main()"
+    },
+    {
+      "label": "No placeholder, intact or mangled, in any of `files`. The check for a generated\u2026",
+      "file_type": "rationale",
+      "source_file": "scripts/assert-placeholders-substituted.py",
+      "source_location": "L93",
+      "_origin": "ast",
+      "id": "scripts_assert_placeholders_substituted_rationale_93",
+      "community": 5,
+      "norm_label": "no placeholder, intact or mangled, in any of `files`. the check for a generated..."
+    },
+    {
+      "label": "No known placeholder appears in Prettier-mangled form in `files`. Runs\u2026",
+      "file_type": "rationale",
+      "source_file": "scripts/assert-placeholders-substituted.py",
+      "source_location": "L131",
+      "_origin": "ast",
+      "id": "scripts_assert_placeholders_substituted_rationale_131",
+      "community": 5,
+      "norm_label": "no known placeholder appears in prettier-mangled form in `files`. runs..."
+    },
+    {
+      "label": "Every known placeholder is present, intact, in the file(s) it belongs in. The\u2026",
+      "file_type": "rationale",
+      "source_file": "scripts/assert-placeholders-substituted.py",
+      "source_location": "L158",
+      "_origin": "ast",
+      "id": "scripts_assert_placeholders_substituted_rationale_158",
+      "community": 5,
+      "norm_label": "every known placeholder is present, intact, in the file(s) it belongs in. the..."
+    },
+    {
+      "label": "test_assert_placeholders_substituted.py",
+      "file_type": "code",
+      "source_file": "scripts/test_assert_placeholders_substituted.py",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "scripts_test_assert_placeholders_substituted",
+      "community": 1,
+      "norm_label": "test_assert_placeholders_substituted.py"
+    },
+    {
+      "label": "FindPlaceholders",
+      "file_type": "code",
+      "source_file": "scripts/test_assert_placeholders_substituted.py",
+      "source_location": "L45",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "id": "scripts_test_assert_placeholders_substituted_findplaceholders",
+      "community": 1,
+      "norm_label": "findplaceholders"
+    },
+    {
+      "label": ".test_reports_each_distinct_placeholder_once_sorted()",
+      "file_type": "code",
+      "source_file": "scripts/test_assert_placeholders_substituted.py",
+      "source_location": "L46",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "scripts_test_assert_placeholders_substituted_findplaceholders_test_reports_each_distinct_placeholder_once_sorted",
+      "community": 1,
+      "norm_label": ".test_reports_each_distinct_placeholder_once_sorted()"
+    },
+    {
+      "label": ".test_lowercase_and_single_underscore_forms_are_not_placeholders()",
+      "file_type": "code",
+      "source_file": "scripts/test_assert_placeholders_substituted.py",
+      "source_location": "L52",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "scripts_test_assert_placeholders_substituted_findplaceholders_test_lowercase_and_single_underscore_forms_are_not_placeholders",
+      "community": 1,
+      "norm_label": ".test_lowercase_and_single_underscore_forms_are_not_placeholders()"
+    },
+    {
+      "label": "Main",
+      "file_type": "code",
+      "source_file": "scripts/test_assert_placeholders_substituted.py",
+      "source_location": "L59",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "id": "scripts_test_assert_placeholders_substituted_main",
+      "community": 1,
+      "norm_label": "main"
+    },
+    {
+      "label": ".test_clean_files_exit_zero()",
+      "file_type": "code",
+      "source_file": "scripts/test_assert_placeholders_substituted.py",
+      "source_location": "L60",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "scripts_test_assert_placeholders_substituted_main_test_clean_files_exit_zero",
+      "community": 1,
+      "norm_label": ".test_clean_files_exit_zero()"
+    },
+    {
+      "label": ".test_a_surviving_placeholder_exits_one()",
+      "file_type": "code",
+      "source_file": "scripts/test_assert_placeholders_substituted.py",
+      "source_location": "L66",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "scripts_test_assert_placeholders_substituted_main_test_a_surviving_placeholder_exits_one",
+      "community": 1,
+      "norm_label": ".test_a_surviving_placeholder_exits_one()"
+    },
+    {
+      "label": ".test_a_missing_file_exits_one_rather_than_passing()",
+      "file_type": "code",
+      "source_file": "scripts/test_assert_placeholders_substituted.py",
+      "source_location": "L72",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "scripts_test_assert_placeholders_substituted_main_test_a_missing_file_exits_one_rather_than_passing",
+      "community": 1,
+      "norm_label": ".test_a_missing_file_exits_one_rather_than_passing()"
+    },
+    {
+      "label": ".test_a_placeholder_mangled_the_way_prettier_would_is_now_caught()",
+      "file_type": "code",
+      "source_file": "scripts/test_assert_placeholders_substituted.py",
+      "source_location": "L78",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "scripts_test_assert_placeholders_substituted_main_test_a_placeholder_mangled_the_way_prettier_would_is_now_caught",
+      "community": 1,
+      "norm_label": ".test_a_placeholder_mangled_the_way_prettier_would_is_now_caught()"
+    },
+    {
+      "label": "FindMangled",
+      "file_type": "code",
+      "source_file": "scripts/test_assert_placeholders_substituted.py",
+      "source_location": "L94",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "id": "scripts_test_assert_placeholders_substituted_findmangled",
+      "community": 1,
+      "norm_label": "findmangled"
+    },
+    {
+      "label": ".test_detects_each_known_placeholder_mangled()",
+      "file_type": "code",
+      "source_file": "scripts/test_assert_placeholders_substituted.py",
+      "source_location": "L95",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "scripts_test_assert_placeholders_substituted_findmangled_test_detects_each_known_placeholder_mangled",
+      "community": 1,
+      "norm_label": ".test_detects_each_known_placeholder_mangled()"
+    },
+    {
+      "label": ".test_ordinary_bold_markdown_is_not_a_mangled_placeholder()",
+      "file_type": "code",
+      "source_file": "scripts/test_assert_placeholders_substituted.py",
+      "source_location": "L104",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "scripts_test_assert_placeholders_substituted_findmangled_test_ordinary_bold_markdown_is_not_a_mangled_placeholder",
+      "community": 1,
+      "norm_label": ".test_ordinary_bold_markdown_is_not_a_mangled_placeholder()"
+    },
+    {
+      "label": "CheckMangled",
+      "file_type": "code",
+      "source_file": "scripts/test_assert_placeholders_substituted.py",
+      "source_location": "L118",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "id": "scripts_test_assert_placeholders_substituted_checkmangled",
+      "community": 1,
+      "norm_label": "checkmangled"
+    },
+    {
+      "label": ".test_a_mangled_placeholder_fails()",
+      "file_type": "code",
+      "source_file": "scripts/test_assert_placeholders_substituted.py",
+      "source_location": "L119",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "scripts_test_assert_placeholders_substituted_checkmangled_test_a_mangled_placeholder_fails",
+      "community": 1,
+      "norm_label": ".test_a_mangled_placeholder_fails()"
+    },
+    {
+      "label": ".test_ordinary_bold_markdown_passes()",
+      "file_type": "code",
+      "source_file": "scripts/test_assert_placeholders_substituted.py",
+      "source_location": "L125",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "scripts_test_assert_placeholders_substituted_checkmangled_test_ordinary_bold_markdown_passes",
+      "community": 1,
+      "norm_label": ".test_ordinary_bold_markdown_passes()"
+    },
+    {
+      "label": ".test_a_missing_file_is_skipped_rather_than_failed()",
+      "file_type": "code",
+      "source_file": "scripts/test_assert_placeholders_substituted.py",
+      "source_location": "L131",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "scripts_test_assert_placeholders_substituted_checkmangled_test_a_missing_file_is_skipped_rather_than_failed",
+      "community": 1,
+      "norm_label": ".test_a_missing_file_is_skipped_rather_than_failed()"
+    },
+    {
+      "label": ".test_main_mangled_flag_catches_the_issues_demonstration()",
+      "file_type": "code",
+      "source_file": "scripts/test_assert_placeholders_substituted.py",
+      "source_location": "L138",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "scripts_test_assert_placeholders_substituted_checkmangled_test_main_mangled_flag_catches_the_issues_demonstration",
+      "community": 1,
+      "norm_label": ".test_main_mangled_flag_catches_the_issues_demonstration()"
+    },
+    {
+      "label": ".test_main_mangled_flag_passes_ordinary_bold_markdown()",
+      "file_type": "code",
+      "source_file": "scripts/test_assert_placeholders_substituted.py",
+      "source_location": "L144",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "scripts_test_assert_placeholders_substituted_checkmangled_test_main_mangled_flag_passes_ordinary_bold_markdown",
+      "community": 1,
+      "norm_label": ".test_main_mangled_flag_passes_ordinary_bold_markdown()"
+    },
+    {
+      "label": "CheckTemplate",
+      "file_type": "code",
+      "source_file": "scripts/test_assert_placeholders_substituted.py",
+      "source_location": "L151",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "id": "scripts_test_assert_placeholders_substituted_checktemplate",
+      "community": 1,
+      "norm_label": "checktemplate"
+    },
+    {
+      "label": ".test_passes_when_every_placeholder_is_present_and_intact()",
+      "file_type": "code",
+      "source_file": "scripts/test_assert_placeholders_substituted.py",
+      "source_location": "L152",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "scripts_test_assert_placeholders_substituted_checktemplate_test_passes_when_every_placeholder_is_present_and_intact",
+      "community": 1,
+      "norm_label": ".test_passes_when_every_placeholder_is_present_and_intact()"
+    },
+    {
+      "label": ".test_fails_when_a_placeholder_was_substituted_away()",
+      "file_type": "code",
+      "source_file": "scripts/test_assert_placeholders_substituted.py",
+      "source_location": "L158",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "scripts_test_assert_placeholders_substituted_checktemplate_test_fails_when_a_placeholder_was_substituted_away",
+      "community": 1,
+      "norm_label": ".test_fails_when_a_placeholder_was_substituted_away()"
+    },
+    {
+      "label": ".test_fails_when_a_placeholder_was_mangled()",
+      "file_type": "code",
+      "source_file": "scripts/test_assert_placeholders_substituted.py",
+      "source_location": "L164",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "scripts_test_assert_placeholders_substituted_checktemplate_test_fails_when_a_placeholder_was_mangled",
+      "community": 1,
+      "norm_label": ".test_fails_when_a_placeholder_was_mangled()"
+    },
+    {
+      "label": ".test_fails_on_a_missing_file()",
+      "file_type": "code",
+      "source_file": "scripts/test_assert_placeholders_substituted.py",
+      "source_location": "L173",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "scripts_test_assert_placeholders_substituted_checktemplate_test_fails_on_a_missing_file",
+      "community": 1,
+      "norm_label": ".test_fails_on_a_missing_file()"
+    },
+    {
+      "label": ".test_this_repos_own_template_files_pass()",
+      "file_type": "code",
+      "source_file": "scripts/test_assert_placeholders_substituted.py",
+      "source_location": "L176",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "scripts_test_assert_placeholders_substituted_checktemplate_test_this_repos_own_template_files_pass",
+      "community": 1,
+      "norm_label": ".test_this_repos_own_template_files_pass()"
+    },
+    {
+      "label": "DefaultFiles",
+      "file_type": "code",
+      "source_file": "scripts/test_assert_placeholders_substituted.py",
+      "source_location": "L187",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "id": "scripts_test_assert_placeholders_substituted_defaultfiles",
+      "community": 1,
+      "norm_label": "defaultfiles"
+    },
+    {
+      "label": ".test_every_named_file_exists_in_this_repo()",
+      "file_type": "code",
+      "source_file": "scripts/test_assert_placeholders_substituted.py",
+      "source_location": "L188",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "scripts_test_assert_placeholders_substituted_defaultfiles_test_every_named_file_exists_in_this_repo",
+      "community": 1,
+      "norm_label": ".test_every_named_file_exists_in_this_repo()"
+    },
+    {
+      "label": ".test_the_template_itself_still_carries_every_placeholder()",
+      "file_type": "code",
+      "source_file": "scripts/test_assert_placeholders_substituted.py",
+      "source_location": "L192",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "scripts_test_assert_placeholders_substituted_defaultfiles_test_the_template_itself_still_carries_every_placeholder",
+      "community": 1,
+      "norm_label": ".test_the_template_itself_still_carries_every_placeholder()"
+    },
+    {
+      "label": ".test_default_files_covers_every_placeholder_in_the_tree()",
+      "file_type": "code",
+      "source_file": "scripts/test_assert_placeholders_substituted.py",
+      "source_location": "L204",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "scripts_test_assert_placeholders_substituted_defaultfiles_test_default_files_covers_every_placeholder_in_the_tree",
+      "community": 1,
+      "norm_label": ".test_default_files_covers_every_placeholder_in_the_tree()"
+    },
+    {
+      "label": "Unit tests for assert-placeholders-substituted.py. The interesting test is not\u2026",
+      "file_type": "rationale",
+      "source_file": "scripts/test_assert_placeholders_substituted.py",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "scripts_test_assert_placeholders_substituted_rationale_1",
+      "community": 1,
+      "norm_label": "unit tests for assert-placeholders-substituted.py. the interesting test is not..."
     },
     {
       "label": "Infra CI Workflow",
       "file_type": "code",
       "source_file": ".github/workflows/infra-ci.yml",
-      "id": "github_workflows_infra_ci_yml",
-      "community": 12,
+      "id": "github_workflows_infra_ci",
+      "community": 10,
       "norm_label": "infra ci workflow"
     },
     {
       "label": "assert-no-tenant-deletes.py",
       "file_type": "code",
       "source_file": "node_modules/@branchleft/ghost-platform-tenant/scripts/assert-no-tenant-deletes.py",
-      "id": "ghost_platform_tenant_delete_guard",
-      "community": 12,
+      "id": "node_modules_branchleft_ghost_platform_tenant_scripts_assert_no_tenant_deletes",
+      "community": 10,
       "norm_label": "assert-no-tenant-deletes.py"
-    },
-    {
-      "label": "Pulumi.<slug>.yaml",
-      "file_type": "code",
-      "source_file": "Pulumi.<slug>.yaml",
-      "id": "pulumi_stack_config",
-      "community": 12,
-      "norm_label": "pulumi.<slug>.yaml"
     }
   ],
   "links": [
@@ -2340,6 +2579,66 @@
       "confidence_score": 1.0,
       "source": "scripts_assert_no_committed_pulumi_secrets_self_test",
       "target": "path"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/assert-placeholders-substituted.py",
+      "source_location": "L137",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "scripts_assert_placeholders_substituted_check_mangled",
+      "target": "path",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/assert-placeholders-substituted.py",
+      "source_location": "L100",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "scripts_assert_placeholders_substituted_check_substituted",
+      "target": "path",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/assert-placeholders-substituted.py",
+      "source_location": "L175",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "scripts_assert_placeholders_substituted_check_template",
+      "target": "path",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "references",
+      "context": "parameter_type",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/assert-placeholders-substituted.py",
+      "source_location": "L87",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "scripts_assert_placeholders_substituted_find_mangled",
+      "target": "path",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "references",
+      "context": "parameter_type",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/assert-placeholders-substituted.py",
+      "source_location": "L82",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "scripts_assert_placeholders_substituted_find_placeholders",
+      "target": "path",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -3404,62 +3703,12 @@
       "target": "branchleft_standards_standards"
     },
     {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "scripts/assert-placeholders-substituted.py",
-      "source_location": "L45",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "scripts_assert_placeholders_substituted",
-      "target": "scripts_assert_placeholders_substituted_find_placeholders"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "scripts/assert-placeholders-substituted.py",
-      "source_location": "L50",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "scripts_assert_placeholders_substituted",
-      "target": "scripts_assert_placeholders_substituted_main"
-    },
-    {
-      "relation": "references",
-      "context": "parameter_type",
-      "confidence": "EXTRACTED",
-      "source_file": "scripts/assert-placeholders-substituted.py",
-      "source_location": "L45",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "scripts_assert_placeholders_substituted_find_placeholders",
-      "target": "scripts_assert_placeholders_substituted_py_path"
-    },
-    {
       "relation": "calls",
-      "context": "call",
       "confidence": "EXTRACTED",
-      "source_file": "scripts/assert-placeholders-substituted.py",
-      "source_location": "L59",
-      "weight": 1.0,
-      "_origin": "ast",
       "confidence_score": 1.0,
-      "source": "scripts_assert_placeholders_substituted_main",
-      "target": "scripts_assert_placeholders_substituted_find_placeholders"
-    },
-    {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "EXTRACTED",
-      "source_file": "scripts/assert-placeholders-substituted.py",
-      "source_location": "L54",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "scripts_assert_placeholders_substituted_main",
-      "target": "scripts_assert_placeholders_substituted_py_path"
+      "source_file": ".github/workflows/infra-ci.yml",
+      "source": "github_workflows_infra_ci",
+      "target": "pulumi_cli"
     },
     {
       "relation": "contains",
@@ -3854,138 +4103,6 @@
       "confidence_score": 1.0,
       "source": "scripts_generate_tenant_repo_main",
       "target": "scripts_generate_tenant_repo_generate"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "scripts/test_assert_placeholders_substituted.py",
-      "source_location": "L78",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "scripts_test_assert_placeholders_substituted",
-      "target": "scripts_test_assert_placeholders_substituted_defaultfiles"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "scripts/test_assert_placeholders_substituted.py",
-      "source_location": "L44",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "scripts_test_assert_placeholders_substituted",
-      "target": "scripts_test_assert_placeholders_substituted_findplaceholders"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "scripts/test_assert_placeholders_substituted.py",
-      "source_location": "L58",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "scripts_test_assert_placeholders_substituted",
-      "target": "scripts_test_assert_placeholders_substituted_main"
-    },
-    {
-      "relation": "rationale_for",
-      "confidence": "EXTRACTED",
-      "source_file": "scripts/test_assert_placeholders_substituted.py",
-      "source_location": "L1",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "scripts_test_assert_placeholders_substituted_rationale_1",
-      "target": "scripts_test_assert_placeholders_substituted"
-    },
-    {
-      "relation": "method",
-      "confidence": "EXTRACTED",
-      "source_file": "scripts/test_assert_placeholders_substituted.py",
-      "source_location": "L51",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "scripts_test_assert_placeholders_substituted_findplaceholders",
-      "target": "scripts_test_assert_placeholders_substituted_findplaceholders_test_lowercase_and_single_underscore_forms_are_not_placeholders"
-    },
-    {
-      "relation": "method",
-      "confidence": "EXTRACTED",
-      "source_file": "scripts/test_assert_placeholders_substituted.py",
-      "source_location": "L45",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "scripts_test_assert_placeholders_substituted_findplaceholders",
-      "target": "scripts_test_assert_placeholders_substituted_findplaceholders_test_reports_each_distinct_placeholder_once_sorted"
-    },
-    {
-      "relation": "method",
-      "confidence": "EXTRACTED",
-      "source_file": "scripts/test_assert_placeholders_substituted.py",
-      "source_location": "L71",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "scripts_test_assert_placeholders_substituted_main",
-      "target": "scripts_test_assert_placeholders_substituted_main_test_a_missing_file_exits_one_rather_than_passing"
-    },
-    {
-      "relation": "method",
-      "confidence": "EXTRACTED",
-      "source_file": "scripts/test_assert_placeholders_substituted.py",
-      "source_location": "L65",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "scripts_test_assert_placeholders_substituted_main",
-      "target": "scripts_test_assert_placeholders_substituted_main_test_a_surviving_placeholder_exits_one"
-    },
-    {
-      "relation": "method",
-      "confidence": "EXTRACTED",
-      "source_file": "scripts/test_assert_placeholders_substituted.py",
-      "source_location": "L59",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "scripts_test_assert_placeholders_substituted_main",
-      "target": "scripts_test_assert_placeholders_substituted_main_test_clean_files_exit_zero"
-    },
-    {
-      "relation": "method",
-      "confidence": "EXTRACTED",
-      "source_file": "scripts/test_assert_placeholders_substituted.py",
-      "source_location": "L95",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "scripts_test_assert_placeholders_substituted_defaultfiles",
-      "target": "scripts_test_assert_placeholders_substituted_defaultfiles_test_default_files_covers_every_placeholder_in_the_tree"
-    },
-    {
-      "relation": "method",
-      "confidence": "EXTRACTED",
-      "source_file": "scripts/test_assert_placeholders_substituted.py",
-      "source_location": "L79",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "scripts_test_assert_placeholders_substituted_defaultfiles",
-      "target": "scripts_test_assert_placeholders_substituted_defaultfiles_test_every_named_file_exists_in_this_repo"
-    },
-    {
-      "relation": "method",
-      "confidence": "EXTRACTED",
-      "source_file": "scripts/test_assert_placeholders_substituted.py",
-      "source_location": "L83",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "scripts_test_assert_placeholders_substituted_defaultfiles",
-      "target": "scripts_test_assert_placeholders_substituted_defaultfiles_test_the_template_itself_still_carries_every_placeholder"
     },
     {
       "relation": "contains",
@@ -4701,40 +4818,6 @@
       "target": "scripts_test_generate_tenant_repo_main_test_exit_zero_on_a_clean_generation"
     },
     {
-      "relation": "references",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "CLAUDE.md",
-      "_origin": "semantic",
-      "source": "claude_md",
-      "target": "node_modules_branchleft_ghost_platform_tenant_component"
-    },
-    {
-      "relation": "references",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "Pulumi.yaml",
-      "_origin": "semantic",
-      "source": "pulumi_yaml",
-      "target": "node_modules_branchleft_ghost_platform_tenant_component"
-    },
-    {
-      "relation": "references",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "README.md",
-      "source": "readme_md",
-      "target": "node_modules_branchleft_ghost_platform_tenant_component"
-    },
-    {
-      "relation": "references",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "README.tenant.md",
-      "source": "readme_tenant_md",
-      "target": "node_modules_branchleft_ghost_platform_tenant_component"
-    },
-    {
       "relation": "shares_data_with",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
@@ -5365,15 +5448,39 @@
       "target": "ghost_platform_repo"
     },
     {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": ".github/workflows/infra-ci.yml",
+      "source": "github_workflows_infra_ci",
+      "target": "scripts_test_unit"
+    },
+    {
+      "relation": "references",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": ".github/workflows/infra-ci.yml",
+      "source": "scripts_test_unit",
+      "target": "node_modules_branchleft_ghost_platform_tenant_scripts_assert_no_tenant_deletes"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": ".github/workflows/infra-ci.yml",
+      "source": "github_workflows_infra_ci",
+      "target": "ghost_tenant_component"
+    },
+    {
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "package.json",
       "source_location": "L11",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "package",
-      "target": "package_dependencies",
-      "confidence_score": 1.0
+      "target": "package_dependencies"
     },
     {
       "relation": "contains",
@@ -5382,9 +5489,9 @@
       "source_location": "L15",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "package",
-      "target": "package_devdependencies",
-      "confidence_score": 1.0
+      "target": "package_devdependencies"
     },
     {
       "relation": "contains",
@@ -5393,9 +5500,9 @@
       "source_location": "L4",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "package",
-      "target": "package_main",
-      "confidence_score": 1.0
+      "target": "package_main"
     },
     {
       "relation": "contains",
@@ -5404,9 +5511,9 @@
       "source_location": "L2",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "package",
-      "target": "package_name",
-      "confidence_score": 1.0
+      "target": "package_name"
     },
     {
       "relation": "contains",
@@ -5415,9 +5522,9 @@
       "source_location": "L5",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "package",
-      "target": "package_prettier",
-      "confidence_score": 1.0
+      "target": "package_prettier"
     },
     {
       "relation": "contains",
@@ -5426,9 +5533,9 @@
       "source_location": "L3",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "package",
-      "target": "package_private",
-      "confidence_score": 1.0
+      "target": "package_private"
     },
     {
       "relation": "contains",
@@ -5437,9 +5544,9 @@
       "source_location": "L6",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "package",
-      "target": "package_scripts",
-      "confidence_score": 1.0
+      "target": "package_scripts"
     },
     {
       "relation": "contains",
@@ -5448,9 +5555,9 @@
       "source_location": "L8",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "package_scripts",
-      "target": "package_scripts_format",
-      "confidence_score": 1.0
+      "target": "package_scripts_format"
     },
     {
       "relation": "contains",
@@ -5459,9 +5566,9 @@
       "source_location": "L9",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "package_scripts",
-      "target": "package_scripts_format_check",
-      "confidence_score": 1.0
+      "target": "package_scripts_format_check"
     },
     {
       "relation": "contains",
@@ -5470,9 +5577,9 @@
       "source_location": "L7",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "package_scripts",
-      "target": "package_scripts_typecheck",
-      "confidence_score": 1.0
+      "target": "package_scripts_typecheck"
     },
     {
       "relation": "contains",
@@ -5481,9 +5588,9 @@
       "source_location": "L12",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "package_dependencies",
-      "target": "package_dependencies_branchleft_ghost_platform_tenant",
-      "confidence_score": 1.0
+      "target": "package_dependencies_branchleft_ghost_platform_tenant"
     },
     {
       "relation": "contains",
@@ -5492,9 +5599,9 @@
       "source_location": "L13",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "package_dependencies",
-      "target": "package_dependencies_pulumi_pulumi",
-      "confidence_score": 1.0
+      "target": "package_dependencies_pulumi_pulumi"
     },
     {
       "relation": "imports",
@@ -5504,9 +5611,9 @@
       "weight": 1.0,
       "context": "import",
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "package_dependencies_branchleft_ghost_platform_tenant",
-      "target": "branchleft_ghost_platform_tenant",
-      "confidence_score": 1.0
+      "target": "branchleft_ghost_platform_tenant"
     },
     {
       "relation": "imports",
@@ -5516,9 +5623,9 @@
       "weight": 1.0,
       "context": "import",
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "package_dependencies_pulumi_pulumi",
-      "target": "pulumi_pulumi",
-      "confidence_score": 1.0
+      "target": "pulumi_pulumi"
     },
     {
       "relation": "contains",
@@ -5527,9 +5634,9 @@
       "source_location": "L16",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "package_devdependencies",
-      "target": "package_devdependencies_branchleft_prettier_config",
-      "confidence_score": 1.0
+      "target": "package_devdependencies_branchleft_prettier_config"
     },
     {
       "relation": "contains",
@@ -5538,9 +5645,9 @@
       "source_location": "L17",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "package_devdependencies",
-      "target": "package_devdependencies_branchleft_tsconfig",
-      "confidence_score": 1.0
+      "target": "package_devdependencies_branchleft_tsconfig"
     },
     {
       "relation": "contains",
@@ -5549,9 +5656,9 @@
       "source_location": "L19",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "package_devdependencies",
-      "target": "package_devdependencies_prettier",
-      "confidence_score": 1.0
+      "target": "package_devdependencies_prettier"
     },
     {
       "relation": "contains",
@@ -5560,9 +5667,9 @@
       "source_location": "L18",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "package_devdependencies",
-      "target": "package_devdependencies_types_node",
-      "confidence_score": 1.0
+      "target": "package_devdependencies_types_node"
     },
     {
       "relation": "contains",
@@ -5571,9 +5678,9 @@
       "source_location": "L20",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "package_devdependencies",
-      "target": "package_devdependencies_typescript",
-      "confidence_score": 1.0
+      "target": "package_devdependencies_typescript"
     },
     {
       "relation": "imports",
@@ -5583,9 +5690,9 @@
       "weight": 1.0,
       "context": "import",
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "package_devdependencies_branchleft_prettier_config",
-      "target": "branchleft_prettier_config",
-      "confidence_score": 1.0
+      "target": "branchleft_prettier_config"
     },
     {
       "relation": "imports",
@@ -5595,9 +5702,9 @@
       "weight": 1.0,
       "context": "import",
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "package_devdependencies_branchleft_tsconfig",
-      "target": "branchleft_tsconfig",
-      "confidence_score": 1.0
+      "target": "branchleft_tsconfig"
     },
     {
       "relation": "imports",
@@ -5607,9 +5714,9 @@
       "weight": 1.0,
       "context": "import",
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "package_devdependencies_types_node",
-      "target": "types_node",
-      "confidence_score": 1.0
+      "target": "types_node"
     },
     {
       "relation": "imports",
@@ -5619,9 +5726,9 @@
       "weight": 1.0,
       "context": "import",
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "package_devdependencies_prettier",
-      "target": "prettier",
-      "confidence_score": 1.0
+      "target": "prettier"
     },
     {
       "relation": "imports",
@@ -5631,8 +5738,499 @@
       "weight": 1.0,
       "context": "import",
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "package_devdependencies_typescript",
-      "target": "typescript",
+      "target": "typescript"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/assert-placeholders-substituted.py",
+      "source_location": "L130",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "scripts_assert_placeholders_substituted",
+      "target": "scripts_assert_placeholders_substituted_check_mangled",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/assert-placeholders-substituted.py",
+      "source_location": "L92",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "scripts_assert_placeholders_substituted",
+      "target": "scripts_assert_placeholders_substituted_check_substituted",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/assert-placeholders-substituted.py",
+      "source_location": "L157",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "scripts_assert_placeholders_substituted",
+      "target": "scripts_assert_placeholders_substituted_check_template",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/assert-placeholders-substituted.py",
+      "source_location": "L87",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "scripts_assert_placeholders_substituted",
+      "target": "scripts_assert_placeholders_substituted_find_mangled",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/assert-placeholders-substituted.py",
+      "source_location": "L82",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "scripts_assert_placeholders_substituted",
+      "target": "scripts_assert_placeholders_substituted_find_placeholders",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/assert-placeholders-substituted.py",
+      "source_location": "L201",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "scripts_assert_placeholders_substituted",
+      "target": "scripts_assert_placeholders_substituted_main",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/assert-placeholders-substituted.py",
+      "source_location": "L105",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "scripts_assert_placeholders_substituted_check_substituted",
+      "target": "scripts_assert_placeholders_substituted_find_placeholders",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/assert-placeholders-substituted.py",
+      "source_location": "L181",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "scripts_assert_placeholders_substituted_check_template",
+      "target": "scripts_assert_placeholders_substituted_find_placeholders",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/assert-placeholders-substituted.py",
+      "source_location": "L143",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "scripts_assert_placeholders_substituted_check_mangled",
+      "target": "scripts_assert_placeholders_substituted_find_mangled",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/assert-placeholders-substituted.py",
+      "source_location": "L117",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "scripts_assert_placeholders_substituted_check_substituted",
+      "target": "scripts_assert_placeholders_substituted_find_mangled",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/assert-placeholders-substituted.py",
+      "source_location": "L226",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "scripts_assert_placeholders_substituted_main",
+      "target": "scripts_assert_placeholders_substituted_check_substituted",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/assert-placeholders-substituted.py",
+      "source_location": "L93",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "scripts_assert_placeholders_substituted_rationale_93",
+      "target": "scripts_assert_placeholders_substituted_check_substituted",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/assert-placeholders-substituted.py",
+      "source_location": "L220",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "scripts_assert_placeholders_substituted_main",
+      "target": "scripts_assert_placeholders_substituted_check_mangled",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/assert-placeholders-substituted.py",
+      "source_location": "L131",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "scripts_assert_placeholders_substituted_rationale_131",
+      "target": "scripts_assert_placeholders_substituted_check_mangled",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/assert-placeholders-substituted.py",
+      "source_location": "L208",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "scripts_assert_placeholders_substituted_main",
+      "target": "scripts_assert_placeholders_substituted_check_template",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/assert-placeholders-substituted.py",
+      "source_location": "L158",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "scripts_assert_placeholders_substituted_rationale_158",
+      "target": "scripts_assert_placeholders_substituted_check_template",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/test_assert_placeholders_substituted.py",
+      "source_location": "L118",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "scripts_test_assert_placeholders_substituted",
+      "target": "scripts_test_assert_placeholders_substituted_checkmangled",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/test_assert_placeholders_substituted.py",
+      "source_location": "L151",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "scripts_test_assert_placeholders_substituted",
+      "target": "scripts_test_assert_placeholders_substituted_checktemplate",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/test_assert_placeholders_substituted.py",
+      "source_location": "L187",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "scripts_test_assert_placeholders_substituted",
+      "target": "scripts_test_assert_placeholders_substituted_defaultfiles",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/test_assert_placeholders_substituted.py",
+      "source_location": "L94",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "scripts_test_assert_placeholders_substituted",
+      "target": "scripts_test_assert_placeholders_substituted_findmangled",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/test_assert_placeholders_substituted.py",
+      "source_location": "L45",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "scripts_test_assert_placeholders_substituted",
+      "target": "scripts_test_assert_placeholders_substituted_findplaceholders",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/test_assert_placeholders_substituted.py",
+      "source_location": "L59",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "scripts_test_assert_placeholders_substituted",
+      "target": "scripts_test_assert_placeholders_substituted_main",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/test_assert_placeholders_substituted.py",
+      "source_location": "L1",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "scripts_test_assert_placeholders_substituted_rationale_1",
+      "target": "scripts_test_assert_placeholders_substituted",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/test_assert_placeholders_substituted.py",
+      "source_location": "L52",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "scripts_test_assert_placeholders_substituted_findplaceholders",
+      "target": "scripts_test_assert_placeholders_substituted_findplaceholders_test_lowercase_and_single_underscore_forms_are_not_placeholders",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/test_assert_placeholders_substituted.py",
+      "source_location": "L46",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "scripts_test_assert_placeholders_substituted_findplaceholders",
+      "target": "scripts_test_assert_placeholders_substituted_findplaceholders_test_reports_each_distinct_placeholder_once_sorted",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/test_assert_placeholders_substituted.py",
+      "source_location": "L72",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "scripts_test_assert_placeholders_substituted_main",
+      "target": "scripts_test_assert_placeholders_substituted_main_test_a_missing_file_exits_one_rather_than_passing",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/test_assert_placeholders_substituted.py",
+      "source_location": "L78",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "scripts_test_assert_placeholders_substituted_main",
+      "target": "scripts_test_assert_placeholders_substituted_main_test_a_placeholder_mangled_the_way_prettier_would_is_now_caught",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/test_assert_placeholders_substituted.py",
+      "source_location": "L66",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "scripts_test_assert_placeholders_substituted_main",
+      "target": "scripts_test_assert_placeholders_substituted_main_test_a_surviving_placeholder_exits_one",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/test_assert_placeholders_substituted.py",
+      "source_location": "L60",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "scripts_test_assert_placeholders_substituted_main",
+      "target": "scripts_test_assert_placeholders_substituted_main_test_clean_files_exit_zero",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/test_assert_placeholders_substituted.py",
+      "source_location": "L95",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "scripts_test_assert_placeholders_substituted_findmangled",
+      "target": "scripts_test_assert_placeholders_substituted_findmangled_test_detects_each_known_placeholder_mangled",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/test_assert_placeholders_substituted.py",
+      "source_location": "L104",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "scripts_test_assert_placeholders_substituted_findmangled",
+      "target": "scripts_test_assert_placeholders_substituted_findmangled_test_ordinary_bold_markdown_is_not_a_mangled_placeholder",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/test_assert_placeholders_substituted.py",
+      "source_location": "L119",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "scripts_test_assert_placeholders_substituted_checkmangled",
+      "target": "scripts_test_assert_placeholders_substituted_checkmangled_test_a_mangled_placeholder_fails",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/test_assert_placeholders_substituted.py",
+      "source_location": "L131",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "scripts_test_assert_placeholders_substituted_checkmangled",
+      "target": "scripts_test_assert_placeholders_substituted_checkmangled_test_a_missing_file_is_skipped_rather_than_failed",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/test_assert_placeholders_substituted.py",
+      "source_location": "L138",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "scripts_test_assert_placeholders_substituted_checkmangled",
+      "target": "scripts_test_assert_placeholders_substituted_checkmangled_test_main_mangled_flag_catches_the_issues_demonstration",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/test_assert_placeholders_substituted.py",
+      "source_location": "L144",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "scripts_test_assert_placeholders_substituted_checkmangled",
+      "target": "scripts_test_assert_placeholders_substituted_checkmangled_test_main_mangled_flag_passes_ordinary_bold_markdown",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/test_assert_placeholders_substituted.py",
+      "source_location": "L125",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "scripts_test_assert_placeholders_substituted_checkmangled",
+      "target": "scripts_test_assert_placeholders_substituted_checkmangled_test_ordinary_bold_markdown_passes",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/test_assert_placeholders_substituted.py",
+      "source_location": "L173",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "scripts_test_assert_placeholders_substituted_checktemplate",
+      "target": "scripts_test_assert_placeholders_substituted_checktemplate_test_fails_on_a_missing_file",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/test_assert_placeholders_substituted.py",
+      "source_location": "L164",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "scripts_test_assert_placeholders_substituted_checktemplate",
+      "target": "scripts_test_assert_placeholders_substituted_checktemplate_test_fails_when_a_placeholder_was_mangled",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/test_assert_placeholders_substituted.py",
+      "source_location": "L158",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "scripts_test_assert_placeholders_substituted_checktemplate",
+      "target": "scripts_test_assert_placeholders_substituted_checktemplate_test_fails_when_a_placeholder_was_substituted_away",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/test_assert_placeholders_substituted.py",
+      "source_location": "L152",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "scripts_test_assert_placeholders_substituted_checktemplate",
+      "target": "scripts_test_assert_placeholders_substituted_checktemplate_test_passes_when_every_placeholder_is_present_and_intact",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/test_assert_placeholders_substituted.py",
+      "source_location": "L176",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "scripts_test_assert_placeholders_substituted_checktemplate",
+      "target": "scripts_test_assert_placeholders_substituted_checktemplate_test_this_repos_own_template_files_pass",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/test_assert_placeholders_substituted.py",
+      "source_location": "L204",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "scripts_test_assert_placeholders_substituted_defaultfiles",
+      "target": "scripts_test_assert_placeholders_substituted_defaultfiles_test_default_files_covers_every_placeholder_in_the_tree",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/test_assert_placeholders_substituted.py",
+      "source_location": "L188",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "scripts_test_assert_placeholders_substituted_defaultfiles",
+      "target": "scripts_test_assert_placeholders_substituted_defaultfiles_test_every_named_file_exists_in_this_repo",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/test_assert_placeholders_substituted.py",
+      "source_location": "L192",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "scripts_test_assert_placeholders_substituted_defaultfiles",
+      "target": "scripts_test_assert_placeholders_substituted_defaultfiles_test_the_template_itself_still_carries_every_placeholder",
       "confidence_score": 1.0
     },
     {
@@ -5640,18 +6238,10 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": ".github/workflows/infra-ci.yml",
-      "source": "github_workflows_infra_ci_yml",
-      "target": "ghost_platform_tenant_delete_guard"
-    },
-    {
-      "relation": "references",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": ".github/workflows/infra-ci.yml",
-      "source": "github_workflows_infra_ci_yml",
-      "target": "pulumi_stack_config"
+      "source": "github_workflows_infra_ci",
+      "target": "node_modules_branchleft_ghost_platform_tenant_scripts_assert_no_tenant_deletes"
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "3c4c5cabd1e7358f7cf78630f1cbbff6791ee044"
+  "built_at_commit": "c624140d79c2927407d854199b690181d6e04f5e"
 }
