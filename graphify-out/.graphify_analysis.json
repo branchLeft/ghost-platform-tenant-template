@@ -237,7 +237,6 @@
     "10": [
       "ghost_tenant_component",
       "github_workflows_infra_ci",
-      "node_modules_branchleft_ghost_platform_tenant_scripts_assert_no_tenant_deletes",
       "pulumi_cli",
       "scripts_test_unit"
     ],
@@ -369,7 +368,7 @@
   ],
   "surprises": [],
   "tokens": {
-    "input": 6047,
-    "output": 808
+    "input": 0,
+    "output": 0
   }
 }
