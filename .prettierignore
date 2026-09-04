@@ -6,11 +6,14 @@ vendor/
 # markdown, so Prettier rewrites any such token that is not inside a code span:
 # README.tenant.md's `# __TENANT_NAME__` heading becomes `# **TENANT_NAME**`.
 # The provisioning substitution then finds nothing to replace and the generated
-# tenant repo ships the literal word. Nothing catches it —
-# assert-placeholders-substituted.py scans Pulumi.yaml and the CI workflow, so a
-# destroyed placeholder in a document reads as a clean run. Tokens inside
-# backticks survive, but that is a property of where someone happened to put
-# them, not a rule anything enforces.
+# tenant repo ships the literal word. This ignore file is the first line of
+# defence, not the only one:
+# `assert-placeholders-substituted.py --mangled` scans for exactly that rewrite
+# and runs unconditionally in CI, so a mangled token is caught even if it
+# reaches one of these files despite being listed here (a removed line, an
+# editor's format-on-save that does not honour this file). Tokens inside
+# backticks survive Prettier either way, but that is a property of where
+# someone happened to put them, not a rule anything enforces.
 README.md
 README.tenant.md
 CLAUDE.md

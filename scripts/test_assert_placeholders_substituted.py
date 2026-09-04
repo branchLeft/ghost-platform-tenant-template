@@ -10,6 +10,7 @@ list, and a file dropped from it stops being covered silently.
 from __future__ import annotations
 
 import importlib.util
+import os
 import pathlib
 import re
 import subprocess
@@ -73,6 +74,114 @@ class Main(unittest.TestCase):
         # "checked and clean" are the same exit status otherwise, and the first
         # is how a placeholder reaches a host.
         self.assertEqual(module.main(["prog", "no/such/file.yml"]), 1)
+
+    def test_the_issues_own_demonstration_is_now_caught(self) -> None:
+        # branchLeft/workspace#117's reproduction: `sed` rewriting
+        # `__TENANT_NAME__` to `**TENANT_NAME**` the way Prettier would, then
+        # handing the result straight to the default (no-flag) invocation --
+        # the exact command line the issue ran. It used to exit 0.
+        with tempfile.TemporaryDirectory() as tmp:
+            path = pathlib.Path(tmp) / "README.tenant.md"
+            path.write_text(
+                "# __TENANT_NAME__ -- Ghost platform tenant stack\n".replace(
+                    "__TENANT_NAME__", "**TENANT_NAME**"
+                ),
+                encoding="utf-8",
+            )
+            self.assertEqual(module.main(["prog", str(path)]), 1)
+
+
+class FindMangled(unittest.TestCase):
+    def test_detects_each_known_placeholder_mangled(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            path = pathlib.Path(tmp) / "f.md"
+            path.write_text("**TENANT_NAME** and **TENANT_PULUMI_PROJECT**\n", encoding="utf-8")
+            self.assertEqual(
+                module.find_mangled(path),
+                ["**TENANT_NAME**", "**TENANT_PULUMI_PROJECT**"],
+            )
+
+    def test_ordinary_bold_markdown_is_not_a_mangled_placeholder(self) -> None:
+        # The false-positive direction: **Note** and **Warning** are bold
+        # prose, not a corrupted placeholder, and a name outside the known
+        # list -- **NEITHER_KNOWN** -- must not match either, or the check
+        # would fail a legitimate build the day someone bolds a heading.
+        with tempfile.TemporaryDirectory() as tmp:
+            path = pathlib.Path(tmp) / "f.md"
+            path.write_text(
+                "**Note**: see below. **Warning**: read this. **NEITHER_KNOWN**\n",
+                encoding="utf-8",
+            )
+            self.assertEqual(module.find_mangled(path), [])
+
+
+class CheckMangled(unittest.TestCase):
+    def test_a_mangled_placeholder_fails(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            path = pathlib.Path(tmp) / "f.md"
+            path.write_text("# **TENANT_NAME**\n", encoding="utf-8")
+            self.assertFalse(module.check_mangled([str(path)]))
+
+    def test_ordinary_bold_markdown_passes(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            path = pathlib.Path(tmp) / "f.md"
+            path.write_text("**Note**: nothing to see here.\n", encoding="utf-8")
+            self.assertTrue(module.check_mangled([str(path)]))
+
+    def test_a_missing_file_is_skipped_rather_than_failed(self) -> None:
+        # Unlike check_substituted and check_template, a missing file here is
+        # not a failure -- --mangled's default file list names
+        # README.tenant.md, which correctly does not exist once a repo has
+        # been generated from this template.
+        self.assertTrue(module.check_mangled(["no/such/file.md"]))
+
+    def test_main_mangled_flag_catches_the_issues_demonstration(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            path = pathlib.Path(tmp) / "README.tenant.md"
+            path.write_text("# **TENANT_NAME**\n", encoding="utf-8")
+            self.assertEqual(module.main(["prog", "--mangled", str(path)]), 1)
+
+    def test_main_mangled_flag_passes_ordinary_bold_markdown(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            path = pathlib.Path(tmp) / "README.tenant.md"
+            path.write_text("**Note**: nothing to see here.\n", encoding="utf-8")
+            self.assertEqual(module.main(["prog", "--mangled", str(path)]), 0)
+
+
+class CheckTemplate(unittest.TestCase):
+    def test_passes_when_every_placeholder_is_present_and_intact(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            path = pathlib.Path(tmp) / "f.yml"
+            path.write_text("name: __TENANT_NAME__\n", encoding="utf-8")
+            self.assertTrue(module.check_template({"TENANT_NAME": [str(path)]}))
+
+    def test_fails_when_a_placeholder_was_substituted_away(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            path = pathlib.Path(tmp) / "f.yml"
+            path.write_text("name: blog-infra\n", encoding="utf-8")
+            self.assertFalse(module.check_template({"TENANT_NAME": [str(path)]}))
+
+    def test_fails_when_a_placeholder_was_mangled(self) -> None:
+        # The presence check catches mangling too, independently of
+        # check_mangled: a mangled token is no longer intact, so it is
+        # indistinguishable here from having been substituted away.
+        with tempfile.TemporaryDirectory() as tmp:
+            path = pathlib.Path(tmp) / "f.md"
+            path.write_text("# **TENANT_NAME**\n", encoding="utf-8")
+            self.assertFalse(module.check_template({"TENANT_NAME": [str(path)]}))
+
+    def test_fails_on_a_missing_file(self) -> None:
+        self.assertFalse(module.check_template({"TENANT_NAME": ["no/such/file.yml"]}))
+
+    def test_this_repos_own_template_files_pass(self) -> None:
+        # Exercises the default mapping (TEMPLATE_PLACEHOLDER_FILES) against
+        # this repo's own tracked files, the same way `--template` runs in CI.
+        cwd = pathlib.Path.cwd()
+        os.chdir(REPO)
+        try:
+            self.assertTrue(module.check_template())
+        finally:
+            os.chdir(cwd)
 
 
 class DefaultFiles(unittest.TestCase):
