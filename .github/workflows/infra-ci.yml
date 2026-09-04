@@ -108,6 +108,24 @@ jobs:
         if: github.event.repository.is_template != true
         run: python3 scripts/assert-placeholders-substituted.py
 
+      # Unconditional -- unlike the step above, this one is never skipped in
+      # this repo itself. Prettier's bold-emphasis rewrite of a placeholder
+      # (see .prettierignore's comment for the concrete example) is a bug in
+      # the template, where it means substitution will find nothing to
+      # replace, and in a repo already generated from it, where it means that
+      # already happened.
+      - name: Verify no template placeholder was mangled
+        run: python3 scripts/assert-placeholders-substituted.py --mangled
+
+      # The inverse of "Verify template placeholders are substituted" above:
+      # only meaningful here, in the template, where a placeholder present and
+      # intact is the correct, permanent state of `main` -- not in a generated
+      # repo, where the same fact would be exactly the bug that step exists to
+      # catch.
+      - name: Verify the template still carries every placeholder, intact
+        if: github.event.repository.is_template == true
+        run: python3 scripts/assert-placeholders-substituted.py --template
+
       # The guard ships inside the component now, rather than being a copy in
       # this repo that has to be kept in step with a component it does not
       # travel with. `--verify-coverage` takes the package ROOT: the script
@@ -208,6 +226,14 @@ jobs:
       # credentials to run.
       - name: Verify template placeholders are substituted
         run: python3 scripts/assert-placeholders-substituted.py
+
+      # `--template` is not added here: this job's own `if:` already keeps it
+      # from running in the template repo (see the comment above the job), so
+      # the "placeholder must still be present" check would never see the one
+      # context where that is the correct state -- only the mangled-form
+      # check, meaningful in a generated repo too, belongs in this job.
+      - name: Verify no template placeholder was mangled
+        run: python3 scripts/assert-placeholders-substituted.py --mangled
 
       - name: Setup Node
         uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
