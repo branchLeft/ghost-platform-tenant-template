@@ -47,10 +47,11 @@ import sys
 # side: the slug also becomes an S3-compatible media bucket name, and bucket
 # naming rules require a bucket name to both start and end with one.
 # `branchLeft/workspace#681` found this copy had drifted to accept a trailing
-# hyphen; `test_bounds_match_the_installed_component` below now runs a full
-# battery of boundary slugs through the installed component rather than
-# comparing only its length and reserved-name constants, so a future drift in
-# the charset itself is caught the same way.
+# hyphen; `test_charset_matches_the_installed_component_across_a_battery`
+# below now runs a full battery of boundary slugs through the installed
+# component, rather than the length and reserved-name constants that
+# `test_bounds_match_the_installed_component` alone compared, so a future
+# drift in the charset itself is caught the same way.
 SLUG = re.compile(r"\A[a-z]([a-z0-9-]*[a-z0-9])?\Z")
 
 # MySQL caps an account name at 32 characters, and a tenant's database and its
