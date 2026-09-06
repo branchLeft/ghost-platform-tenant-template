@@ -42,8 +42,16 @@ import sys
 # Mirrors `validateTenantSlug` in @branchleft/ghost-platform-tenant. The slug
 # becomes a Compose project, a systemd instance name, a directory, a MySQL
 # identifier and two volume names, so a value valid in one and not another is a
-# tenant that provisions and then cannot start.
-SLUG = re.compile(r"\A[a-z][a-z0-9-]*\Z")
+# tenant that provisions and then cannot start. The trailing character is
+# restricted to a letter or digit for the same reason it is on the component's
+# side: the slug also becomes an S3-compatible media bucket name, and bucket
+# naming rules require a bucket name to both start and end with one.
+# `branchLeft/workspace#681` found this copy had drifted to accept a trailing
+# hyphen; `test_bounds_match_the_installed_component` below now runs a full
+# battery of boundary slugs through the installed component rather than
+# comparing only its length and reserved-name constants, so a future drift in
+# the charset itself is caught the same way.
+SLUG = re.compile(r"\A[a-z]([a-z0-9-]*[a-z0-9])?\Z")
 
 # MySQL caps an account name at 32 characters, and a tenant's database and its
 # dedicated user share one name of `ghost_<slug>` -- so the slug has 26 to work

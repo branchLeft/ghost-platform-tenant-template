@@ -35,9 +35,13 @@ def tracked_files() -> list[str]:
     return [name for name in listing.stdout.splitlines() if name]
 
 
+def _component_installed() -> bool:
+    return (REPO / "node_modules" / "@branchleft" / "ghost-platform-tenant").is_dir()
+
+
 def component_constants() -> dict | None:
     """The component's own slug bounds, or None when it is not installed."""
-    if not (REPO / "node_modules" / "@branchleft" / "ghost-platform-tenant").is_dir():
+    if not _component_installed():
         return None
     script = (
         "const c = require('@branchleft/ghost-platform-tenant');"
@@ -52,6 +56,60 @@ def component_constants() -> dict | None:
     except (OSError, subprocess.CalledProcessError):
         return None
     return json.loads(result.stdout)
+
+
+def component_accepts_battery(slugs: list[str]) -> list[bool] | None:
+    """Whether the installed component's `validateTenantSlug` accepts each
+    slug, or None when the component is not installed.
+
+    Executes the installed package rather than parsing anything out of it,
+    for the same reason `component_constants` does: a regex over compiled
+    output can match the wrong assignment. This is the mechanism that spans
+    the boundary `branchLeft/workspace#681` could not close with a unit test
+    in either repo alone -- it runs the *published artefact* this template
+    actually depends on, not this repository's copy of its source.
+    """
+    if not _component_installed():
+        return None
+    script = (
+        "const c = require('@branchleft/ghost-platform-tenant');"
+        "const slugs = JSON.parse(process.argv[1]);"
+        "const out = slugs.map((s) => {"
+        "  try { c.validateTenantSlug(s); return true; }"
+        "  catch (e) { return false; }"
+        "});"
+        "console.log(JSON.stringify(out));"
+    )
+    try:
+        result = subprocess.run(
+            ["node", "-e", script, "--", json.dumps(slugs)],
+            cwd=REPO,
+            capture_output=True,
+            text=True,
+            check=True,
+        )
+    except (OSError, subprocess.CalledProcessError):
+        return None
+    return json.loads(result.stdout)
+
+
+# Boundary slugs that exercise the charset rule specifically -- none of these
+# is a reserved name and none is length-boundary-adjacent, so a disagreement
+# here is a charset drift, not a scope difference in what else a copy checks.
+CHARSET_BATTERY: list[tuple[str, bool]] = [
+    ("", False),
+    ("-blog", False),
+    ("blog-", False),
+    ("Blog", False),
+    ("blög", False),
+    ("1blog", False),
+    ("blog_one", False),
+    ("blog one", False),
+    ("a", True),
+    ("blog", True),
+    ("blog--co", True),
+    ("acme-blog", True),
+]
 
 
 def copy_repo(destination: pathlib.Path) -> pathlib.Path:
@@ -87,6 +145,23 @@ class ValidateSlug(unittest.TestCase):
         with self.assertRaises(module.GenerateError):
             module.validate_slug("a" * (module.MAX_SLUG_LENGTH + 1))
 
+    def test_refuses_a_trailing_hyphen_and_accepts_the_boundary(self) -> None:
+        # `branchLeft/workspace#681`'s acceptance test: this is the fourth (in
+        # fact fifth -- see the module's SLUG comment) copy of the charset
+        # rule found to accept a trailing hyphen, which fails downstream at
+        # `mediaBucketName()` -- after a repository already exists for it.
+        # The single-character and maximum-length acceptances are the
+        # control: the fix narrows what is accepted, it does not also start
+        # rejecting slugs that were always valid.
+        with self.assertRaises(module.GenerateError):
+            module.validate_slug("blog-")
+        self.assertEqual(module.validate_slug("a"), "a")
+        self.assertEqual(
+            module.validate_slug("a" * module.MAX_SLUG_LENGTH), "a" * module.MAX_SLUG_LENGTH
+        )
+        with self.assertRaises(module.GenerateError):
+            module.validate_slug(("a" * (module.MAX_SLUG_LENGTH - 1)) + "-")
+
     def test_refuses_every_reserved_stack_name(self) -> None:
         # A tenant taking one of these overwrites a platform stack's directory,
         # secrets file and systemd unit on the app host.
@@ -118,6 +193,36 @@ class ValidateSlug(unittest.TestCase):
             module.MAX_SLUG_LENGTH,
             "MAX_SLUG_LENGTH has drifted from the component's MAX_TENANT_SLUG_LENGTH",
         )
+
+    def test_charset_matches_the_installed_component_across_a_battery(self) -> None:
+        # The constants above cover length and the reserved list; neither
+        # proves the CHARSET itself still agrees; branchLeft/workspace#681 was
+        # exactly that -- a charset drift with an unchanged length and
+        # reserved list. Comparing decisions on a shared battery, rather than
+        # any regex text, is what still works if either side's pattern is
+        # rewritten to an equivalent but differently-spelled form.
+        slugs = [slug for slug, _ in CHARSET_BATTERY]
+        accepted = component_accepts_battery(slugs)
+        if accepted is None:
+            self.skipTest("component not installed or node unavailable; run npm ci")
+        for (slug, expected), component_accepted in zip(CHARSET_BATTERY, accepted):
+            with self.subTest(slug=slug):
+                self.assertEqual(
+                    component_accepted,
+                    expected,
+                    f"test battery's own expectation for {slug!r} disagrees with the "
+                    "installed component -- fix the battery, not this assertion",
+                )
+                local_accepted = True
+                try:
+                    module.validate_slug(slug)
+                except module.GenerateError:
+                    local_accepted = False
+                self.assertEqual(
+                    local_accepted,
+                    component_accepted,
+                    f"validate_slug disagrees with the installed component on {slug!r}",
+                )
 
 
 class Substitutions(unittest.TestCase):
