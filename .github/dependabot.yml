@@ -1,0 +1,35 @@
+version: 2
+
+updates:
+  # Tenant repo generator: Pulumi component, generator scripts and tooling.
+  - package-ecosystem: 'npm'
+    directory: '/'
+    schedule:
+      interval: 'weekly'
+      day: 'monday'
+    open-pull-requests-limit: 5
+    groups:
+      npm-minor-and-patch:
+        applies-to: version-updates
+        update-types:
+          - 'minor'
+          - 'patch'
+    labels:
+      - 'dependencies'
+
+  # Actions used by workflows in .github/workflows.
+  - package-ecosystem: 'github-actions'
+    directory: '/'
+    schedule:
+      interval: 'weekly'
+      day: 'monday'
+    open-pull-requests-limit: 5
+    groups:
+      github-actions-minor-and-patch:
+        applies-to: version-updates
+        update-types:
+          - 'minor'
+          - 'patch'
+    labels:
+      - 'dependencies'
+      - 'github-actions'
