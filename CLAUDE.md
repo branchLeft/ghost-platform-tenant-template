@@ -32,14 +32,3 @@ provider-enforced repository pin Workload Identity Federation used to give.
 
 **A hostname plus a slug is that tenant's identity.** Never carry it into a
 public repo, an issue, or a PR description outside this repo.
-
-<!-- template-only:start -->
-## graphify
-
-`graphify-out/` holds a knowledge graph of this repo, rebuilt by CI on every push to `main` and published as a `chore(graphify)` PR.
-
-- Answer codebase and architecture questions with `graphify query "<question>"` first — `graphify path "<A>" "<B>"` for a relationship, `graphify explain "<concept>"` for a concept. Each returns a scoped subgraph, far smaller than the equivalent grep. The payload files behind it are read-blocked in `.claude/settings.json` — go through the query commands instead.
-- If a `chore(graphify)` PR is open, the graph you have is behind — get it merged and pulled before reasoning from it.
-- After changing code, `graphify update .` refreshes the graph locally. AST-only, no API cost.
-- `graphify-out/.graphify_root` and `.graphify_python` are never committed: they record absolute paths on the machine that built the graph, and a foreign value in either one is worse than its absence.
-<!-- template-only:end -->

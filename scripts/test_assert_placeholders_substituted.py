@@ -31,7 +31,7 @@ _spec.loader.exec_module(module)
 # the script itself both carry the pattern as data. Substitution happens in
 # files a tool reads, so those are what the coverage assertion is about.
 EXCLUDED_SUFFIXES = {".md"}
-EXCLUDED_DIRS = {"scripts", "graphify-out", ".claude"}
+EXCLUDED_DIRS = {"scripts", ".claude"}
 
 # A `#` comment line naming a placeholder is documenting it, not carrying one:
 # `.prettierignore` explains why the markdown files are excluded from

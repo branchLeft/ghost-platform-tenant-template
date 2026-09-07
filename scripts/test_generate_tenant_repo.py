@@ -114,20 +114,12 @@ CHARSET_BATTERY: list[tuple[str, bool]] = [
 
 def copy_repo(destination: pathlib.Path) -> pathlib.Path:
     for name in tracked_files():
-        if name.startswith("graphify-out/"):
-            continue
         source = REPO / name
         if not source.is_file():
             continue
         target = destination / name
         target.parent.mkdir(parents=True, exist_ok=True)
         shutil.copy2(source, target)
-    # `git ls-files` output is filtered above to keep the copy cheap, so the
-    # graph artefact is re-created as a stub. Without it the "graphify-out is
-    # removed" assertion would pass against a tree that never had one.
-    graph = destination / "graphify-out"
-    graph.mkdir(exist_ok=True)
-    (graph / "graph.json").write_text('{"stub": true}\n', encoding="utf-8")
     return destination
 
 
@@ -285,19 +277,6 @@ class Generate(unittest.TestCase):
             module.generate(root, "acme-blog")
             for name in module.TEMPLATE_ONLY_PATHS:
                 self.assertFalse((root / name).exists(), f"{name} survived generation")
-
-    def test_the_generated_claude_md_does_not_point_at_a_deleted_graph(self) -> None:
-        # The graph artefact and its workflow are removed, so guidance telling a
-        # tenant repo's agents to answer from `graphify-out/` would send them at
-        # a directory that is not there -- and, worse, would have described the
-        # template rather than the tenant if it were.
-        with tempfile.TemporaryDirectory() as tmp:
-            root = copy_repo(pathlib.Path(tmp))
-            module.generate(root, "acme-blog")
-            claude = (root / "CLAUDE.md").read_text(encoding="utf-8")
-            self.assertNotIn("graphify", claude)
-            self.assertNotIn(module.BLOCK_START, claude)
-            self.assertNotIn(module.BLOCK_END, claude)
 
     def test_the_pulumi_project_name_is_substituted(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
