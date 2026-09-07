@@ -4,6 +4,19 @@
   "graph": {
     "hyperedges": [
       {
+        "id": "tenant_onboarding_flow",
+        "label": "Tenant Onboarding Flow",
+        "nodes": [
+          "runbook_bootstrap_md",
+          "github_workflows_infra_ci_yml",
+          "pulumi_stack"
+        ],
+        "relation": "participate_in",
+        "confidence": "EXTRACTED",
+        "confidence_score": 0.95,
+        "source_file": "RUNBOOK-bootstrap.md"
+      },
+      {
         "id": "dependency_management_strategy",
         "label": "Dependency Management Strategy",
         "nodes": [
@@ -25,7 +38,7 @@
       "source_file": "",
       "source_location": "",
       "_origin": "ast",
-      "community": 20,
+      "community": 21,
       "norm_label": "pattern",
       "id": "pattern"
     },
@@ -35,7 +48,7 @@
       "source_file": "",
       "source_location": "",
       "_origin": "ast",
-      "community": 4,
+      "community": 6,
       "norm_label": "path",
       "id": "path"
     },
@@ -175,7 +188,7 @@
       "source_file": "scripts/assert-no-committed-pulumi-secrets.py",
       "source_location": "L1",
       "_origin": "ast",
-      "community": 4,
+      "community": 6,
       "norm_label": "assert-no-committed-pulumi-secrets.py",
       "id": "scripts_assert_no_committed_pulumi_secrets"
     },
@@ -186,7 +199,7 @@
       "source_location": "L123",
       "_callable": true,
       "_origin": "ast",
-      "community": 4,
+      "community": 6,
       "norm_label": "is_commented()",
       "id": "scripts_assert_no_committed_pulumi_secrets_is_commented"
     },
@@ -197,7 +210,7 @@
       "source_location": "L132",
       "_callable": true,
       "_origin": "ast",
-      "community": 4,
+      "community": 6,
       "norm_label": "offending_lines()",
       "id": "scripts_assert_no_committed_pulumi_secrets_offending_lines"
     },
@@ -208,7 +221,7 @@
       "source_location": "L147",
       "_callable": true,
       "_origin": "ast",
-      "community": 4,
+      "community": 6,
       "norm_label": "is_stack_config()",
       "id": "scripts_assert_no_committed_pulumi_secrets_is_stack_config"
     },
@@ -219,7 +232,7 @@
       "source_location": "L151",
       "_callable": true,
       "_origin": "ast",
-      "community": 4,
+      "community": 6,
       "norm_label": "find_stack_configs()",
       "id": "scripts_assert_no_committed_pulumi_secrets_find_stack_configs"
     },
@@ -230,7 +243,7 @@
       "source_location": "L161",
       "_callable": true,
       "_origin": "ast",
-      "community": 4,
+      "community": 6,
       "norm_label": "check()",
       "id": "scripts_assert_no_committed_pulumi_secrets_check"
     },
@@ -241,7 +254,7 @@
       "source_location": "L235",
       "_callable": true,
       "_origin": "ast",
-      "community": 4,
+      "community": 6,
       "norm_label": "_quiet_check()",
       "id": "scripts_assert_no_committed_pulumi_secrets_quiet_check"
     },
@@ -252,7 +265,7 @@
       "source_location": "L244",
       "_callable": true,
       "_origin": "ast",
-      "community": 4,
+      "community": 6,
       "norm_label": "_self_test()",
       "id": "scripts_assert_no_committed_pulumi_secrets_self_test"
     },
@@ -263,7 +276,7 @@
       "source_location": "L374",
       "_callable": true,
       "_origin": "ast",
-      "community": 4,
+      "community": 6,
       "norm_label": "main()",
       "id": "scripts_assert_no_committed_pulumi_secrets_main"
     },
@@ -273,7 +286,7 @@
       "source_file": "scripts/assert-no-committed-pulumi-secrets.py",
       "source_location": "L124",
       "_origin": "ast",
-      "community": 4,
+      "community": 6,
       "norm_label": "whether the line is entirely a comment. only a leading `#` counts. a `#`...",
       "id": "scripts_assert_no_committed_pulumi_secrets_rationale_124"
     },
@@ -283,7 +296,7 @@
       "source_file": "scripts/assert-no-committed-pulumi-secrets.py",
       "source_location": "L133",
       "_origin": "ast",
-      "community": 4,
+      "community": 6,
       "norm_label": "every (1-based line number, line) that commits a secret.",
       "id": "scripts_assert_no_committed_pulumi_secrets_rationale_133"
     },
@@ -293,7 +306,7 @@
       "source_file": "scripts/assert-no-committed-pulumi-secrets.py",
       "source_location": "L236",
       "_origin": "ast",
-      "community": 4,
+      "community": 6,
       "norm_label": "`check` with its report captured, so a fixture's own error output does not read...",
       "id": "scripts_assert_no_committed_pulumi_secrets_rationale_236"
     },
@@ -303,7 +316,7 @@
       "source_file": "scripts/test_assert_no_committed_pulumi_secrets.py",
       "source_location": "L1",
       "_origin": "ast",
-      "community": 3,
+      "community": 5,
       "norm_label": "test_assert_no_committed_pulumi_secrets.py",
       "id": "scripts_test_assert_no_committed_pulumi_secrets"
     },
@@ -314,7 +327,7 @@
       "source_location": "L25",
       "_callable": true,
       "_origin": "ast",
-      "community": 3,
+      "community": 5,
       "norm_label": "_load_module()",
       "id": "scripts_test_assert_no_committed_pulumi_secrets_load_module"
     },
@@ -325,7 +338,7 @@
       "source_location": "L38",
       "_callable": true,
       "_origin": "ast",
-      "community": 3,
+      "community": 5,
       "norm_label": "lines_flagged()",
       "id": "scripts_test_assert_no_committed_pulumi_secrets_lines_flagged"
     },
@@ -337,7 +350,7 @@
       "_callable": true,
       "_callable_class": true,
       "_origin": "ast",
-      "community": 3,
+      "community": 5,
       "norm_label": "matchercatchesasalt",
       "id": "scripts_test_assert_no_committed_pulumi_secrets_matchercatchesasalt"
     },
@@ -348,7 +361,7 @@
       "source_location": "L45",
       "_callable": true,
       "_origin": "ast",
-      "community": 3,
+      "community": 5,
       "norm_label": ".test_plain_key_at_column_zero()",
       "id": "scripts_test_assert_no_committed_pulumi_secrets_matchercatchesasalt_test_plain_key_at_column_zero"
     },
@@ -359,7 +372,7 @@
       "source_location": "L48",
       "_callable": true,
       "_origin": "ast",
-      "community": 3,
+      "community": 5,
       "norm_label": ".test_indented_key()",
       "id": "scripts_test_assert_no_committed_pulumi_secrets_matchercatchesasalt_test_indented_key"
     },
@@ -370,7 +383,7 @@
       "source_location": "L51",
       "_callable": true,
       "_origin": "ast",
-      "community": 3,
+      "community": 5,
       "norm_label": ".test_key_as_a_list_item()",
       "id": "scripts_test_assert_no_committed_pulumi_secrets_matchercatchesasalt_test_key_as_a_list_item"
     },
@@ -381,7 +394,7 @@
       "source_location": "L54",
       "_callable": true,
       "_origin": "ast",
-      "community": 3,
+      "community": 5,
       "norm_label": ".test_case_is_ignored()",
       "id": "scripts_test_assert_no_committed_pulumi_secrets_matchercatchesasalt_test_case_is_ignored"
     },
@@ -392,7 +405,7 @@
       "source_location": "L61",
       "_callable": true,
       "_origin": "ast",
-      "community": 3,
+      "community": 5,
       "norm_label": ".test_quoted_keys()",
       "id": "scripts_test_assert_no_committed_pulumi_secrets_matchercatchesasalt_test_quoted_keys"
     },
@@ -403,7 +416,7 @@
       "source_location": "L68",
       "_callable": true,
       "_origin": "ast",
-      "community": 3,
+      "community": 5,
       "norm_label": ".test_hash_inside_the_value_is_not_a_comment()",
       "id": "scripts_test_assert_no_committed_pulumi_secrets_matchercatchesasalt_test_hash_inside_the_value_is_not_a_comment"
     },
@@ -414,7 +427,7 @@
       "source_location": "L71",
       "_callable": true,
       "_origin": "ast",
-      "community": 3,
+      "community": 5,
       "norm_label": ".test_leading_byte_order_mark_does_not_hide_line_one()",
       "id": "scripts_test_assert_no_committed_pulumi_secrets_matchercatchesasalt_test_leading_byte_order_mark_does_not_hide_line_one"
     },
@@ -425,7 +438,7 @@
       "source_location": "L74",
       "_callable": true,
       "_origin": "ast",
-      "community": 3,
+      "community": 5,
       "norm_label": ".test_a_salt_beside_a_ciphertext_is_still_caught()",
       "id": "scripts_test_assert_no_committed_pulumi_secrets_matchercatchesasalt_test_a_salt_beside_a_ciphertext_is_still_caught"
     },
@@ -436,7 +449,7 @@
       "source_location": "L78",
       "_callable": true,
       "_origin": "ast",
-      "community": 3,
+      "community": 5,
       "norm_label": ".test_every_offending_line_is_reported_not_just_the_first()",
       "id": "scripts_test_assert_no_committed_pulumi_secrets_matchercatchesasalt_test_every_offending_line_is_reported_not_just_the_first"
     },
@@ -448,7 +461,7 @@
       "_callable": true,
       "_callable_class": true,
       "_origin": "ast",
-      "community": 3,
+      "community": 5,
       "norm_label": "matcherdoesnotcrywolf",
       "id": "scripts_test_assert_no_committed_pulumi_secrets_matcherdoesnotcrywolf"
     },
@@ -459,7 +472,7 @@
       "source_location": "L87",
       "_callable": true,
       "_origin": "ast",
-      "community": 3,
+      "community": 5,
       "norm_label": ".test_a_ciphertext_with_no_salt_is_allowed()",
       "id": "scripts_test_assert_no_committed_pulumi_secrets_matcherdoesnotcrywolf_test_a_ciphertext_with_no_salt_is_allowed"
     },
@@ -470,7 +483,7 @@
       "source_location": "L94",
       "_callable": true,
       "_origin": "ast",
-      "community": 3,
+      "community": 5,
       "norm_label": ".test_a_key_merely_containing_the_word()",
       "id": "scripts_test_assert_no_committed_pulumi_secrets_matcherdoesnotcrywolf_test_a_key_merely_containing_the_word"
     },
@@ -481,7 +494,7 @@
       "source_location": "L99",
       "_callable": true,
       "_origin": "ast",
-      "community": 3,
+      "community": 5,
       "norm_label": ".test_a_commented_line()",
       "id": "scripts_test_assert_no_committed_pulumi_secrets_matcherdoesnotcrywolf_test_a_commented_line"
     },
@@ -492,7 +505,7 @@
       "source_location": "L103",
       "_callable": true,
       "_origin": "ast",
-      "community": 3,
+      "community": 5,
       "norm_label": ".test_the_word_appearing_in_a_value()",
       "id": "scripts_test_assert_no_committed_pulumi_secrets_matcherdoesnotcrywolf_test_the_word_appearing_in_a_value"
     },
@@ -503,7 +516,7 @@
       "source_location": "L106",
       "_callable": true,
       "_origin": "ast",
-      "community": 3,
+      "community": 5,
       "norm_label": ".test_a_clean_config()",
       "id": "scripts_test_assert_no_committed_pulumi_secrets_matcherdoesnotcrywolf_test_a_clean_config"
     },
@@ -515,7 +528,7 @@
       "_callable": true,
       "_callable_class": true,
       "_origin": "ast",
-      "community": 3,
+      "community": 5,
       "norm_label": "fileselection",
       "id": "scripts_test_assert_no_committed_pulumi_secrets_fileselection"
     },
@@ -526,7 +539,7 @@
       "source_location": "L111",
       "_callable": true,
       "_origin": "ast",
-      "community": 3,
+      "community": 5,
       "norm_label": ".test_stack_configs_are_matched_and_project_files_are_not()",
       "id": "scripts_test_assert_no_committed_pulumi_secrets_fileselection_test_stack_configs_are_matched_and_project_files_are_not"
     },
@@ -537,7 +550,7 @@
       "source_location": "L123",
       "_callable": true,
       "_origin": "ast",
-      "community": 3,
+      "community": 5,
       "norm_label": ".test_scan_tree_recurses_and_skips_vendored_trees()",
       "id": "scripts_test_assert_no_committed_pulumi_secrets_fileselection_test_scan_tree_recurses_and_skips_vendored_trees"
     },
@@ -669,7 +682,7 @@
       "source_file": "scripts/test_assert_no_committed_pulumi_secrets.py",
       "source_location": "L26",
       "_origin": "ast",
-      "community": 3,
+      "community": 5,
       "norm_label": "import the script by path: its filename has hyphens, so it is not a legal...",
       "id": "scripts_test_assert_no_committed_pulumi_secrets_rationale_26"
     },
@@ -679,7 +692,7 @@
       "source_file": "scripts/test_assert_no_committed_pulumi_secrets.py",
       "source_location": "L43",
       "_origin": "ast",
-      "community": 3,
+      "community": 5,
       "norm_label": "every shape pulumi writes, and the shapes an edit could turn it into.",
       "id": "scripts_test_assert_no_committed_pulumi_secrets_rationale_43"
     },
@@ -689,7 +702,7 @@
       "source_file": "scripts/test_assert_no_committed_pulumi_secrets.py",
       "source_location": "L84",
       "_origin": "ast",
-      "community": 3,
+      "community": 5,
       "norm_label": "a guard people start bypassing protects nothing, so the false-positive side is...",
       "id": "scripts_test_assert_no_committed_pulumi_secrets_rationale_84"
     },
@@ -707,7 +720,7 @@
       "label": "Graphify Workflow",
       "file_type": "code",
       "source_file": ".github/workflows/graphify.yml",
-      "community": 18,
+      "community": 19,
       "norm_label": "graphify workflow",
       "_origin": "semantic",
       "id": "github_workflows_graphify"
@@ -721,7 +734,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 12,
+      "community": 14,
       "norm_label": "docs-lint",
       "_origin": "semantic",
       "id": "github_workflows_docs_lint_docs_lint"
@@ -735,7 +748,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 12,
+      "community": 14,
       "norm_label": "branchleft/github-workflows/.github/workflows/docs-lint.yml@v1.0.6",
       "_origin": "semantic",
       "id": "branchleft_github_workflows_docs_lint"
@@ -749,7 +762,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 13,
+      "community": 15,
       "norm_label": "standards",
       "_origin": "semantic",
       "id": "github_workflows_standards_standards"
@@ -763,7 +776,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 13,
+      "community": 15,
       "norm_label": "branchleft/standards/.github/workflows/standards.yml@v0.4.0",
       "_origin": "semantic",
       "id": "branchleft_standards_standards"
@@ -777,7 +790,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 10,
+      "community": 23,
       "norm_label": "pulumi cli",
       "_origin": "semantic",
       "id": "pulumi_cli"
@@ -791,7 +804,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 19,
+      "community": 20,
       "norm_label": "google cloud platform",
       "_origin": "semantic",
       "id": "google_cloud_platform"
@@ -802,7 +815,7 @@
       "source_file": "",
       "source_location": "",
       "_origin": "ast",
-      "community": 25,
+      "community": 27,
       "norm_label": "path",
       "id": "scripts_assert_placeholders_substituted_py_path"
     },
@@ -832,7 +845,7 @@
       "source_file": "",
       "source_location": "",
       "_origin": "ast",
-      "community": 6,
+      "community": 1,
       "norm_label": "path",
       "id": "scripts_test_generate_tenant_repo_py_path"
     },
@@ -840,7 +853,7 @@
       "label": ".pre-commit-config.yaml",
       "file_type": "code",
       "source_file": ".pre-commit-config.yaml",
-      "community": 21,
+      "community": 22,
       "norm_label": ".pre-commit-config.yaml",
       "_origin": "semantic",
       "id": "pre_commit_config_yaml"
@@ -849,7 +862,7 @@
       "label": "CLAUDE.md",
       "file_type": "document",
       "source_file": "CLAUDE.md",
-      "community": 17,
+      "community": 16,
       "norm_label": "claude.md",
       "_origin": "semantic",
       "id": "claude_md"
@@ -858,7 +871,7 @@
       "label": "Pulumi.yaml",
       "file_type": "code",
       "source_file": "Pulumi.yaml",
-      "community": 22,
+      "community": 24,
       "norm_label": "pulumi.yaml",
       "_origin": "semantic",
       "id": "pulumi_yaml"
@@ -867,7 +880,7 @@
       "label": "Pulumi Stack",
       "file_type": "concept",
       "source_file": "Pulumi.yaml",
-      "community": 15,
+      "community": 13,
       "norm_label": "pulumi stack",
       "_origin": "semantic",
       "id": "pulumi_stack"
@@ -876,7 +889,7 @@
       "label": "Hetzner Object Storage",
       "file_type": "concept",
       "source_file": null,
-      "community": 15,
+      "community": 13,
       "norm_label": "hetzner object storage",
       "_origin": "semantic",
       "id": "hetzner_object_storage"
@@ -1262,19 +1275,10 @@
       "id": "index_apphost"
     },
     {
-      "label": "Runbook \u2014 a generated tenant repo",
-      "file_type": "document",
-      "source_file": "RUNBOOK-bootstrap.md",
-      "community": 14,
-      "norm_label": "runbook \u2014 a generated tenant repo",
-      "_origin": "semantic",
-      "id": "runbook_bootstrap"
-    },
-    {
       "label": "branchleft-deploy",
       "file_type": "code",
       "source_file": null,
-      "community": 16,
+      "community": 11,
       "norm_label": "branchleft-deploy",
       "_origin": "semantic",
       "id": "branchleft_deploy"
@@ -1283,7 +1287,7 @@
       "label": "branchLeft/ghost-platform",
       "file_type": "document",
       "source_url": "https://github.com/branchLeft/ghost-platform",
-      "community": 14,
+      "community": 17,
       "norm_label": "branchleft/ghost-platform",
       "_origin": "semantic",
       "id": "ghost_platform_repo"
@@ -1292,7 +1296,7 @@
       "label": "Script Unit Tests",
       "file_type": "code",
       "source_file": "scripts/",
-      "community": 10,
+      "community": 28,
       "norm_label": "script unit tests",
       "_origin": "semantic",
       "id": "scripts_test_unit"
@@ -1301,7 +1305,7 @@
       "label": "GhostTenant Component",
       "file_type": "concept",
       "source_file": null,
-      "community": 10,
+      "community": 18,
       "norm_label": "ghosttenant component",
       "_origin": "semantic",
       "id": "ghost_tenant_component"
@@ -1310,7 +1314,7 @@
       "label": "README.md",
       "file_type": "document",
       "source_file": "README.md",
-      "community": 23,
+      "community": 25,
       "norm_label": "readme.md",
       "_origin": "semantic",
       "id": "readme_md"
@@ -1319,7 +1323,7 @@
       "label": "README.tenant.md",
       "file_type": "document",
       "source_file": "README.tenant.md",
-      "community": 24,
+      "community": 26,
       "norm_label": "readme.tenant.md",
       "_origin": "semantic",
       "id": "readme_tenant_md"
@@ -1330,7 +1334,7 @@
       "source_file": "scripts/assert-placeholders-substituted.py",
       "source_location": "L1",
       "_origin": "ast",
-      "community": 4,
+      "community": 6,
       "norm_label": "assert-placeholders-substituted.py",
       "id": "scripts_assert_placeholders_substituted"
     },
@@ -1341,7 +1345,7 @@
       "source_location": "L82",
       "_callable": true,
       "_origin": "ast",
-      "community": 4,
+      "community": 6,
       "norm_label": "find_placeholders()",
       "id": "scripts_assert_placeholders_substituted_find_placeholders"
     },
@@ -1352,7 +1356,7 @@
       "source_location": "L87",
       "_callable": true,
       "_origin": "ast",
-      "community": 4,
+      "community": 6,
       "norm_label": "find_mangled()",
       "id": "scripts_assert_placeholders_substituted_find_mangled"
     },
@@ -1363,7 +1367,7 @@
       "source_location": "L92",
       "_callable": true,
       "_origin": "ast",
-      "community": 4,
+      "community": 6,
       "norm_label": "check_substituted()",
       "id": "scripts_assert_placeholders_substituted_check_substituted"
     },
@@ -1374,7 +1378,7 @@
       "source_location": "L130",
       "_callable": true,
       "_origin": "ast",
-      "community": 4,
+      "community": 6,
       "norm_label": "check_mangled()",
       "id": "scripts_assert_placeholders_substituted_check_mangled"
     },
@@ -1385,7 +1389,7 @@
       "source_location": "L157",
       "_callable": true,
       "_origin": "ast",
-      "community": 4,
+      "community": 6,
       "norm_label": "check_template()",
       "id": "scripts_assert_placeholders_substituted_check_template"
     },
@@ -1396,7 +1400,7 @@
       "source_location": "L201",
       "_callable": true,
       "_origin": "ast",
-      "community": 4,
+      "community": 6,
       "norm_label": "main()",
       "id": "scripts_assert_placeholders_substituted_main"
     },
@@ -1406,7 +1410,7 @@
       "source_file": "scripts/assert-placeholders-substituted.py",
       "source_location": "L93",
       "_origin": "ast",
-      "community": 4,
+      "community": 6,
       "norm_label": "no placeholder, intact or mangled, in any of `files`. the check for a generated...",
       "id": "scripts_assert_placeholders_substituted_rationale_93"
     },
@@ -1416,7 +1420,7 @@
       "source_file": "scripts/assert-placeholders-substituted.py",
       "source_location": "L131",
       "_origin": "ast",
-      "community": 4,
+      "community": 6,
       "norm_label": "no known placeholder appears in prettier-mangled form in `files`. runs...",
       "id": "scripts_assert_placeholders_substituted_rationale_131"
     },
@@ -1426,7 +1430,7 @@
       "source_file": "scripts/assert-placeholders-substituted.py",
       "source_location": "L158",
       "_origin": "ast",
-      "community": 4,
+      "community": 6,
       "norm_label": "every known placeholder is present, intact, in the file(s) it belongs in. the...",
       "id": "scripts_assert_placeholders_substituted_rationale_158"
     },
@@ -1436,7 +1440,7 @@
       "source_file": "scripts/test_assert_placeholders_substituted.py",
       "source_location": "L1",
       "_origin": "ast",
-      "community": 1,
+      "community": 3,
       "norm_label": "test_assert_placeholders_substituted.py",
       "id": "scripts_test_assert_placeholders_substituted"
     },
@@ -1448,7 +1452,7 @@
       "_callable": true,
       "_callable_class": true,
       "_origin": "ast",
-      "community": 1,
+      "community": 3,
       "norm_label": "findplaceholders",
       "id": "scripts_test_assert_placeholders_substituted_findplaceholders"
     },
@@ -1459,7 +1463,7 @@
       "source_location": "L46",
       "_callable": true,
       "_origin": "ast",
-      "community": 1,
+      "community": 3,
       "norm_label": ".test_reports_each_distinct_placeholder_once_sorted()",
       "id": "scripts_test_assert_placeholders_substituted_findplaceholders_test_reports_each_distinct_placeholder_once_sorted"
     },
@@ -1470,7 +1474,7 @@
       "source_location": "L52",
       "_callable": true,
       "_origin": "ast",
-      "community": 1,
+      "community": 3,
       "norm_label": ".test_lowercase_and_single_underscore_forms_are_not_placeholders()",
       "id": "scripts_test_assert_placeholders_substituted_findplaceholders_test_lowercase_and_single_underscore_forms_are_not_placeholders"
     },
@@ -1482,7 +1486,7 @@
       "_callable": true,
       "_callable_class": true,
       "_origin": "ast",
-      "community": 1,
+      "community": 3,
       "norm_label": "main",
       "id": "scripts_test_assert_placeholders_substituted_main"
     },
@@ -1493,7 +1497,7 @@
       "source_location": "L60",
       "_callable": true,
       "_origin": "ast",
-      "community": 1,
+      "community": 3,
       "norm_label": ".test_clean_files_exit_zero()",
       "id": "scripts_test_assert_placeholders_substituted_main_test_clean_files_exit_zero"
     },
@@ -1504,7 +1508,7 @@
       "source_location": "L66",
       "_callable": true,
       "_origin": "ast",
-      "community": 1,
+      "community": 3,
       "norm_label": ".test_a_surviving_placeholder_exits_one()",
       "id": "scripts_test_assert_placeholders_substituted_main_test_a_surviving_placeholder_exits_one"
     },
@@ -1515,7 +1519,7 @@
       "source_location": "L72",
       "_callable": true,
       "_origin": "ast",
-      "community": 1,
+      "community": 3,
       "norm_label": ".test_a_missing_file_exits_one_rather_than_passing()",
       "id": "scripts_test_assert_placeholders_substituted_main_test_a_missing_file_exits_one_rather_than_passing"
     },
@@ -1526,7 +1530,7 @@
       "source_location": "L78",
       "_callable": true,
       "_origin": "ast",
-      "community": 1,
+      "community": 3,
       "norm_label": ".test_a_placeholder_mangled_the_way_prettier_would_is_now_caught()",
       "id": "scripts_test_assert_placeholders_substituted_main_test_a_placeholder_mangled_the_way_prettier_would_is_now_caught"
     },
@@ -1538,7 +1542,7 @@
       "_callable": true,
       "_callable_class": true,
       "_origin": "ast",
-      "community": 1,
+      "community": 3,
       "norm_label": "findmangled",
       "id": "scripts_test_assert_placeholders_substituted_findmangled"
     },
@@ -1549,7 +1553,7 @@
       "source_location": "L95",
       "_callable": true,
       "_origin": "ast",
-      "community": 1,
+      "community": 3,
       "norm_label": ".test_detects_each_known_placeholder_mangled()",
       "id": "scripts_test_assert_placeholders_substituted_findmangled_test_detects_each_known_placeholder_mangled"
     },
@@ -1560,7 +1564,7 @@
       "source_location": "L104",
       "_callable": true,
       "_origin": "ast",
-      "community": 1,
+      "community": 3,
       "norm_label": ".test_ordinary_bold_markdown_is_not_a_mangled_placeholder()",
       "id": "scripts_test_assert_placeholders_substituted_findmangled_test_ordinary_bold_markdown_is_not_a_mangled_placeholder"
     },
@@ -1572,7 +1576,7 @@
       "_callable": true,
       "_callable_class": true,
       "_origin": "ast",
-      "community": 1,
+      "community": 3,
       "norm_label": "checkmangled",
       "id": "scripts_test_assert_placeholders_substituted_checkmangled"
     },
@@ -1583,7 +1587,7 @@
       "source_location": "L119",
       "_callable": true,
       "_origin": "ast",
-      "community": 1,
+      "community": 3,
       "norm_label": ".test_a_mangled_placeholder_fails()",
       "id": "scripts_test_assert_placeholders_substituted_checkmangled_test_a_mangled_placeholder_fails"
     },
@@ -1594,7 +1598,7 @@
       "source_location": "L125",
       "_callable": true,
       "_origin": "ast",
-      "community": 1,
+      "community": 3,
       "norm_label": ".test_ordinary_bold_markdown_passes()",
       "id": "scripts_test_assert_placeholders_substituted_checkmangled_test_ordinary_bold_markdown_passes"
     },
@@ -1605,7 +1609,7 @@
       "source_location": "L131",
       "_callable": true,
       "_origin": "ast",
-      "community": 1,
+      "community": 3,
       "norm_label": ".test_a_missing_file_is_skipped_rather_than_failed()",
       "id": "scripts_test_assert_placeholders_substituted_checkmangled_test_a_missing_file_is_skipped_rather_than_failed"
     },
@@ -1616,7 +1620,7 @@
       "source_location": "L138",
       "_callable": true,
       "_origin": "ast",
-      "community": 1,
+      "community": 3,
       "norm_label": ".test_main_mangled_flag_catches_the_issues_demonstration()",
       "id": "scripts_test_assert_placeholders_substituted_checkmangled_test_main_mangled_flag_catches_the_issues_demonstration"
     },
@@ -1627,7 +1631,7 @@
       "source_location": "L144",
       "_callable": true,
       "_origin": "ast",
-      "community": 1,
+      "community": 3,
       "norm_label": ".test_main_mangled_flag_passes_ordinary_bold_markdown()",
       "id": "scripts_test_assert_placeholders_substituted_checkmangled_test_main_mangled_flag_passes_ordinary_bold_markdown"
     },
@@ -1639,7 +1643,7 @@
       "_callable": true,
       "_callable_class": true,
       "_origin": "ast",
-      "community": 1,
+      "community": 3,
       "norm_label": "checktemplate",
       "id": "scripts_test_assert_placeholders_substituted_checktemplate"
     },
@@ -1650,7 +1654,7 @@
       "source_location": "L152",
       "_callable": true,
       "_origin": "ast",
-      "community": 1,
+      "community": 3,
       "norm_label": ".test_passes_when_every_placeholder_is_present_and_intact()",
       "id": "scripts_test_assert_placeholders_substituted_checktemplate_test_passes_when_every_placeholder_is_present_and_intact"
     },
@@ -1661,7 +1665,7 @@
       "source_location": "L158",
       "_callable": true,
       "_origin": "ast",
-      "community": 1,
+      "community": 3,
       "norm_label": ".test_fails_when_a_placeholder_was_substituted_away()",
       "id": "scripts_test_assert_placeholders_substituted_checktemplate_test_fails_when_a_placeholder_was_substituted_away"
     },
@@ -1672,7 +1676,7 @@
       "source_location": "L164",
       "_callable": true,
       "_origin": "ast",
-      "community": 1,
+      "community": 3,
       "norm_label": ".test_fails_when_a_placeholder_was_mangled()",
       "id": "scripts_test_assert_placeholders_substituted_checktemplate_test_fails_when_a_placeholder_was_mangled"
     },
@@ -1683,7 +1687,7 @@
       "source_location": "L173",
       "_callable": true,
       "_origin": "ast",
-      "community": 1,
+      "community": 3,
       "norm_label": ".test_fails_on_a_missing_file()",
       "id": "scripts_test_assert_placeholders_substituted_checktemplate_test_fails_on_a_missing_file"
     },
@@ -1694,7 +1698,7 @@
       "source_location": "L176",
       "_callable": true,
       "_origin": "ast",
-      "community": 1,
+      "community": 3,
       "norm_label": ".test_this_repos_own_template_files_pass()",
       "id": "scripts_test_assert_placeholders_substituted_checktemplate_test_this_repos_own_template_files_pass"
     },
@@ -1706,7 +1710,7 @@
       "_callable": true,
       "_callable_class": true,
       "_origin": "ast",
-      "community": 1,
+      "community": 3,
       "norm_label": "defaultfiles",
       "id": "scripts_test_assert_placeholders_substituted_defaultfiles"
     },
@@ -1717,7 +1721,7 @@
       "source_location": "L188",
       "_callable": true,
       "_origin": "ast",
-      "community": 1,
+      "community": 3,
       "norm_label": ".test_every_named_file_exists_in_this_repo()",
       "id": "scripts_test_assert_placeholders_substituted_defaultfiles_test_every_named_file_exists_in_this_repo"
     },
@@ -1728,7 +1732,7 @@
       "source_location": "L192",
       "_callable": true,
       "_origin": "ast",
-      "community": 1,
+      "community": 3,
       "norm_label": ".test_the_template_itself_still_carries_every_placeholder()",
       "id": "scripts_test_assert_placeholders_substituted_defaultfiles_test_the_template_itself_still_carries_every_placeholder"
     },
@@ -1739,7 +1743,7 @@
       "source_location": "L204",
       "_callable": true,
       "_origin": "ast",
-      "community": 1,
+      "community": 3,
       "norm_label": ".test_default_files_covers_every_placeholder_in_the_tree()",
       "id": "scripts_test_assert_placeholders_substituted_defaultfiles_test_default_files_covers_every_placeholder_in_the_tree"
     },
@@ -1749,18 +1753,9 @@
       "source_file": "scripts/test_assert_placeholders_substituted.py",
       "source_location": "L1",
       "_origin": "ast",
-      "community": 1,
+      "community": 3,
       "norm_label": "unit tests for assert-placeholders-substituted.py. the interesting test is not...",
       "id": "scripts_test_assert_placeholders_substituted_rationale_1"
-    },
-    {
-      "label": "Infra CI Workflow",
-      "file_type": "code",
-      "source_file": ".github/workflows/infra-ci.yml",
-      "community": 10,
-      "norm_label": "infra ci workflow",
-      "_origin": "semantic",
-      "id": "github_workflows_infra_ci"
     },
     {
       "label": "package.json",
@@ -1768,7 +1763,7 @@
       "source_file": "package.json",
       "source_location": "L1",
       "_origin": "ast",
-      "community": 2,
+      "community": 4,
       "norm_label": "package.json",
       "id": "package"
     },
@@ -1778,7 +1773,7 @@
       "source_file": "package.json",
       "source_location": "L2",
       "_origin": "ast",
-      "community": 2,
+      "community": 4,
       "norm_label": "name",
       "id": "package_name"
     },
@@ -1788,7 +1783,7 @@
       "source_file": "package.json",
       "source_location": "L3",
       "_origin": "ast",
-      "community": 2,
+      "community": 4,
       "norm_label": "private",
       "id": "package_private"
     },
@@ -1798,7 +1793,7 @@
       "source_file": "package.json",
       "source_location": "L4",
       "_origin": "ast",
-      "community": 2,
+      "community": 4,
       "norm_label": "main",
       "id": "package_main"
     },
@@ -1808,7 +1803,7 @@
       "source_file": "package.json",
       "source_location": "L5",
       "_origin": "ast",
-      "community": 2,
+      "community": 4,
       "norm_label": "prettier",
       "id": "package_prettier"
     },
@@ -1818,7 +1813,7 @@
       "source_file": "package.json",
       "source_location": "L6",
       "_origin": "ast",
-      "community": 2,
+      "community": 4,
       "norm_label": "scripts",
       "id": "package_scripts"
     },
@@ -1828,7 +1823,7 @@
       "source_file": "package.json",
       "source_location": "L7",
       "_origin": "ast",
-      "community": 2,
+      "community": 4,
       "norm_label": "typecheck",
       "id": "package_scripts_typecheck"
     },
@@ -1838,7 +1833,7 @@
       "source_file": "package.json",
       "source_location": "L8",
       "_origin": "ast",
-      "community": 2,
+      "community": 4,
       "norm_label": "format",
       "id": "package_scripts_format"
     },
@@ -1848,7 +1843,7 @@
       "source_file": "package.json",
       "source_location": "L9",
       "_origin": "ast",
-      "community": 2,
+      "community": 4,
       "norm_label": "format:check",
       "id": "package_scripts_format_check"
     },
@@ -1858,7 +1853,7 @@
       "source_file": "package.json",
       "source_location": "L11",
       "_origin": "ast",
-      "community": 2,
+      "community": 4,
       "norm_label": "dependencies",
       "id": "package_dependencies"
     },
@@ -1868,7 +1863,7 @@
       "source_file": "package.json",
       "source_location": "L12",
       "_origin": "ast",
-      "community": 2,
+      "community": 4,
       "norm_label": "@branchleft/ghost-platform-tenant",
       "id": "package_dependencies_branchleft_ghost_platform_tenant"
     },
@@ -1878,7 +1873,7 @@
       "source_file": "package.json",
       "source_location": "L12",
       "_origin": "ast",
-      "community": 2,
+      "community": 4,
       "norm_label": "@branchleft/ghost-platform-tenant",
       "id": "branchleft_ghost_platform_tenant"
     },
@@ -1888,7 +1883,7 @@
       "source_file": "package.json",
       "source_location": "L13",
       "_origin": "ast",
-      "community": 2,
+      "community": 4,
       "norm_label": "@pulumi/pulumi",
       "id": "package_dependencies_pulumi_pulumi"
     },
@@ -1898,7 +1893,7 @@
       "source_file": "package.json",
       "source_location": "L13",
       "_origin": "ast",
-      "community": 2,
+      "community": 4,
       "norm_label": "@pulumi/pulumi",
       "id": "pulumi_pulumi"
     },
@@ -1908,7 +1903,7 @@
       "source_file": "package.json",
       "source_location": "L15",
       "_origin": "ast",
-      "community": 2,
+      "community": 4,
       "norm_label": "devdependencies",
       "id": "package_devdependencies"
     },
@@ -1918,7 +1913,7 @@
       "source_file": "package.json",
       "source_location": "L16",
       "_origin": "ast",
-      "community": 2,
+      "community": 4,
       "norm_label": "@branchleft/prettier-config",
       "id": "package_devdependencies_branchleft_prettier_config"
     },
@@ -1928,7 +1923,7 @@
       "source_file": "package.json",
       "source_location": "L16",
       "_origin": "ast",
-      "community": 2,
+      "community": 4,
       "norm_label": "@branchleft/prettier-config",
       "id": "branchleft_prettier_config"
     },
@@ -1938,7 +1933,7 @@
       "source_file": "package.json",
       "source_location": "L17",
       "_origin": "ast",
-      "community": 2,
+      "community": 4,
       "norm_label": "@branchleft/tsconfig",
       "id": "package_devdependencies_branchleft_tsconfig"
     },
@@ -1948,7 +1943,7 @@
       "source_file": "package.json",
       "source_location": "L17",
       "_origin": "ast",
-      "community": 2,
+      "community": 4,
       "norm_label": "@branchleft/tsconfig",
       "id": "branchleft_tsconfig"
     },
@@ -1958,7 +1953,7 @@
       "source_file": "package.json",
       "source_location": "L18",
       "_origin": "ast",
-      "community": 2,
+      "community": 4,
       "norm_label": "@types/node",
       "id": "package_devdependencies_types_node"
     },
@@ -1968,7 +1963,7 @@
       "source_file": "package.json",
       "source_location": "L18",
       "_origin": "ast",
-      "community": 2,
+      "community": 4,
       "norm_label": "@types/node",
       "id": "types_node"
     },
@@ -1978,7 +1973,7 @@
       "source_file": "package.json",
       "source_location": "L19",
       "_origin": "ast",
-      "community": 2,
+      "community": 4,
       "norm_label": "prettier",
       "id": "package_devdependencies_prettier"
     },
@@ -1988,7 +1983,7 @@
       "source_file": "package.json",
       "source_location": "L19",
       "_origin": "ast",
-      "community": 2,
+      "community": 4,
       "norm_label": "prettier",
       "id": "prettier"
     },
@@ -1998,7 +1993,7 @@
       "source_file": "package.json",
       "source_location": "L20",
       "_origin": "ast",
-      "community": 2,
+      "community": 4,
       "norm_label": "typescript",
       "id": "package_devdependencies_typescript"
     },
@@ -2008,7 +2003,7 @@
       "source_file": "package.json",
       "source_location": "L20",
       "_origin": "ast",
-      "community": 2,
+      "community": 4,
       "norm_label": "typescript",
       "id": "typescript"
     },
@@ -2022,7 +2017,7 @@
       "author": null,
       "contributor": null,
       "verification": "unverified",
-      "community": 11,
+      "community": 12,
       "norm_label": "dependabot configuration",
       "_origin": "semantic",
       "id": "github_dependabot_config"
@@ -2036,7 +2031,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 11,
+      "community": 12,
       "norm_label": "npm package updates",
       "_origin": "semantic",
       "id": "github_dependabot_npm_updates"
@@ -2050,7 +2045,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 11,
+      "community": 12,
       "norm_label": "github actions updates",
       "_origin": "semantic",
       "id": "github_dependabot_actions_updates"
@@ -2061,9 +2056,9 @@
       "source_file": "scripts/generate-tenant-repo.py",
       "source_location": "L1",
       "_origin": "ast",
-      "id": "scripts_generate_tenant_repo",
       "community": 7,
-      "norm_label": "generate-tenant-repo.py"
+      "norm_label": "generate-tenant-repo.py",
+      "id": "scripts_generate_tenant_repo"
     },
     {
       "label": "GenerateError",
@@ -2073,9 +2068,9 @@
       "_callable": true,
       "_callable_class": true,
       "_origin": "ast",
-      "id": "scripts_generate_tenant_repo_generateerror",
       "community": 7,
-      "norm_label": "generateerror"
+      "norm_label": "generateerror",
+      "id": "scripts_generate_tenant_repo_generateerror"
     },
     {
       "label": "validate_slug()",
@@ -2084,9 +2079,9 @@
       "source_location": "L130",
       "_callable": true,
       "_origin": "ast",
-      "id": "scripts_generate_tenant_repo_validate_slug",
       "community": 7,
-      "norm_label": "validate_slug()"
+      "norm_label": "validate_slug()",
+      "id": "scripts_generate_tenant_repo_validate_slug"
     },
     {
       "label": "substitutions()",
@@ -2095,9 +2090,9 @@
       "source_location": "L150",
       "_callable": true,
       "_origin": "ast",
-      "id": "scripts_generate_tenant_repo_substitutions",
       "community": 7,
-      "norm_label": "substitutions()"
+      "norm_label": "substitutions()",
+      "id": "scripts_generate_tenant_repo_substitutions"
     },
     {
       "label": "remove_template_only()",
@@ -2106,9 +2101,9 @@
       "source_location": "L159",
       "_callable": true,
       "_origin": "ast",
-      "id": "scripts_generate_tenant_repo_remove_template_only",
       "community": 7,
-      "norm_label": "remove_template_only()"
+      "norm_label": "remove_template_only()",
+      "id": "scripts_generate_tenant_repo_remove_template_only"
     },
     {
       "label": "strip_template_only_blocks()",
@@ -2117,9 +2112,9 @@
       "source_location": "L173",
       "_callable": true,
       "_origin": "ast",
-      "id": "scripts_generate_tenant_repo_strip_template_only_blocks",
       "community": 7,
-      "norm_label": "strip_template_only_blocks()"
+      "norm_label": "strip_template_only_blocks()",
+      "id": "scripts_generate_tenant_repo_strip_template_only_blocks"
     },
     {
       "label": "apply_substitutions()",
@@ -2128,9 +2123,9 @@
       "source_location": "L198",
       "_callable": true,
       "_origin": "ast",
-      "id": "scripts_generate_tenant_repo_apply_substitutions",
       "community": 7,
-      "norm_label": "apply_substitutions()"
+      "norm_label": "apply_substitutions()",
+      "id": "scripts_generate_tenant_repo_apply_substitutions"
     },
     {
       "label": "apply_renames()",
@@ -2139,9 +2134,9 @@
       "source_location": "L217",
       "_callable": true,
       "_origin": "ast",
-      "id": "scripts_generate_tenant_repo_apply_renames",
       "community": 7,
-      "norm_label": "apply_renames()"
+      "norm_label": "apply_renames()",
+      "id": "scripts_generate_tenant_repo_apply_renames"
     },
     {
       "label": "sweep()",
@@ -2150,9 +2145,9 @@
       "source_location": "L231",
       "_callable": true,
       "_origin": "ast",
-      "id": "scripts_generate_tenant_repo_sweep",
       "community": 7,
-      "norm_label": "sweep()"
+      "norm_label": "sweep()",
+      "id": "scripts_generate_tenant_repo_sweep"
     },
     {
       "label": "generate()",
@@ -2161,9 +2156,9 @@
       "source_location": "L254",
       "_callable": true,
       "_origin": "ast",
-      "id": "scripts_generate_tenant_repo_generate",
       "community": 7,
-      "norm_label": "generate()"
+      "norm_label": "generate()",
+      "id": "scripts_generate_tenant_repo_generate"
     },
     {
       "label": "main()",
@@ -2172,9 +2167,9 @@
       "source_location": "L272",
       "_callable": true,
       "_origin": "ast",
-      "id": "scripts_generate_tenant_repo_main",
       "community": 7,
-      "norm_label": "main()"
+      "norm_label": "main()",
+      "id": "scripts_generate_tenant_repo_main"
     },
     {
       "label": "Raised for anything a caller could have avoided, or that the tree refused.",
@@ -2182,9 +2177,9 @@
       "source_file": "scripts/generate-tenant-repo.py",
       "source_location": "L127",
       "_origin": "ast",
-      "id": "scripts_generate_tenant_repo_rationale_127",
       "community": 7,
-      "norm_label": "raised for anything a caller could have avoided, or that the tree refused."
+      "norm_label": "raised for anything a caller could have avoided, or that the tree refused.",
+      "id": "scripts_generate_tenant_repo_rationale_127"
     },
     {
       "label": "Delete what belongs to the template. Idempotent: a missing path is fine.",
@@ -2192,9 +2187,9 @@
       "source_file": "scripts/generate-tenant-repo.py",
       "source_location": "L160",
       "_origin": "ast",
-      "id": "scripts_generate_tenant_repo_rationale_160",
       "community": 7,
-      "norm_label": "delete what belongs to the template. idempotent: a missing path is fine."
+      "norm_label": "delete what belongs to the template. idempotent: a missing path is fine.",
+      "id": "scripts_generate_tenant_repo_rationale_160"
     },
     {
       "label": "Return every `path:line` still carrying a placeholder token.",
@@ -2202,9 +2197,9 @@
       "source_file": "scripts/generate-tenant-repo.py",
       "source_location": "L232",
       "_origin": "ast",
-      "id": "scripts_generate_tenant_repo_rationale_232",
       "community": 7,
-      "norm_label": "return every `path:line` still carrying a placeholder token."
+      "norm_label": "return every `path:line` still carrying a placeholder token.",
+      "id": "scripts_generate_tenant_repo_rationale_232"
     },
     {
       "label": "test_generate_tenant_repo.py",
@@ -2212,9 +2207,9 @@
       "source_file": "scripts/test_generate_tenant_repo.py",
       "source_location": "L1",
       "_origin": "ast",
-      "id": "scripts_test_generate_tenant_repo",
-      "community": 5,
-      "norm_label": "test_generate_tenant_repo.py"
+      "community": 1,
+      "norm_label": "test_generate_tenant_repo.py",
+      "id": "scripts_test_generate_tenant_repo"
     },
     {
       "label": "tracked_files()",
@@ -2223,9 +2218,9 @@
       "source_location": "L31",
       "_callable": true,
       "_origin": "ast",
-      "id": "scripts_test_generate_tenant_repo_tracked_files",
-      "community": 5,
-      "norm_label": "tracked_files()"
+      "community": 1,
+      "norm_label": "tracked_files()",
+      "id": "scripts_test_generate_tenant_repo_tracked_files"
     },
     {
       "label": "_component_installed()",
@@ -2234,9 +2229,9 @@
       "source_location": "L38",
       "_callable": true,
       "_origin": "ast",
-      "id": "scripts_test_generate_tenant_repo_component_installed",
-      "community": 5,
-      "norm_label": "_component_installed()"
+      "community": 1,
+      "norm_label": "_component_installed()",
+      "id": "scripts_test_generate_tenant_repo_component_installed"
     },
     {
       "label": "component_constants()",
@@ -2245,9 +2240,9 @@
       "source_location": "L42",
       "_callable": true,
       "_origin": "ast",
-      "id": "scripts_test_generate_tenant_repo_component_constants",
-      "community": 5,
-      "norm_label": "component_constants()"
+      "community": 1,
+      "norm_label": "component_constants()",
+      "id": "scripts_test_generate_tenant_repo_component_constants"
     },
     {
       "label": "component_accepts_battery()",
@@ -2256,9 +2251,9 @@
       "source_location": "L61",
       "_callable": true,
       "_origin": "ast",
-      "id": "scripts_test_generate_tenant_repo_component_accepts_battery",
-      "community": 5,
-      "norm_label": "component_accepts_battery()"
+      "community": 1,
+      "norm_label": "component_accepts_battery()",
+      "id": "scripts_test_generate_tenant_repo_component_accepts_battery"
     },
     {
       "label": "copy_repo()",
@@ -2267,9 +2262,9 @@
       "source_location": "L115",
       "_callable": true,
       "_origin": "ast",
-      "id": "scripts_test_generate_tenant_repo_copy_repo",
-      "community": 6,
-      "norm_label": "copy_repo()"
+      "community": 1,
+      "norm_label": "copy_repo()",
+      "id": "scripts_test_generate_tenant_repo_copy_repo"
     },
     {
       "label": "ValidateSlug",
@@ -2279,9 +2274,9 @@
       "_callable": true,
       "_callable_class": true,
       "_origin": "ast",
-      "id": "scripts_test_generate_tenant_repo_validateslug",
-      "community": 5,
-      "norm_label": "validateslug"
+      "community": 1,
+      "norm_label": "validateslug",
+      "id": "scripts_test_generate_tenant_repo_validateslug"
     },
     {
       "label": ".test_accepts_an_ordinary_slug()",
@@ -2290,9 +2285,9 @@
       "source_location": "L135",
       "_callable": true,
       "_origin": "ast",
-      "id": "scripts_test_generate_tenant_repo_validateslug_test_accepts_an_ordinary_slug",
-      "community": 5,
-      "norm_label": ".test_accepts_an_ordinary_slug()"
+      "community": 1,
+      "norm_label": ".test_accepts_an_ordinary_slug()",
+      "id": "scripts_test_generate_tenant_repo_validateslug_test_accepts_an_ordinary_slug"
     },
     {
       "label": ".test_refuses_uppercase_underscores_and_a_leading_digit()",
@@ -2301,9 +2296,9 @@
       "source_location": "L138",
       "_callable": true,
       "_origin": "ast",
-      "id": "scripts_test_generate_tenant_repo_validateslug_test_refuses_uppercase_underscores_and_a_leading_digit",
-      "community": 5,
-      "norm_label": ".test_refuses_uppercase_underscores_and_a_leading_digit()"
+      "community": 1,
+      "norm_label": ".test_refuses_uppercase_underscores_and_a_leading_digit()",
+      "id": "scripts_test_generate_tenant_repo_validateslug_test_refuses_uppercase_underscores_and_a_leading_digit"
     },
     {
       "label": ".test_refuses_a_slug_past_the_mysql_identifier_bound()",
@@ -2312,9 +2307,9 @@
       "source_location": "L144",
       "_callable": true,
       "_origin": "ast",
-      "id": "scripts_test_generate_tenant_repo_validateslug_test_refuses_a_slug_past_the_mysql_identifier_bound",
-      "community": 5,
-      "norm_label": ".test_refuses_a_slug_past_the_mysql_identifier_bound()"
+      "community": 1,
+      "norm_label": ".test_refuses_a_slug_past_the_mysql_identifier_bound()",
+      "id": "scripts_test_generate_tenant_repo_validateslug_test_refuses_a_slug_past_the_mysql_identifier_bound"
     },
     {
       "label": ".test_refuses_a_trailing_hyphen_and_accepts_the_boundary()",
@@ -2323,9 +2318,9 @@
       "source_location": "L148",
       "_callable": true,
       "_origin": "ast",
-      "id": "scripts_test_generate_tenant_repo_validateslug_test_refuses_a_trailing_hyphen_and_accepts_the_boundary",
-      "community": 5,
-      "norm_label": ".test_refuses_a_trailing_hyphen_and_accepts_the_boundary()"
+      "community": 1,
+      "norm_label": ".test_refuses_a_trailing_hyphen_and_accepts_the_boundary()",
+      "id": "scripts_test_generate_tenant_repo_validateslug_test_refuses_a_trailing_hyphen_and_accepts_the_boundary"
     },
     {
       "label": ".test_refuses_every_reserved_stack_name()",
@@ -2334,9 +2329,9 @@
       "source_location": "L165",
       "_callable": true,
       "_origin": "ast",
-      "id": "scripts_test_generate_tenant_repo_validateslug_test_refuses_every_reserved_stack_name",
-      "community": 5,
-      "norm_label": ".test_refuses_every_reserved_stack_name()"
+      "community": 1,
+      "norm_label": ".test_refuses_every_reserved_stack_name()",
+      "id": "scripts_test_generate_tenant_repo_validateslug_test_refuses_every_reserved_stack_name"
     },
     {
       "label": ".test_bounds_match_the_installed_component()",
@@ -2345,9 +2340,9 @@
       "source_location": "L173",
       "_callable": true,
       "_origin": "ast",
-      "id": "scripts_test_generate_tenant_repo_validateslug_test_bounds_match_the_installed_component",
-      "community": 5,
-      "norm_label": ".test_bounds_match_the_installed_component()"
+      "community": 1,
+      "norm_label": ".test_bounds_match_the_installed_component()",
+      "id": "scripts_test_generate_tenant_repo_validateslug_test_bounds_match_the_installed_component"
     },
     {
       "label": ".test_charset_matches_the_installed_component_across_a_battery()",
@@ -2356,9 +2351,9 @@
       "source_location": "L197",
       "_callable": true,
       "_origin": "ast",
-      "id": "scripts_test_generate_tenant_repo_validateslug_test_charset_matches_the_installed_component_across_a_battery",
-      "community": 5,
-      "norm_label": ".test_charset_matches_the_installed_component_across_a_battery()"
+      "community": 1,
+      "norm_label": ".test_charset_matches_the_installed_component_across_a_battery()",
+      "id": "scripts_test_generate_tenant_repo_validateslug_test_charset_matches_the_installed_component_across_a_battery"
     },
     {
       "label": "Substitutions",
@@ -2368,9 +2363,9 @@
       "_callable": true,
       "_callable_class": true,
       "_origin": "ast",
-      "id": "scripts_test_generate_tenant_repo_substitutions",
-      "community": 5,
-      "norm_label": "substitutions"
+      "community": 1,
+      "norm_label": "substitutions",
+      "id": "scripts_test_generate_tenant_repo_substitutions"
     },
     {
       "label": ".test_project_name_is_the_slug_plus_infra()",
@@ -2379,9 +2374,9 @@
       "source_location": "L229",
       "_callable": true,
       "_origin": "ast",
-      "id": "scripts_test_generate_tenant_repo_substitutions_test_project_name_is_the_slug_plus_infra",
-      "community": 5,
-      "norm_label": ".test_project_name_is_the_slug_plus_infra()"
+      "community": 1,
+      "norm_label": ".test_project_name_is_the_slug_plus_infra()",
+      "id": "scripts_test_generate_tenant_repo_substitutions_test_project_name_is_the_slug_plus_infra"
     },
     {
       "label": ".test_tenant_name_is_the_bare_slug()",
@@ -2390,9 +2385,9 @@
       "source_location": "L234",
       "_callable": true,
       "_origin": "ast",
-      "id": "scripts_test_generate_tenant_repo_substitutions_test_tenant_name_is_the_bare_slug",
-      "community": 5,
-      "norm_label": ".test_tenant_name_is_the_bare_slug()"
+      "community": 1,
+      "norm_label": ".test_tenant_name_is_the_bare_slug()",
+      "id": "scripts_test_generate_tenant_repo_substitutions_test_tenant_name_is_the_bare_slug"
     },
     {
       "label": "Generate",
@@ -2402,9 +2397,9 @@
       "_callable": true,
       "_callable_class": true,
       "_origin": "ast",
-      "id": "scripts_test_generate_tenant_repo_generate",
-      "community": 6,
-      "norm_label": "generate"
+      "community": 1,
+      "norm_label": "generate",
+      "id": "scripts_test_generate_tenant_repo_generate"
     },
     {
       "label": ".test_generating_this_repos_own_tree_leaves_no_token()",
@@ -2413,9 +2408,9 @@
       "source_location": "L239",
       "_callable": true,
       "_origin": "ast",
-      "id": "scripts_test_generate_tenant_repo_generate_test_generating_this_repos_own_tree_leaves_no_token",
-      "community": 6,
-      "norm_label": ".test_generating_this_repos_own_tree_leaves_no_token()"
+      "community": 1,
+      "norm_label": ".test_generating_this_repos_own_tree_leaves_no_token()",
+      "id": "scripts_test_generate_tenant_repo_generate_test_generating_this_repos_own_tree_leaves_no_token"
     },
     {
       "label": ".test_the_tenant_readme_replaces_the_template_one()",
@@ -2424,9 +2419,9 @@
       "source_location": "L245",
       "_callable": true,
       "_origin": "ast",
-      "id": "scripts_test_generate_tenant_repo_generate_test_the_tenant_readme_replaces_the_template_one",
-      "community": 6,
-      "norm_label": ".test_the_tenant_readme_replaces_the_template_one()"
+      "community": 1,
+      "norm_label": ".test_the_tenant_readme_replaces_the_template_one()",
+      "id": "scripts_test_generate_tenant_repo_generate_test_the_tenant_readme_replaces_the_template_one"
     },
     {
       "label": ".test_the_generated_repo_passes_its_own_ci()",
@@ -2435,9 +2430,9 @@
       "source_location": "L253",
       "_callable": true,
       "_origin": "ast",
-      "id": "scripts_test_generate_tenant_repo_generate_test_the_generated_repo_passes_its_own_ci",
-      "community": 6,
-      "norm_label": ".test_the_generated_repo_passes_its_own_ci()"
+      "community": 1,
+      "norm_label": ".test_the_generated_repo_passes_its_own_ci()",
+      "id": "scripts_test_generate_tenant_repo_generate_test_the_generated_repo_passes_its_own_ci"
     },
     {
       "label": ".test_template_only_artefacts_do_not_reach_a_tenant()",
@@ -2446,9 +2441,9 @@
       "source_location": "L282",
       "_callable": true,
       "_origin": "ast",
-      "id": "scripts_test_generate_tenant_repo_generate_test_template_only_artefacts_do_not_reach_a_tenant",
-      "community": 6,
-      "norm_label": ".test_template_only_artefacts_do_not_reach_a_tenant()"
+      "community": 1,
+      "norm_label": ".test_template_only_artefacts_do_not_reach_a_tenant()",
+      "id": "scripts_test_generate_tenant_repo_generate_test_template_only_artefacts_do_not_reach_a_tenant"
     },
     {
       "label": ".test_the_generated_claude_md_does_not_point_at_a_deleted_graph()",
@@ -2457,9 +2452,9 @@
       "source_location": "L289",
       "_callable": true,
       "_origin": "ast",
-      "id": "scripts_test_generate_tenant_repo_generate_test_the_generated_claude_md_does_not_point_at_a_deleted_graph",
-      "community": 6,
-      "norm_label": ".test_the_generated_claude_md_does_not_point_at_a_deleted_graph()"
+      "community": 1,
+      "norm_label": ".test_the_generated_claude_md_does_not_point_at_a_deleted_graph()",
+      "id": "scripts_test_generate_tenant_repo_generate_test_the_generated_claude_md_does_not_point_at_a_deleted_graph"
     },
     {
       "label": ".test_the_pulumi_project_name_is_substituted()",
@@ -2468,9 +2463,9 @@
       "source_location": "L302",
       "_callable": true,
       "_origin": "ast",
-      "id": "scripts_test_generate_tenant_repo_generate_test_the_pulumi_project_name_is_substituted",
-      "community": 6,
-      "norm_label": ".test_the_pulumi_project_name_is_substituted()"
+      "community": 1,
+      "norm_label": ".test_the_pulumi_project_name_is_substituted()",
+      "id": "scripts_test_generate_tenant_repo_generate_test_the_pulumi_project_name_is_substituted"
     },
     {
       "label": ".test_a_missing_tenant_readme_refuses_rather_than_skipping()",
@@ -2479,9 +2474,9 @@
       "source_location": "L310",
       "_callable": true,
       "_origin": "ast",
-      "id": "scripts_test_generate_tenant_repo_generate_test_a_missing_tenant_readme_refuses_rather_than_skipping",
-      "community": 6,
-      "norm_label": ".test_a_missing_tenant_readme_refuses_rather_than_skipping()"
+      "community": 1,
+      "norm_label": ".test_a_missing_tenant_readme_refuses_rather_than_skipping()",
+      "id": "scripts_test_generate_tenant_repo_generate_test_a_missing_tenant_readme_refuses_rather_than_skipping"
     },
     {
       "label": ".test_a_placeholder_in_an_unlisted_file_fails_generation()",
@@ -2490,9 +2485,9 @@
       "source_location": "L317",
       "_callable": true,
       "_origin": "ast",
-      "id": "scripts_test_generate_tenant_repo_generate_test_a_placeholder_in_an_unlisted_file_fails_generation",
-      "community": 6,
-      "norm_label": ".test_a_placeholder_in_an_unlisted_file_fails_generation()"
+      "community": 1,
+      "norm_label": ".test_a_placeholder_in_an_unlisted_file_fails_generation()",
+      "id": "scripts_test_generate_tenant_repo_generate_test_a_placeholder_in_an_unlisted_file_fails_generation"
     },
     {
       "label": ".test_a_listed_file_that_moved_refuses_rather_than_skipping()",
@@ -2501,9 +2496,9 @@
       "source_location": "L329",
       "_callable": true,
       "_origin": "ast",
-      "id": "scripts_test_generate_tenant_repo_generate_test_a_listed_file_that_moved_refuses_rather_than_skipping",
-      "community": 6,
-      "norm_label": ".test_a_listed_file_that_moved_refuses_rather_than_skipping()"
+      "community": 1,
+      "norm_label": ".test_a_listed_file_that_moved_refuses_rather_than_skipping()",
+      "id": "scripts_test_generate_tenant_repo_generate_test_a_listed_file_that_moved_refuses_rather_than_skipping"
     },
     {
       "label": ".test_a_reserved_slug_is_refused_before_anything_is_written()",
@@ -2512,9 +2507,9 @@
       "source_location": "L337",
       "_callable": true,
       "_origin": "ast",
-      "id": "scripts_test_generate_tenant_repo_generate_test_a_reserved_slug_is_refused_before_anything_is_written",
-      "community": 6,
-      "norm_label": ".test_a_reserved_slug_is_refused_before_anything_is_written()"
+      "community": 1,
+      "norm_label": ".test_a_reserved_slug_is_refused_before_anything_is_written()",
+      "id": "scripts_test_generate_tenant_repo_generate_test_a_reserved_slug_is_refused_before_anything_is_written"
     },
     {
       "label": ".test_a_failure_before_the_rename_leaves_a_re_runnable_tree()",
@@ -2523,9 +2518,9 @@
       "source_location": "L344",
       "_callable": true,
       "_origin": "ast",
-      "id": "scripts_test_generate_tenant_repo_generate_test_a_failure_before_the_rename_leaves_a_re_runnable_tree",
-      "community": 6,
-      "norm_label": ".test_a_failure_before_the_rename_leaves_a_re_runnable_tree()"
+      "community": 1,
+      "norm_label": ".test_a_failure_before_the_rename_leaves_a_re_runnable_tree()",
+      "id": "scripts_test_generate_tenant_repo_generate_test_a_failure_before_the_rename_leaves_a_re_runnable_tree"
     },
     {
       "label": ".test_a_placeholder_in_a_markdown_heading_is_not_mistaken_for_a_comment()",
@@ -2534,9 +2529,9 @@
       "source_location": "L355",
       "_callable": true,
       "_origin": "ast",
-      "id": "scripts_test_generate_tenant_repo_generate_test_a_placeholder_in_a_markdown_heading_is_not_mistaken_for_a_comment",
-      "community": 6,
-      "norm_label": ".test_a_placeholder_in_a_markdown_heading_is_not_mistaken_for_a_comment()"
+      "community": 1,
+      "norm_label": ".test_a_placeholder_in_a_markdown_heading_is_not_mistaken_for_a_comment()",
+      "id": "scripts_test_generate_tenant_repo_generate_test_a_placeholder_in_a_markdown_heading_is_not_mistaken_for_a_comment"
     },
     {
       "label": "Main",
@@ -2546,9 +2541,9 @@
       "_callable": true,
       "_callable_class": true,
       "_origin": "ast",
-      "id": "scripts_test_generate_tenant_repo_main",
-      "community": 6,
-      "norm_label": "main"
+      "community": 1,
+      "norm_label": "main",
+      "id": "scripts_test_generate_tenant_repo_main"
     },
     {
       "label": ".test_exit_zero_on_a_clean_generation()",
@@ -2557,9 +2552,9 @@
       "source_location": "L368",
       "_callable": true,
       "_origin": "ast",
-      "id": "scripts_test_generate_tenant_repo_main_test_exit_zero_on_a_clean_generation",
-      "community": 6,
-      "norm_label": ".test_exit_zero_on_a_clean_generation()"
+      "community": 1,
+      "norm_label": ".test_exit_zero_on_a_clean_generation()",
+      "id": "scripts_test_generate_tenant_repo_main_test_exit_zero_on_a_clean_generation"
     },
     {
       "label": ".test_exit_one_on_a_refusal()",
@@ -2568,9 +2563,9 @@
       "source_location": "L373",
       "_callable": true,
       "_origin": "ast",
-      "id": "scripts_test_generate_tenant_repo_main_test_exit_one_on_a_refusal",
-      "community": 6,
-      "norm_label": ".test_exit_one_on_a_refusal()"
+      "community": 1,
+      "norm_label": ".test_exit_one_on_a_refusal()",
+      "id": "scripts_test_generate_tenant_repo_main_test_exit_one_on_a_refusal"
     },
     {
       "label": "Unit tests for generate-tenant-repo.py. The load-bearing one is\u2026",
@@ -2578,9 +2573,9 @@
       "source_file": "scripts/test_generate_tenant_repo.py",
       "source_location": "L1",
       "_origin": "ast",
-      "id": "scripts_test_generate_tenant_repo_rationale_1",
-      "community": 5,
-      "norm_label": "unit tests for generate-tenant-repo.py. the load-bearing one is..."
+      "community": 1,
+      "norm_label": "unit tests for generate-tenant-repo.py. the load-bearing one is...",
+      "id": "scripts_test_generate_tenant_repo_rationale_1"
     },
     {
       "label": "The component's own slug bounds, or None when it is not installed.",
@@ -2588,9 +2583,9 @@
       "source_file": "scripts/test_generate_tenant_repo.py",
       "source_location": "L43",
       "_origin": "ast",
-      "id": "scripts_test_generate_tenant_repo_rationale_43",
-      "community": 5,
-      "norm_label": "the component's own slug bounds, or none when it is not installed."
+      "community": 1,
+      "norm_label": "the component's own slug bounds, or none when it is not installed.",
+      "id": "scripts_test_generate_tenant_repo_rationale_43"
     },
     {
       "label": "Whether the installed component's `validateTenantSlug` accepts each slug, or\u2026",
@@ -2598,9 +2593,9 @@
       "source_file": "scripts/test_generate_tenant_repo.py",
       "source_location": "L62",
       "_origin": "ast",
-      "id": "scripts_test_generate_tenant_repo_rationale_62",
-      "community": 5,
-      "norm_label": "whether the installed component's `validatetenantslug` accepts each slug, or..."
+      "community": 1,
+      "norm_label": "whether the installed component's `validatetenantslug` accepts each slug, or...",
+      "id": "scripts_test_generate_tenant_repo_rationale_62"
     },
     {
       "label": "The finding this test exists for: every tenant repo was red from birth. The\u2026",
@@ -2608,9 +2603,421 @@
       "source_file": "scripts/test_generate_tenant_repo.py",
       "source_location": "L254",
       "_origin": "ast",
-      "id": "scripts_test_generate_tenant_repo_rationale_254",
-      "community": 6,
-      "norm_label": "the finding this test exists for: every tenant repo was red from birth. the..."
+      "community": 1,
+      "norm_label": "the finding this test exists for: every tenant repo was red from birth. the...",
+      "id": "scripts_test_generate_tenant_repo_rationale_254"
+    },
+    {
+      "label": "assert-no-inline-credential.py",
+      "file_type": "code",
+      "source_file": "scripts/assert-no-inline-credential.py",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "scripts_assert_no_inline_credential",
+      "community": 10,
+      "norm_label": "assert-no-inline-credential.py"
+    },
+    {
+      "label": "is_placeholder()",
+      "file_type": "code",
+      "source_file": "scripts/assert-no-inline-credential.py",
+      "source_location": "L64",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "scripts_assert_no_inline_credential_is_placeholder",
+      "community": 10,
+      "norm_label": "is_placeholder()"
+    },
+    {
+      "label": "find_offenses()",
+      "file_type": "code",
+      "source_file": "scripts/assert-no-inline-credential.py",
+      "source_location": "L84",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "scripts_assert_no_inline_credential_find_offenses",
+      "community": 10,
+      "norm_label": "find_offenses()"
+    },
+    {
+      "label": "Path",
+      "file_type": "code",
+      "source_file": "",
+      "source_location": "",
+      "_origin": "ast",
+      "id": "scripts_assert_no_inline_credential_py_path",
+      "community": 10,
+      "norm_label": "path"
+    },
+    {
+      "label": "main()",
+      "file_type": "code",
+      "source_file": "scripts/assert-no-inline-credential.py",
+      "source_location": "L119",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "scripts_assert_no_inline_credential_main",
+      "community": 10,
+      "norm_label": "main()"
+    },
+    {
+      "label": "A value that is not a real credential, in either shape this estate has actually\u2026",
+      "file_type": "rationale",
+      "source_file": "scripts/assert-no-inline-credential.py",
+      "source_location": "L65",
+      "_origin": "ast",
+      "id": "scripts_assert_no_inline_credential_rationale_65",
+      "community": 10,
+      "norm_label": "a value that is not a real credential, in either shape this estate has actually..."
+    },
+    {
+      "label": "test_assert_no_inline_credential.py",
+      "file_type": "code",
+      "source_file": "scripts/test_assert_no_inline_credential.py",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "scripts_test_assert_no_inline_credential",
+      "community": 2,
+      "norm_label": "test_assert_no_inline_credential.py"
+    },
+    {
+      "label": "_write()",
+      "file_type": "code",
+      "source_file": "scripts/test_assert_no_inline_credential.py",
+      "source_location": "L29",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "scripts_test_assert_no_inline_credential_write",
+      "community": 2,
+      "norm_label": "_write()"
+    },
+    {
+      "label": "Path",
+      "file_type": "code",
+      "source_file": "",
+      "source_location": "",
+      "_origin": "ast",
+      "id": "scripts_test_assert_no_inline_credential_py_path",
+      "community": 2,
+      "norm_label": "path"
+    },
+    {
+      "label": "IsPlaceholder",
+      "file_type": "code",
+      "source_file": "scripts/test_assert_no_inline_credential.py",
+      "source_location": "L35",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "id": "scripts_test_assert_no_inline_credential_isplaceholder",
+      "community": 2,
+      "norm_label": "isplaceholder"
+    },
+    {
+      "label": ".test_angle_bracket_form()",
+      "file_type": "code",
+      "source_file": "scripts/test_assert_no_inline_credential.py",
+      "source_location": "L36",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "scripts_test_assert_no_inline_credential_isplaceholder_test_angle_bracket_form",
+      "community": 2,
+      "norm_label": ".test_angle_bracket_form()"
+    },
+    {
+      "label": ".test_ellipsis_form()",
+      "file_type": "code",
+      "source_file": "scripts/test_assert_no_inline_credential.py",
+      "source_location": "L39",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "scripts_test_assert_no_inline_credential_isplaceholder_test_ellipsis_form",
+      "community": 2,
+      "norm_label": ".test_ellipsis_form()"
+    },
+    {
+      "label": ".test_a_real_looking_value_is_not_a_placeholder()",
+      "file_type": "code",
+      "source_file": "scripts/test_assert_no_inline_credential.py",
+      "source_location": "L43",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "scripts_test_assert_no_inline_credential_isplaceholder_test_a_real_looking_value_is_not_a_placeholder",
+      "community": 2,
+      "norm_label": ".test_a_real_looking_value_is_not_a_placeholder()"
+    },
+    {
+      "label": ".test_empty_value_is_not_a_placeholder()",
+      "file_type": "code",
+      "source_file": "scripts/test_assert_no_inline_credential.py",
+      "source_location": "L47",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "scripts_test_assert_no_inline_credential_isplaceholder_test_empty_value_is_not_a_placeholder",
+      "community": 2,
+      "norm_label": ".test_empty_value_is_not_a_placeholder()"
+    },
+    {
+      "label": "FindOffenses",
+      "file_type": "code",
+      "source_file": "scripts/test_assert_no_inline_credential.py",
+      "source_location": "L52",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "id": "scripts_test_assert_no_inline_credential_findoffenses",
+      "community": 2,
+      "norm_label": "findoffenses"
+    },
+    {
+      "label": ".test_angle_bracket_form_is_caught()",
+      "file_type": "code",
+      "source_file": "scripts/test_assert_no_inline_credential.py",
+      "source_location": "L53",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "scripts_test_assert_no_inline_credential_findoffenses_test_angle_bracket_form_is_caught",
+      "community": 2,
+      "norm_label": ".test_angle_bracket_form_is_caught()"
+    },
+    {
+      "label": ".test_ellipsis_form_is_caught()",
+      "file_type": "code",
+      "source_file": "scripts/test_assert_no_inline_credential.py",
+      "source_location": "L65",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "scripts_test_assert_no_inline_credential_findoffenses_test_ellipsis_form_is_caught",
+      "community": 2,
+      "norm_label": ".test_ellipsis_form_is_caught()"
+    },
+    {
+      "label": ".test_ellipsis_form_with_trailing_comment_is_caught()",
+      "file_type": "code",
+      "source_file": "scripts/test_assert_no_inline_credential.py",
+      "source_location": "L75",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "scripts_test_assert_no_inline_credential_findoffenses_test_ellipsis_form_with_trailing_comment_is_caught",
+      "community": 2,
+      "norm_label": ".test_ellipsis_form_with_trailing_comment_is_caught()"
+    },
+    {
+      "label": ".test_ascii_ellipsis_form_is_caught()",
+      "file_type": "code",
+      "source_file": "scripts/test_assert_no_inline_credential.py",
+      "source_location": "L90",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "scripts_test_assert_no_inline_credential_findoffenses_test_ascii_ellipsis_form_is_caught",
+      "community": 2,
+      "norm_label": ".test_ascii_ellipsis_form_is_caught()"
+    },
+    {
+      "label": ".test_printf_salt_placeholder_is_caught()",
+      "file_type": "code",
+      "source_file": "scripts/test_assert_no_inline_credential.py",
+      "source_location": "L96",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "scripts_test_assert_no_inline_credential_findoffenses_test_printf_salt_placeholder_is_caught",
+      "community": 2,
+      "norm_label": ".test_printf_salt_placeholder_is_caught()"
+    },
+    {
+      "label": ".test_printf_salt_ellipsis_is_caught()",
+      "file_type": "code",
+      "source_file": "scripts/test_assert_no_inline_credential.py",
+      "source_location": "L105",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "scripts_test_assert_no_inline_credential_findoffenses_test_printf_salt_ellipsis_is_caught",
+      "community": 2,
+      "norm_label": ".test_printf_salt_ellipsis_is_caught()"
+    },
+    {
+      "label": ".test_printf_smtp_password_placeholder_is_caught()",
+      "file_type": "code",
+      "source_file": "scripts/test_assert_no_inline_credential.py",
+      "source_location": "L114",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "scripts_test_assert_no_inline_credential_findoffenses_test_printf_smtp_password_placeholder_is_caught",
+      "community": 2,
+      "norm_label": ".test_printf_smtp_password_placeholder_is_caught()"
+    },
+    {
+      "label": ".test_non_credential_export_is_not_flagged()",
+      "file_type": "code",
+      "source_file": "scripts/test_assert_no_inline_credential.py",
+      "source_location": "L125",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "scripts_test_assert_no_inline_credential_findoffenses_test_non_credential_export_is_not_flagged",
+      "community": 2,
+      "norm_label": ".test_non_credential_export_is_not_flagged()"
+    },
+    {
+      "label": ".test_the_safe_read_pattern_is_not_flagged()",
+      "file_type": "code",
+      "source_file": "scripts/test_assert_no_inline_credential.py",
+      "source_location": "L134",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "scripts_test_assert_no_inline_credential_findoffenses_test_the_safe_read_pattern_is_not_flagged",
+      "community": 2,
+      "norm_label": ".test_the_safe_read_pattern_is_not_flagged()"
+    },
+    {
+      "label": ".test_a_clean_file_has_no_offenses()",
+      "file_type": "code",
+      "source_file": "scripts/test_assert_no_inline_credential.py",
+      "source_location": "L144",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "scripts_test_assert_no_inline_credential_findoffenses_test_a_clean_file_has_no_offenses",
+      "community": 2,
+      "norm_label": ".test_a_clean_file_has_no_offenses()"
+    },
+    {
+      "label": "Main",
+      "file_type": "code",
+      "source_file": "scripts/test_assert_no_inline_credential.py",
+      "source_location": "L150",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "id": "scripts_test_assert_no_inline_credential_main",
+      "community": 2,
+      "norm_label": "main"
+    },
+    {
+      "label": ".test_a_missing_file_exits_one()",
+      "file_type": "code",
+      "source_file": "scripts/test_assert_no_inline_credential.py",
+      "source_location": "L151",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "scripts_test_assert_no_inline_credential_main_test_a_missing_file_exits_one",
+      "community": 2,
+      "norm_label": ".test_a_missing_file_exits_one()"
+    },
+    {
+      "label": ".test_no_files_given_exits_two()",
+      "file_type": "code",
+      "source_file": "scripts/test_assert_no_inline_credential.py",
+      "source_location": "L154",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "scripts_test_assert_no_inline_credential_main_test_no_files_given_exits_two",
+      "community": 2,
+      "norm_label": ".test_no_files_given_exits_two()"
+    },
+    {
+      "label": ".test_clean_file_exits_zero()",
+      "file_type": "code",
+      "source_file": "scripts/test_assert_no_inline_credential.py",
+      "source_location": "L157",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "scripts_test_assert_no_inline_credential_main_test_clean_file_exits_zero",
+      "community": 2,
+      "norm_label": ".test_clean_file_exits_zero()"
+    },
+    {
+      "label": ".test_offending_file_exits_one()",
+      "file_type": "code",
+      "source_file": "scripts/test_assert_no_inline_credential.py",
+      "source_location": "L162",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "scripts_test_assert_no_inline_credential_main_test_offending_file_exits_one",
+      "community": 2,
+      "norm_label": ".test_offending_file_exits_one()"
+    },
+    {
+      "label": "Unit tests for assert-no-inline-credential.py. The interesting tests are the\u2026",
+      "file_type": "rationale",
+      "source_file": "scripts/test_assert_no_inline_credential.py",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "scripts_test_assert_no_inline_credential_rationale_1",
+      "community": 2,
+      "norm_label": "unit tests for assert-no-inline-credential.py. the interesting tests are the..."
+    },
+    {
+      "label": "The proof this guard is worth more than fixing the instances: the exact ghost-\u2026",
+      "file_type": "rationale",
+      "source_file": "scripts/test_assert_no_inline_credential.py",
+      "source_location": "L66",
+      "_origin": "ast",
+      "id": "scripts_test_assert_no_inline_credential_rationale_66",
+      "community": 2,
+      "norm_label": "the proof this guard is worth more than fixing the instances: the exact ghost-..."
+    },
+    {
+      "label": "The literal ghost-tenant-blog instance carries a trailing shell comment (`#\u2026",
+      "file_type": "rationale",
+      "source_file": "scripts/test_assert_no_inline_credential.py",
+      "source_location": "L76",
+      "_origin": "ast",
+      "id": "scripts_test_assert_no_inline_credential_rationale_76",
+      "community": 2,
+      "norm_label": "the literal ghost-tenant-blog instance carries a trailing shell comment (`#..."
+    },
+    {
+      "label": "The literal ghost-tenant-blog instance.",
+      "file_type": "rationale",
+      "source_file": "scripts/test_assert_no_inline_credential.py",
+      "source_location": "L106",
+      "_origin": "ast",
+      "id": "scripts_test_assert_no_inline_credential_rationale_106",
+      "community": 2,
+      "norm_label": "the literal ghost-tenant-blog instance."
+    },
+    {
+      "label": "The literal website instance: a credential keyword in the format string, not in\u2026",
+      "file_type": "rationale",
+      "source_file": "scripts/test_assert_no_inline_credential.py",
+      "source_location": "L115",
+      "_origin": "ast",
+      "id": "scripts_test_assert_no_inline_credential_rationale_115",
+      "community": 2,
+      "norm_label": "the literal website instance: a credential keyword in the format string, not in..."
+    },
+    {
+      "label": "The address half of the owner's principle is a different, already -handled\u2026",
+      "file_type": "rationale",
+      "source_file": "scripts/test_assert_no_inline_credential.py",
+      "source_location": "L126",
+      "_origin": "ast",
+      "id": "scripts_test_assert_no_inline_credential_rationale_126",
+      "community": 2,
+      "norm_label": "the address half of the owner's principle is a different, already -handled..."
+    },
+    {
+      "label": "RUNBOOK-bootstrap.md",
+      "file_type": "document",
+      "source_file": "RUNBOOK-bootstrap.md",
+      "id": "runbook_bootstrap_md",
+      "community": 13,
+      "norm_label": "runbook-bootstrap.md"
+    },
+    {
+      "label": "Infra CI Workflow",
+      "file_type": "code",
+      "source_file": ".github/workflows/infra-ci.yml",
+      "id": "github_workflows_infra_ci_yml",
+      "community": 11,
+      "norm_label": "infra ci workflow"
+    },
+    {
+      "label": "@branchleft/ghost-platform-tenant",
+      "file_type": "code",
+      "source_file": ".github/workflows/infra-ci.yml",
+      "id": "ghost_platform_tenant_pkg",
+      "community": 11,
+      "norm_label": "@branchleft/ghost-platform-tenant"
     }
   ],
   "links": [
@@ -3809,24 +4216,15 @@
       "target": "branchleft_standards_standards"
     },
     {
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": ".github/workflows/infra-ci.yml",
-      "_origin": "semantic",
-      "source": "github_workflows_infra_ci",
-      "target": "pulumi_cli"
-    },
-    {
       "relation": "inherits",
       "confidence": "EXTRACTED",
       "source_file": "scripts/generate-tenant-repo.py",
       "source_location": "L126",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "scripts_generate_tenant_repo_generateerror",
-      "target": "exception",
-      "confidence_score": 1.0
+      "target": "exception"
     },
     {
       "relation": "references",
@@ -3836,9 +4234,9 @@
       "source_location": "L217",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "scripts_generate_tenant_repo_apply_renames",
-      "target": "scripts_generate_tenant_repo_py_path",
-      "confidence_score": 1.0
+      "target": "scripts_generate_tenant_repo_py_path"
     },
     {
       "relation": "references",
@@ -3848,9 +4246,9 @@
       "source_location": "L198",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "scripts_generate_tenant_repo_apply_substitutions",
-      "target": "scripts_generate_tenant_repo_py_path",
-      "confidence_score": 1.0
+      "target": "scripts_generate_tenant_repo_py_path"
     },
     {
       "relation": "references",
@@ -3860,9 +4258,9 @@
       "source_location": "L254",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "scripts_generate_tenant_repo_generate",
-      "target": "scripts_generate_tenant_repo_py_path",
-      "confidence_score": 1.0
+      "target": "scripts_generate_tenant_repo_py_path"
     },
     {
       "relation": "calls",
@@ -3872,9 +4270,9 @@
       "source_location": "L282",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "scripts_generate_tenant_repo_main",
-      "target": "scripts_generate_tenant_repo_py_path",
-      "confidence_score": 1.0
+      "target": "scripts_generate_tenant_repo_py_path"
     },
     {
       "relation": "references",
@@ -3884,9 +4282,9 @@
       "source_location": "L159",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "scripts_generate_tenant_repo_remove_template_only",
-      "target": "scripts_generate_tenant_repo_py_path",
-      "confidence_score": 1.0
+      "target": "scripts_generate_tenant_repo_py_path"
     },
     {
       "relation": "references",
@@ -3896,9 +4294,9 @@
       "source_location": "L173",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "scripts_generate_tenant_repo_strip_template_only_blocks",
-      "target": "scripts_generate_tenant_repo_py_path",
-      "confidence_score": 1.0
+      "target": "scripts_generate_tenant_repo_py_path"
     },
     {
       "relation": "references",
@@ -3908,9 +4306,9 @@
       "source_location": "L231",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "scripts_generate_tenant_repo_sweep",
-      "target": "scripts_generate_tenant_repo_py_path",
-      "confidence_score": 1.0
+      "target": "scripts_generate_tenant_repo_py_path"
     },
     {
       "relation": "references",
@@ -3920,9 +4318,9 @@
       "source_location": "L115",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "scripts_test_generate_tenant_repo_copy_repo",
-      "target": "scripts_test_generate_tenant_repo_py_path",
-      "confidence_score": 1.0
+      "target": "scripts_test_generate_tenant_repo_py_path"
     },
     {
       "relation": "calls",
@@ -3932,9 +4330,9 @@
       "source_location": "L349",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "scripts_test_generate_tenant_repo_generate_test_a_failure_before_the_rename_leaves_a_re_runnable_tree",
-      "target": "scripts_test_generate_tenant_repo_py_path",
-      "confidence_score": 1.0
+      "target": "scripts_test_generate_tenant_repo_py_path"
     },
     {
       "relation": "calls",
@@ -3944,9 +4342,9 @@
       "source_location": "L331",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "scripts_test_generate_tenant_repo_generate_test_a_listed_file_that_moved_refuses_rather_than_skipping",
-      "target": "scripts_test_generate_tenant_repo_py_path",
-      "confidence_score": 1.0
+      "target": "scripts_test_generate_tenant_repo_py_path"
     },
     {
       "relation": "calls",
@@ -3956,9 +4354,9 @@
       "source_location": "L312",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "scripts_test_generate_tenant_repo_generate_test_a_missing_tenant_readme_refuses_rather_than_skipping",
-      "target": "scripts_test_generate_tenant_repo_py_path",
-      "confidence_score": 1.0
+      "target": "scripts_test_generate_tenant_repo_py_path"
     },
     {
       "relation": "calls",
@@ -3968,9 +4366,9 @@
       "source_location": "L360",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "scripts_test_generate_tenant_repo_generate_test_a_placeholder_in_a_markdown_heading_is_not_mistaken_for_a_comment",
-      "target": "scripts_test_generate_tenant_repo_py_path",
-      "confidence_score": 1.0
+      "target": "scripts_test_generate_tenant_repo_py_path"
     },
     {
       "relation": "calls",
@@ -3980,9 +4378,9 @@
       "source_location": "L321",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "scripts_test_generate_tenant_repo_generate_test_a_placeholder_in_an_unlisted_file_fails_generation",
-      "target": "scripts_test_generate_tenant_repo_py_path",
-      "confidence_score": 1.0
+      "target": "scripts_test_generate_tenant_repo_py_path"
     },
     {
       "relation": "calls",
@@ -3992,9 +4390,9 @@
       "source_location": "L339",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "scripts_test_generate_tenant_repo_generate_test_a_reserved_slug_is_refused_before_anything_is_written",
-      "target": "scripts_test_generate_tenant_repo_py_path",
-      "confidence_score": 1.0
+      "target": "scripts_test_generate_tenant_repo_py_path"
     },
     {
       "relation": "calls",
@@ -4004,9 +4402,9 @@
       "source_location": "L241",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "scripts_test_generate_tenant_repo_generate_test_generating_this_repos_own_tree_leaves_no_token",
-      "target": "scripts_test_generate_tenant_repo_py_path",
-      "confidence_score": 1.0
+      "target": "scripts_test_generate_tenant_repo_py_path"
     },
     {
       "relation": "calls",
@@ -4016,9 +4414,9 @@
       "source_location": "L284",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "scripts_test_generate_tenant_repo_generate_test_template_only_artefacts_do_not_reach_a_tenant",
-      "target": "scripts_test_generate_tenant_repo_py_path",
-      "confidence_score": 1.0
+      "target": "scripts_test_generate_tenant_repo_py_path"
     },
     {
       "relation": "calls",
@@ -4028,9 +4426,9 @@
       "source_location": "L295",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "scripts_test_generate_tenant_repo_generate_test_the_generated_claude_md_does_not_point_at_a_deleted_graph",
-      "target": "scripts_test_generate_tenant_repo_py_path",
-      "confidence_score": 1.0
+      "target": "scripts_test_generate_tenant_repo_py_path"
     },
     {
       "relation": "calls",
@@ -4040,9 +4438,9 @@
       "source_location": "L266",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "scripts_test_generate_tenant_repo_generate_test_the_generated_repo_passes_its_own_ci",
-      "target": "scripts_test_generate_tenant_repo_py_path",
-      "confidence_score": 1.0
+      "target": "scripts_test_generate_tenant_repo_py_path"
     },
     {
       "relation": "calls",
@@ -4052,9 +4450,9 @@
       "source_location": "L304",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "scripts_test_generate_tenant_repo_generate_test_the_pulumi_project_name_is_substituted",
-      "target": "scripts_test_generate_tenant_repo_py_path",
-      "confidence_score": 1.0
+      "target": "scripts_test_generate_tenant_repo_py_path"
     },
     {
       "relation": "calls",
@@ -4064,9 +4462,9 @@
       "source_location": "L247",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "scripts_test_generate_tenant_repo_generate_test_the_tenant_readme_replaces_the_template_one",
-      "target": "scripts_test_generate_tenant_repo_py_path",
-      "confidence_score": 1.0
+      "target": "scripts_test_generate_tenant_repo_py_path"
     },
     {
       "relation": "calls",
@@ -4076,9 +4474,9 @@
       "source_location": "L375",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "scripts_test_generate_tenant_repo_main_test_exit_one_on_a_refusal",
-      "target": "scripts_test_generate_tenant_repo_py_path",
-      "confidence_score": 1.0
+      "target": "scripts_test_generate_tenant_repo_py_path"
     },
     {
       "relation": "calls",
@@ -4088,9 +4486,9 @@
       "source_location": "L370",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "scripts_test_generate_tenant_repo_main_test_exit_zero_on_a_clean_generation",
-      "target": "scripts_test_generate_tenant_repo_py_path",
-      "confidence_score": 1.0
+      "target": "scripts_test_generate_tenant_repo_py_path"
     },
     {
       "relation": "shares_data_with",
@@ -4100,6 +4498,14 @@
       "_origin": "semantic",
       "source": "pulumi_stack",
       "target": "hetzner_object_storage"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "RUNBOOK-bootstrap.md",
+      "source": "runbook_bootstrap_md",
+      "target": "pulumi_stack"
     },
     {
       "relation": "contains",
@@ -4714,31 +5120,12 @@
       "target": "index_tenant"
     },
     {
-      "relation": "references",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "RUNBOOK-bootstrap.md",
-      "_origin": "semantic",
-      "source": "runbook_bootstrap",
-      "target": "ghost_platform_repo"
-    },
-    {
       "relation": "calls",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
+      "confidence": "INFERRED",
+      "confidence_score": 0.9,
       "source_file": ".github/workflows/infra-ci.yml",
-      "_origin": "semantic",
-      "source": "github_workflows_infra_ci",
-      "target": "scripts_test_unit"
-    },
-    {
-      "relation": "references",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": ".github/workflows/infra-ci.yml",
-      "_origin": "semantic",
-      "source": "github_workflows_infra_ci",
-      "target": "ghost_tenant_component"
+      "source": "github_workflows_infra_ci_yml",
+      "target": "branchleft_deploy"
     },
     {
       "relation": "contains",
@@ -5531,9 +5918,9 @@
       "source_location": "L217",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "scripts_generate_tenant_repo",
-      "target": "scripts_generate_tenant_repo_apply_renames",
-      "confidence_score": 1.0
+      "target": "scripts_generate_tenant_repo_apply_renames"
     },
     {
       "relation": "contains",
@@ -5542,9 +5929,9 @@
       "source_location": "L198",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "scripts_generate_tenant_repo",
-      "target": "scripts_generate_tenant_repo_apply_substitutions",
-      "confidence_score": 1.0
+      "target": "scripts_generate_tenant_repo_apply_substitutions"
     },
     {
       "relation": "contains",
@@ -5553,9 +5940,9 @@
       "source_location": "L254",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "scripts_generate_tenant_repo",
-      "target": "scripts_generate_tenant_repo_generate",
-      "confidence_score": 1.0
+      "target": "scripts_generate_tenant_repo_generate"
     },
     {
       "relation": "contains",
@@ -5564,9 +5951,9 @@
       "source_location": "L126",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "scripts_generate_tenant_repo",
-      "target": "scripts_generate_tenant_repo_generateerror",
-      "confidence_score": 1.0
+      "target": "scripts_generate_tenant_repo_generateerror"
     },
     {
       "relation": "contains",
@@ -5575,9 +5962,9 @@
       "source_location": "L272",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "scripts_generate_tenant_repo",
-      "target": "scripts_generate_tenant_repo_main",
-      "confidence_score": 1.0
+      "target": "scripts_generate_tenant_repo_main"
     },
     {
       "relation": "contains",
@@ -5586,9 +5973,9 @@
       "source_location": "L159",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "scripts_generate_tenant_repo",
-      "target": "scripts_generate_tenant_repo_remove_template_only",
-      "confidence_score": 1.0
+      "target": "scripts_generate_tenant_repo_remove_template_only"
     },
     {
       "relation": "contains",
@@ -5597,9 +5984,9 @@
       "source_location": "L173",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "scripts_generate_tenant_repo",
-      "target": "scripts_generate_tenant_repo_strip_template_only_blocks",
-      "confidence_score": 1.0
+      "target": "scripts_generate_tenant_repo_strip_template_only_blocks"
     },
     {
       "relation": "contains",
@@ -5608,9 +5995,9 @@
       "source_location": "L150",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "scripts_generate_tenant_repo",
-      "target": "scripts_generate_tenant_repo_substitutions",
-      "confidence_score": 1.0
+      "target": "scripts_generate_tenant_repo_substitutions"
     },
     {
       "relation": "contains",
@@ -5619,9 +6006,9 @@
       "source_location": "L231",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "scripts_generate_tenant_repo",
-      "target": "scripts_generate_tenant_repo_sweep",
-      "confidence_score": 1.0
+      "target": "scripts_generate_tenant_repo_sweep"
     },
     {
       "relation": "contains",
@@ -5630,9 +6017,9 @@
       "source_location": "L130",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "scripts_generate_tenant_repo",
-      "target": "scripts_generate_tenant_repo_validate_slug",
-      "confidence_score": 1.0
+      "target": "scripts_generate_tenant_repo_validate_slug"
     },
     {
       "relation": "calls",
@@ -5642,9 +6029,9 @@
       "source_location": "L222",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "scripts_generate_tenant_repo_apply_renames",
-      "target": "scripts_generate_tenant_repo_generateerror",
-      "confidence_score": 1.0
+      "target": "scripts_generate_tenant_repo_generateerror"
     },
     {
       "relation": "calls",
@@ -5654,9 +6041,9 @@
       "source_location": "L204",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "scripts_generate_tenant_repo_apply_substitutions",
-      "target": "scripts_generate_tenant_repo_generateerror",
-      "confidence_score": 1.0
+      "target": "scripts_generate_tenant_repo_generateerror"
     },
     {
       "relation": "calls",
@@ -5666,9 +6053,9 @@
       "source_location": "L262",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "scripts_generate_tenant_repo_generate",
-      "target": "scripts_generate_tenant_repo_generateerror",
-      "confidence_score": 1.0
+      "target": "scripts_generate_tenant_repo_generateerror"
     },
     {
       "relation": "rationale_for",
@@ -5677,9 +6064,9 @@
       "source_location": "L127",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "scripts_generate_tenant_repo_rationale_127",
-      "target": "scripts_generate_tenant_repo_generateerror",
-      "confidence_score": 1.0
+      "target": "scripts_generate_tenant_repo_generateerror"
     },
     {
       "relation": "calls",
@@ -5689,9 +6076,9 @@
       "source_location": "L183",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "scripts_generate_tenant_repo_strip_template_only_blocks",
-      "target": "scripts_generate_tenant_repo_generateerror",
-      "confidence_score": 1.0
+      "target": "scripts_generate_tenant_repo_generateerror"
     },
     {
       "relation": "calls",
@@ -5701,9 +6088,9 @@
       "source_location": "L132",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "scripts_generate_tenant_repo_validate_slug",
-      "target": "scripts_generate_tenant_repo_generateerror",
-      "confidence_score": 1.0
+      "target": "scripts_generate_tenant_repo_generateerror"
     },
     {
       "relation": "calls",
@@ -5713,9 +6100,9 @@
       "source_location": "L255",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "scripts_generate_tenant_repo_generate",
-      "target": "scripts_generate_tenant_repo_validate_slug",
-      "confidence_score": 1.0
+      "target": "scripts_generate_tenant_repo_validate_slug"
     },
     {
       "relation": "calls",
@@ -5725,9 +6112,9 @@
       "source_location": "L199",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "scripts_generate_tenant_repo_apply_substitutions",
-      "target": "scripts_generate_tenant_repo_substitutions",
-      "confidence_score": 1.0
+      "target": "scripts_generate_tenant_repo_substitutions"
     },
     {
       "relation": "calls",
@@ -5737,9 +6124,9 @@
       "source_location": "L256",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "scripts_generate_tenant_repo_generate",
-      "target": "scripts_generate_tenant_repo_remove_template_only",
-      "confidence_score": 1.0
+      "target": "scripts_generate_tenant_repo_remove_template_only"
     },
     {
       "relation": "rationale_for",
@@ -5748,9 +6135,9 @@
       "source_location": "L160",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "scripts_generate_tenant_repo_rationale_160",
-      "target": "scripts_generate_tenant_repo_remove_template_only",
-      "confidence_score": 1.0
+      "target": "scripts_generate_tenant_repo_remove_template_only"
     },
     {
       "relation": "calls",
@@ -5760,9 +6147,9 @@
       "source_location": "L257",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "scripts_generate_tenant_repo_generate",
-      "target": "scripts_generate_tenant_repo_strip_template_only_blocks",
-      "confidence_score": 1.0
+      "target": "scripts_generate_tenant_repo_strip_template_only_blocks"
     },
     {
       "relation": "calls",
@@ -5772,9 +6159,9 @@
       "source_location": "L258",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "scripts_generate_tenant_repo_generate",
-      "target": "scripts_generate_tenant_repo_apply_substitutions",
-      "confidence_score": 1.0
+      "target": "scripts_generate_tenant_repo_apply_substitutions"
     },
     {
       "relation": "calls",
@@ -5784,9 +6171,9 @@
       "source_location": "L259",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "scripts_generate_tenant_repo_generate",
-      "target": "scripts_generate_tenant_repo_apply_renames",
-      "confidence_score": 1.0
+      "target": "scripts_generate_tenant_repo_apply_renames"
     },
     {
       "relation": "calls",
@@ -5796,9 +6183,9 @@
       "source_location": "L260",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "scripts_generate_tenant_repo_generate",
-      "target": "scripts_generate_tenant_repo_sweep",
-      "confidence_score": 1.0
+      "target": "scripts_generate_tenant_repo_sweep"
     },
     {
       "relation": "rationale_for",
@@ -5807,9 +6194,9 @@
       "source_location": "L232",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "scripts_generate_tenant_repo_rationale_232",
-      "target": "scripts_generate_tenant_repo_sweep",
-      "confidence_score": 1.0
+      "target": "scripts_generate_tenant_repo_sweep"
     },
     {
       "relation": "calls",
@@ -5819,9 +6206,9 @@
       "source_location": "L282",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "scripts_generate_tenant_repo_main",
-      "target": "scripts_generate_tenant_repo_generate",
-      "confidence_score": 1.0
+      "target": "scripts_generate_tenant_repo_generate"
     },
     {
       "relation": "contains",
@@ -5830,9 +6217,9 @@
       "source_location": "L61",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "scripts_test_generate_tenant_repo",
-      "target": "scripts_test_generate_tenant_repo_component_accepts_battery",
-      "confidence_score": 1.0
+      "target": "scripts_test_generate_tenant_repo_component_accepts_battery"
     },
     {
       "relation": "contains",
@@ -5841,9 +6228,9 @@
       "source_location": "L42",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "scripts_test_generate_tenant_repo",
-      "target": "scripts_test_generate_tenant_repo_component_constants",
-      "confidence_score": 1.0
+      "target": "scripts_test_generate_tenant_repo_component_constants"
     },
     {
       "relation": "contains",
@@ -5852,9 +6239,9 @@
       "source_location": "L38",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "scripts_test_generate_tenant_repo",
-      "target": "scripts_test_generate_tenant_repo_component_installed",
-      "confidence_score": 1.0
+      "target": "scripts_test_generate_tenant_repo_component_installed"
     },
     {
       "relation": "contains",
@@ -5863,9 +6250,9 @@
       "source_location": "L115",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "scripts_test_generate_tenant_repo",
-      "target": "scripts_test_generate_tenant_repo_copy_repo",
-      "confidence_score": 1.0
+      "target": "scripts_test_generate_tenant_repo_copy_repo"
     },
     {
       "relation": "contains",
@@ -5874,9 +6261,9 @@
       "source_location": "L238",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "scripts_test_generate_tenant_repo",
-      "target": "scripts_test_generate_tenant_repo_generate",
-      "confidence_score": 1.0
+      "target": "scripts_test_generate_tenant_repo_generate"
     },
     {
       "relation": "contains",
@@ -5885,9 +6272,9 @@
       "source_location": "L367",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "scripts_test_generate_tenant_repo",
-      "target": "scripts_test_generate_tenant_repo_main",
-      "confidence_score": 1.0
+      "target": "scripts_test_generate_tenant_repo_main"
     },
     {
       "relation": "contains",
@@ -5896,9 +6283,9 @@
       "source_location": "L228",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "scripts_test_generate_tenant_repo",
-      "target": "scripts_test_generate_tenant_repo_substitutions",
-      "confidence_score": 1.0
+      "target": "scripts_test_generate_tenant_repo_substitutions"
     },
     {
       "relation": "contains",
@@ -5907,9 +6294,9 @@
       "source_location": "L31",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "scripts_test_generate_tenant_repo",
-      "target": "scripts_test_generate_tenant_repo_tracked_files",
-      "confidence_score": 1.0
+      "target": "scripts_test_generate_tenant_repo_tracked_files"
     },
     {
       "relation": "contains",
@@ -5918,9 +6305,9 @@
       "source_location": "L134",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "scripts_test_generate_tenant_repo",
-      "target": "scripts_test_generate_tenant_repo_validateslug",
-      "confidence_score": 1.0
+      "target": "scripts_test_generate_tenant_repo_validateslug"
     },
     {
       "relation": "rationale_for",
@@ -5929,9 +6316,9 @@
       "source_location": "L1",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "scripts_test_generate_tenant_repo_rationale_1",
-      "target": "scripts_test_generate_tenant_repo",
-      "confidence_score": 1.0
+      "target": "scripts_test_generate_tenant_repo"
     },
     {
       "relation": "calls",
@@ -5941,9 +6328,9 @@
       "source_location": "L116",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "scripts_test_generate_tenant_repo_copy_repo",
-      "target": "scripts_test_generate_tenant_repo_tracked_files",
-      "confidence_score": 1.0
+      "target": "scripts_test_generate_tenant_repo_tracked_files"
     },
     {
       "relation": "calls",
@@ -5953,9 +6340,9 @@
       "source_location": "L72",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "scripts_test_generate_tenant_repo_component_accepts_battery",
-      "target": "scripts_test_generate_tenant_repo_component_installed",
-      "confidence_score": 1.0
+      "target": "scripts_test_generate_tenant_repo_component_installed"
     },
     {
       "relation": "calls",
@@ -5965,9 +6352,9 @@
       "source_location": "L44",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "scripts_test_generate_tenant_repo_component_constants",
-      "target": "scripts_test_generate_tenant_repo_component_installed",
-      "confidence_score": 1.0
+      "target": "scripts_test_generate_tenant_repo_component_installed"
     },
     {
       "relation": "rationale_for",
@@ -5976,9 +6363,9 @@
       "source_location": "L43",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "scripts_test_generate_tenant_repo_rationale_43",
-      "target": "scripts_test_generate_tenant_repo_component_constants",
-      "confidence_score": 1.0
+      "target": "scripts_test_generate_tenant_repo_component_constants"
     },
     {
       "relation": "calls",
@@ -5988,9 +6375,9 @@
       "source_location": "L183",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "scripts_test_generate_tenant_repo_validateslug_test_bounds_match_the_installed_component",
-      "target": "scripts_test_generate_tenant_repo_component_constants",
-      "confidence_score": 1.0
+      "target": "scripts_test_generate_tenant_repo_component_constants"
     },
     {
       "relation": "rationale_for",
@@ -5999,9 +6386,9 @@
       "source_location": "L62",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "scripts_test_generate_tenant_repo_rationale_62",
-      "target": "scripts_test_generate_tenant_repo_component_accepts_battery",
-      "confidence_score": 1.0
+      "target": "scripts_test_generate_tenant_repo_component_accepts_battery"
     },
     {
       "relation": "calls",
@@ -6011,9 +6398,9 @@
       "source_location": "L205",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "scripts_test_generate_tenant_repo_validateslug_test_charset_matches_the_installed_component_across_a_battery",
-      "target": "scripts_test_generate_tenant_repo_component_accepts_battery",
-      "confidence_score": 1.0
+      "target": "scripts_test_generate_tenant_repo_component_accepts_battery"
     },
     {
       "relation": "calls",
@@ -6023,9 +6410,9 @@
       "source_location": "L349",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "scripts_test_generate_tenant_repo_generate_test_a_failure_before_the_rename_leaves_a_re_runnable_tree",
-      "target": "scripts_test_generate_tenant_repo_copy_repo",
-      "confidence_score": 1.0
+      "target": "scripts_test_generate_tenant_repo_copy_repo"
     },
     {
       "relation": "calls",
@@ -6035,9 +6422,9 @@
       "source_location": "L331",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "scripts_test_generate_tenant_repo_generate_test_a_listed_file_that_moved_refuses_rather_than_skipping",
-      "target": "scripts_test_generate_tenant_repo_copy_repo",
-      "confidence_score": 1.0
+      "target": "scripts_test_generate_tenant_repo_copy_repo"
     },
     {
       "relation": "calls",
@@ -6047,9 +6434,9 @@
       "source_location": "L312",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "scripts_test_generate_tenant_repo_generate_test_a_missing_tenant_readme_refuses_rather_than_skipping",
-      "target": "scripts_test_generate_tenant_repo_copy_repo",
-      "confidence_score": 1.0
+      "target": "scripts_test_generate_tenant_repo_copy_repo"
     },
     {
       "relation": "calls",
@@ -6059,9 +6446,9 @@
       "source_location": "L360",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "scripts_test_generate_tenant_repo_generate_test_a_placeholder_in_a_markdown_heading_is_not_mistaken_for_a_comment",
-      "target": "scripts_test_generate_tenant_repo_copy_repo",
-      "confidence_score": 1.0
+      "target": "scripts_test_generate_tenant_repo_copy_repo"
     },
     {
       "relation": "calls",
@@ -6071,9 +6458,9 @@
       "source_location": "L321",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "scripts_test_generate_tenant_repo_generate_test_a_placeholder_in_an_unlisted_file_fails_generation",
-      "target": "scripts_test_generate_tenant_repo_copy_repo",
-      "confidence_score": 1.0
+      "target": "scripts_test_generate_tenant_repo_copy_repo"
     },
     {
       "relation": "calls",
@@ -6083,9 +6470,9 @@
       "source_location": "L339",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "scripts_test_generate_tenant_repo_generate_test_a_reserved_slug_is_refused_before_anything_is_written",
-      "target": "scripts_test_generate_tenant_repo_copy_repo",
-      "confidence_score": 1.0
+      "target": "scripts_test_generate_tenant_repo_copy_repo"
     },
     {
       "relation": "calls",
@@ -6095,9 +6482,9 @@
       "source_location": "L241",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "scripts_test_generate_tenant_repo_generate_test_generating_this_repos_own_tree_leaves_no_token",
-      "target": "scripts_test_generate_tenant_repo_copy_repo",
-      "confidence_score": 1.0
+      "target": "scripts_test_generate_tenant_repo_copy_repo"
     },
     {
       "relation": "calls",
@@ -6107,9 +6494,9 @@
       "source_location": "L284",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "scripts_test_generate_tenant_repo_generate_test_template_only_artefacts_do_not_reach_a_tenant",
-      "target": "scripts_test_generate_tenant_repo_copy_repo",
-      "confidence_score": 1.0
+      "target": "scripts_test_generate_tenant_repo_copy_repo"
     },
     {
       "relation": "calls",
@@ -6119,9 +6506,9 @@
       "source_location": "L295",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "scripts_test_generate_tenant_repo_generate_test_the_generated_claude_md_does_not_point_at_a_deleted_graph",
-      "target": "scripts_test_generate_tenant_repo_copy_repo",
-      "confidence_score": 1.0
+      "target": "scripts_test_generate_tenant_repo_copy_repo"
     },
     {
       "relation": "calls",
@@ -6131,9 +6518,9 @@
       "source_location": "L266",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "scripts_test_generate_tenant_repo_generate_test_the_generated_repo_passes_its_own_ci",
-      "target": "scripts_test_generate_tenant_repo_copy_repo",
-      "confidence_score": 1.0
+      "target": "scripts_test_generate_tenant_repo_copy_repo"
     },
     {
       "relation": "calls",
@@ -6143,9 +6530,9 @@
       "source_location": "L304",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "scripts_test_generate_tenant_repo_generate_test_the_pulumi_project_name_is_substituted",
-      "target": "scripts_test_generate_tenant_repo_copy_repo",
-      "confidence_score": 1.0
+      "target": "scripts_test_generate_tenant_repo_copy_repo"
     },
     {
       "relation": "calls",
@@ -6155,9 +6542,9 @@
       "source_location": "L247",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "scripts_test_generate_tenant_repo_generate_test_the_tenant_readme_replaces_the_template_one",
-      "target": "scripts_test_generate_tenant_repo_copy_repo",
-      "confidence_score": 1.0
+      "target": "scripts_test_generate_tenant_repo_copy_repo"
     },
     {
       "relation": "calls",
@@ -6167,9 +6554,9 @@
       "source_location": "L375",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "scripts_test_generate_tenant_repo_main_test_exit_one_on_a_refusal",
-      "target": "scripts_test_generate_tenant_repo_copy_repo",
-      "confidence_score": 1.0
+      "target": "scripts_test_generate_tenant_repo_copy_repo"
     },
     {
       "relation": "calls",
@@ -6179,9 +6566,9 @@
       "source_location": "L370",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "scripts_test_generate_tenant_repo_main_test_exit_zero_on_a_clean_generation",
-      "target": "scripts_test_generate_tenant_repo_copy_repo",
-      "confidence_score": 1.0
+      "target": "scripts_test_generate_tenant_repo_copy_repo"
     },
     {
       "relation": "method",
@@ -6190,9 +6577,9 @@
       "source_location": "L135",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "scripts_test_generate_tenant_repo_validateslug",
-      "target": "scripts_test_generate_tenant_repo_validateslug_test_accepts_an_ordinary_slug",
-      "confidence_score": 1.0
+      "target": "scripts_test_generate_tenant_repo_validateslug_test_accepts_an_ordinary_slug"
     },
     {
       "relation": "method",
@@ -6201,9 +6588,9 @@
       "source_location": "L173",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "scripts_test_generate_tenant_repo_validateslug",
-      "target": "scripts_test_generate_tenant_repo_validateslug_test_bounds_match_the_installed_component",
-      "confidence_score": 1.0
+      "target": "scripts_test_generate_tenant_repo_validateslug_test_bounds_match_the_installed_component"
     },
     {
       "relation": "method",
@@ -6212,9 +6599,9 @@
       "source_location": "L197",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "scripts_test_generate_tenant_repo_validateslug",
-      "target": "scripts_test_generate_tenant_repo_validateslug_test_charset_matches_the_installed_component_across_a_battery",
-      "confidence_score": 1.0
+      "target": "scripts_test_generate_tenant_repo_validateslug_test_charset_matches_the_installed_component_across_a_battery"
     },
     {
       "relation": "method",
@@ -6223,9 +6610,9 @@
       "source_location": "L144",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "scripts_test_generate_tenant_repo_validateslug",
-      "target": "scripts_test_generate_tenant_repo_validateslug_test_refuses_a_slug_past_the_mysql_identifier_bound",
-      "confidence_score": 1.0
+      "target": "scripts_test_generate_tenant_repo_validateslug_test_refuses_a_slug_past_the_mysql_identifier_bound"
     },
     {
       "relation": "method",
@@ -6234,9 +6621,9 @@
       "source_location": "L148",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "scripts_test_generate_tenant_repo_validateslug",
-      "target": "scripts_test_generate_tenant_repo_validateslug_test_refuses_a_trailing_hyphen_and_accepts_the_boundary",
-      "confidence_score": 1.0
+      "target": "scripts_test_generate_tenant_repo_validateslug_test_refuses_a_trailing_hyphen_and_accepts_the_boundary"
     },
     {
       "relation": "method",
@@ -6245,9 +6632,9 @@
       "source_location": "L165",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "scripts_test_generate_tenant_repo_validateslug",
-      "target": "scripts_test_generate_tenant_repo_validateslug_test_refuses_every_reserved_stack_name",
-      "confidence_score": 1.0
+      "target": "scripts_test_generate_tenant_repo_validateslug_test_refuses_every_reserved_stack_name"
     },
     {
       "relation": "method",
@@ -6256,9 +6643,9 @@
       "source_location": "L138",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "scripts_test_generate_tenant_repo_validateslug",
-      "target": "scripts_test_generate_tenant_repo_validateslug_test_refuses_uppercase_underscores_and_a_leading_digit",
-      "confidence_score": 1.0
+      "target": "scripts_test_generate_tenant_repo_validateslug_test_refuses_uppercase_underscores_and_a_leading_digit"
     },
     {
       "relation": "method",
@@ -6267,9 +6654,9 @@
       "source_location": "L229",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "scripts_test_generate_tenant_repo_substitutions",
-      "target": "scripts_test_generate_tenant_repo_substitutions_test_project_name_is_the_slug_plus_infra",
-      "confidence_score": 1.0
+      "target": "scripts_test_generate_tenant_repo_substitutions_test_project_name_is_the_slug_plus_infra"
     },
     {
       "relation": "method",
@@ -6278,9 +6665,9 @@
       "source_location": "L234",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "scripts_test_generate_tenant_repo_substitutions",
-      "target": "scripts_test_generate_tenant_repo_substitutions_test_tenant_name_is_the_bare_slug",
-      "confidence_score": 1.0
+      "target": "scripts_test_generate_tenant_repo_substitutions_test_tenant_name_is_the_bare_slug"
     },
     {
       "relation": "method",
@@ -6289,9 +6676,9 @@
       "source_location": "L344",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "scripts_test_generate_tenant_repo_generate",
-      "target": "scripts_test_generate_tenant_repo_generate_test_a_failure_before_the_rename_leaves_a_re_runnable_tree",
-      "confidence_score": 1.0
+      "target": "scripts_test_generate_tenant_repo_generate_test_a_failure_before_the_rename_leaves_a_re_runnable_tree"
     },
     {
       "relation": "method",
@@ -6300,9 +6687,9 @@
       "source_location": "L329",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "scripts_test_generate_tenant_repo_generate",
-      "target": "scripts_test_generate_tenant_repo_generate_test_a_listed_file_that_moved_refuses_rather_than_skipping",
-      "confidence_score": 1.0
+      "target": "scripts_test_generate_tenant_repo_generate_test_a_listed_file_that_moved_refuses_rather_than_skipping"
     },
     {
       "relation": "method",
@@ -6311,9 +6698,9 @@
       "source_location": "L310",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "scripts_test_generate_tenant_repo_generate",
-      "target": "scripts_test_generate_tenant_repo_generate_test_a_missing_tenant_readme_refuses_rather_than_skipping",
-      "confidence_score": 1.0
+      "target": "scripts_test_generate_tenant_repo_generate_test_a_missing_tenant_readme_refuses_rather_than_skipping"
     },
     {
       "relation": "method",
@@ -6322,9 +6709,9 @@
       "source_location": "L355",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "scripts_test_generate_tenant_repo_generate",
-      "target": "scripts_test_generate_tenant_repo_generate_test_a_placeholder_in_a_markdown_heading_is_not_mistaken_for_a_comment",
-      "confidence_score": 1.0
+      "target": "scripts_test_generate_tenant_repo_generate_test_a_placeholder_in_a_markdown_heading_is_not_mistaken_for_a_comment"
     },
     {
       "relation": "method",
@@ -6333,9 +6720,9 @@
       "source_location": "L317",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "scripts_test_generate_tenant_repo_generate",
-      "target": "scripts_test_generate_tenant_repo_generate_test_a_placeholder_in_an_unlisted_file_fails_generation",
-      "confidence_score": 1.0
+      "target": "scripts_test_generate_tenant_repo_generate_test_a_placeholder_in_an_unlisted_file_fails_generation"
     },
     {
       "relation": "method",
@@ -6344,9 +6731,9 @@
       "source_location": "L337",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "scripts_test_generate_tenant_repo_generate",
-      "target": "scripts_test_generate_tenant_repo_generate_test_a_reserved_slug_is_refused_before_anything_is_written",
-      "confidence_score": 1.0
+      "target": "scripts_test_generate_tenant_repo_generate_test_a_reserved_slug_is_refused_before_anything_is_written"
     },
     {
       "relation": "method",
@@ -6355,9 +6742,9 @@
       "source_location": "L239",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "scripts_test_generate_tenant_repo_generate",
-      "target": "scripts_test_generate_tenant_repo_generate_test_generating_this_repos_own_tree_leaves_no_token",
-      "confidence_score": 1.0
+      "target": "scripts_test_generate_tenant_repo_generate_test_generating_this_repos_own_tree_leaves_no_token"
     },
     {
       "relation": "method",
@@ -6366,9 +6753,9 @@
       "source_location": "L282",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "scripts_test_generate_tenant_repo_generate",
-      "target": "scripts_test_generate_tenant_repo_generate_test_template_only_artefacts_do_not_reach_a_tenant",
-      "confidence_score": 1.0
+      "target": "scripts_test_generate_tenant_repo_generate_test_template_only_artefacts_do_not_reach_a_tenant"
     },
     {
       "relation": "method",
@@ -6377,9 +6764,9 @@
       "source_location": "L289",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "scripts_test_generate_tenant_repo_generate",
-      "target": "scripts_test_generate_tenant_repo_generate_test_the_generated_claude_md_does_not_point_at_a_deleted_graph",
-      "confidence_score": 1.0
+      "target": "scripts_test_generate_tenant_repo_generate_test_the_generated_claude_md_does_not_point_at_a_deleted_graph"
     },
     {
       "relation": "method",
@@ -6388,9 +6775,9 @@
       "source_location": "L253",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "scripts_test_generate_tenant_repo_generate",
-      "target": "scripts_test_generate_tenant_repo_generate_test_the_generated_repo_passes_its_own_ci",
-      "confidence_score": 1.0
+      "target": "scripts_test_generate_tenant_repo_generate_test_the_generated_repo_passes_its_own_ci"
     },
     {
       "relation": "method",
@@ -6399,9 +6786,9 @@
       "source_location": "L302",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "scripts_test_generate_tenant_repo_generate",
-      "target": "scripts_test_generate_tenant_repo_generate_test_the_pulumi_project_name_is_substituted",
-      "confidence_score": 1.0
+      "target": "scripts_test_generate_tenant_repo_generate_test_the_pulumi_project_name_is_substituted"
     },
     {
       "relation": "method",
@@ -6410,9 +6797,9 @@
       "source_location": "L245",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "scripts_test_generate_tenant_repo_generate",
-      "target": "scripts_test_generate_tenant_repo_generate_test_the_tenant_readme_replaces_the_template_one",
-      "confidence_score": 1.0
+      "target": "scripts_test_generate_tenant_repo_generate_test_the_tenant_readme_replaces_the_template_one"
     },
     {
       "relation": "rationale_for",
@@ -6421,9 +6808,9 @@
       "source_location": "L254",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "scripts_test_generate_tenant_repo_rationale_254",
-      "target": "scripts_test_generate_tenant_repo_generate_test_the_generated_repo_passes_its_own_ci",
-      "confidence_score": 1.0
+      "target": "scripts_test_generate_tenant_repo_generate_test_the_generated_repo_passes_its_own_ci"
     },
     {
       "relation": "method",
@@ -6432,9 +6819,9 @@
       "source_location": "L373",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "scripts_test_generate_tenant_repo_main",
-      "target": "scripts_test_generate_tenant_repo_main_test_exit_one_on_a_refusal",
-      "confidence_score": 1.0
+      "target": "scripts_test_generate_tenant_repo_main_test_exit_one_on_a_refusal"
     },
     {
       "relation": "method",
@@ -6443,12 +6830,589 @@
       "source_location": "L368",
       "weight": 1.0,
       "_origin": "ast",
+      "confidence_score": 1.0,
       "source": "scripts_test_generate_tenant_repo_main",
-      "target": "scripts_test_generate_tenant_repo_main_test_exit_zero_on_a_clean_generation",
+      "target": "scripts_test_generate_tenant_repo_main_test_exit_zero_on_a_clean_generation"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/assert-no-inline-credential.py",
+      "source_location": "L84",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "scripts_assert_no_inline_credential",
+      "target": "scripts_assert_no_inline_credential_find_offenses",
       "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/assert-no-inline-credential.py",
+      "source_location": "L64",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "scripts_assert_no_inline_credential",
+      "target": "scripts_assert_no_inline_credential_is_placeholder",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/assert-no-inline-credential.py",
+      "source_location": "L119",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "scripts_assert_no_inline_credential",
+      "target": "scripts_assert_no_inline_credential_main",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/assert-no-inline-credential.py",
+      "source_location": "L91",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "scripts_assert_no_inline_credential_find_offenses",
+      "target": "scripts_assert_no_inline_credential_is_placeholder",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/assert-no-inline-credential.py",
+      "source_location": "L65",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "scripts_assert_no_inline_credential_rationale_65",
+      "target": "scripts_assert_no_inline_credential_is_placeholder",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "references",
+      "context": "parameter_type",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/assert-no-inline-credential.py",
+      "source_location": "L84",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "scripts_assert_no_inline_credential_find_offenses",
+      "target": "scripts_assert_no_inline_credential_py_path",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/assert-no-inline-credential.py",
+      "source_location": "L131",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "scripts_assert_no_inline_credential_main",
+      "target": "scripts_assert_no_inline_credential_find_offenses",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/assert-no-inline-credential.py",
+      "source_location": "L126",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "scripts_assert_no_inline_credential_main",
+      "target": "scripts_assert_no_inline_credential_py_path",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/test_assert_no_inline_credential.py",
+      "source_location": "L52",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "scripts_test_assert_no_inline_credential",
+      "target": "scripts_test_assert_no_inline_credential_findoffenses",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/test_assert_no_inline_credential.py",
+      "source_location": "L35",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "scripts_test_assert_no_inline_credential",
+      "target": "scripts_test_assert_no_inline_credential_isplaceholder",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/test_assert_no_inline_credential.py",
+      "source_location": "L150",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "scripts_test_assert_no_inline_credential",
+      "target": "scripts_test_assert_no_inline_credential_main",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/test_assert_no_inline_credential.py",
+      "source_location": "L29",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "scripts_test_assert_no_inline_credential",
+      "target": "scripts_test_assert_no_inline_credential_write",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/test_assert_no_inline_credential.py",
+      "source_location": "L1",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "scripts_test_assert_no_inline_credential_rationale_1",
+      "target": "scripts_test_assert_no_inline_credential",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/test_assert_no_inline_credential.py",
+      "source_location": "L146",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "scripts_test_assert_no_inline_credential_findoffenses_test_a_clean_file_has_no_offenses",
+      "target": "scripts_test_assert_no_inline_credential_write",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/test_assert_no_inline_credential.py",
+      "source_location": "L55",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "scripts_test_assert_no_inline_credential_findoffenses_test_angle_bracket_form_is_caught",
+      "target": "scripts_test_assert_no_inline_credential_write",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/test_assert_no_inline_credential.py",
+      "source_location": "L92",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "scripts_test_assert_no_inline_credential_findoffenses_test_ascii_ellipsis_form_is_caught",
+      "target": "scripts_test_assert_no_inline_credential_write",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/test_assert_no_inline_credential.py",
+      "source_location": "L71",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "scripts_test_assert_no_inline_credential_findoffenses_test_ellipsis_form_is_caught",
+      "target": "scripts_test_assert_no_inline_credential_write",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/test_assert_no_inline_credential.py",
+      "source_location": "L83",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "scripts_test_assert_no_inline_credential_findoffenses_test_ellipsis_form_with_trailing_comment_is_caught",
+      "target": "scripts_test_assert_no_inline_credential_write",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/test_assert_no_inline_credential.py",
+      "source_location": "L131",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "scripts_test_assert_no_inline_credential_findoffenses_test_non_credential_export_is_not_flagged",
+      "target": "scripts_test_assert_no_inline_credential_write",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/test_assert_no_inline_credential.py",
+      "source_location": "L108",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "scripts_test_assert_no_inline_credential_findoffenses_test_printf_salt_ellipsis_is_caught",
+      "target": "scripts_test_assert_no_inline_credential_write",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/test_assert_no_inline_credential.py",
+      "source_location": "L98",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "scripts_test_assert_no_inline_credential_findoffenses_test_printf_salt_placeholder_is_caught",
+      "target": "scripts_test_assert_no_inline_credential_write",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/test_assert_no_inline_credential.py",
+      "source_location": "L119",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "scripts_test_assert_no_inline_credential_findoffenses_test_printf_smtp_password_placeholder_is_caught",
+      "target": "scripts_test_assert_no_inline_credential_write",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/test_assert_no_inline_credential.py",
+      "source_location": "L136",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "scripts_test_assert_no_inline_credential_findoffenses_test_the_safe_read_pattern_is_not_flagged",
+      "target": "scripts_test_assert_no_inline_credential_write",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/test_assert_no_inline_credential.py",
+      "source_location": "L159",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "scripts_test_assert_no_inline_credential_main_test_clean_file_exits_zero",
+      "target": "scripts_test_assert_no_inline_credential_write",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/test_assert_no_inline_credential.py",
+      "source_location": "L164",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "scripts_test_assert_no_inline_credential_main_test_offending_file_exits_one",
+      "target": "scripts_test_assert_no_inline_credential_write",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "references",
+      "context": "return_type",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/test_assert_no_inline_credential.py",
+      "source_location": "L29",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "scripts_test_assert_no_inline_credential_write",
+      "target": "scripts_test_assert_no_inline_credential_py_path",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/test_assert_no_inline_credential.py",
+      "source_location": "L43",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "scripts_test_assert_no_inline_credential_isplaceholder",
+      "target": "scripts_test_assert_no_inline_credential_isplaceholder_test_a_real_looking_value_is_not_a_placeholder",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/test_assert_no_inline_credential.py",
+      "source_location": "L36",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "scripts_test_assert_no_inline_credential_isplaceholder",
+      "target": "scripts_test_assert_no_inline_credential_isplaceholder_test_angle_bracket_form",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/test_assert_no_inline_credential.py",
+      "source_location": "L39",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "scripts_test_assert_no_inline_credential_isplaceholder",
+      "target": "scripts_test_assert_no_inline_credential_isplaceholder_test_ellipsis_form",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/test_assert_no_inline_credential.py",
+      "source_location": "L47",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "scripts_test_assert_no_inline_credential_isplaceholder",
+      "target": "scripts_test_assert_no_inline_credential_isplaceholder_test_empty_value_is_not_a_placeholder",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/test_assert_no_inline_credential.py",
+      "source_location": "L144",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "scripts_test_assert_no_inline_credential_findoffenses",
+      "target": "scripts_test_assert_no_inline_credential_findoffenses_test_a_clean_file_has_no_offenses",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/test_assert_no_inline_credential.py",
+      "source_location": "L53",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "scripts_test_assert_no_inline_credential_findoffenses",
+      "target": "scripts_test_assert_no_inline_credential_findoffenses_test_angle_bracket_form_is_caught",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/test_assert_no_inline_credential.py",
+      "source_location": "L90",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "scripts_test_assert_no_inline_credential_findoffenses",
+      "target": "scripts_test_assert_no_inline_credential_findoffenses_test_ascii_ellipsis_form_is_caught",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/test_assert_no_inline_credential.py",
+      "source_location": "L65",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "scripts_test_assert_no_inline_credential_findoffenses",
+      "target": "scripts_test_assert_no_inline_credential_findoffenses_test_ellipsis_form_is_caught",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/test_assert_no_inline_credential.py",
+      "source_location": "L75",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "scripts_test_assert_no_inline_credential_findoffenses",
+      "target": "scripts_test_assert_no_inline_credential_findoffenses_test_ellipsis_form_with_trailing_comment_is_caught",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/test_assert_no_inline_credential.py",
+      "source_location": "L125",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "scripts_test_assert_no_inline_credential_findoffenses",
+      "target": "scripts_test_assert_no_inline_credential_findoffenses_test_non_credential_export_is_not_flagged",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/test_assert_no_inline_credential.py",
+      "source_location": "L105",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "scripts_test_assert_no_inline_credential_findoffenses",
+      "target": "scripts_test_assert_no_inline_credential_findoffenses_test_printf_salt_ellipsis_is_caught",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/test_assert_no_inline_credential.py",
+      "source_location": "L96",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "scripts_test_assert_no_inline_credential_findoffenses",
+      "target": "scripts_test_assert_no_inline_credential_findoffenses_test_printf_salt_placeholder_is_caught",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/test_assert_no_inline_credential.py",
+      "source_location": "L114",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "scripts_test_assert_no_inline_credential_findoffenses",
+      "target": "scripts_test_assert_no_inline_credential_findoffenses_test_printf_smtp_password_placeholder_is_caught",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/test_assert_no_inline_credential.py",
+      "source_location": "L134",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "scripts_test_assert_no_inline_credential_findoffenses",
+      "target": "scripts_test_assert_no_inline_credential_findoffenses_test_the_safe_read_pattern_is_not_flagged",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/test_assert_no_inline_credential.py",
+      "source_location": "L66",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "scripts_test_assert_no_inline_credential_rationale_66",
+      "target": "scripts_test_assert_no_inline_credential_findoffenses_test_ellipsis_form_is_caught",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/test_assert_no_inline_credential.py",
+      "source_location": "L76",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "scripts_test_assert_no_inline_credential_rationale_76",
+      "target": "scripts_test_assert_no_inline_credential_findoffenses_test_ellipsis_form_with_trailing_comment_is_caught",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/test_assert_no_inline_credential.py",
+      "source_location": "L106",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "scripts_test_assert_no_inline_credential_rationale_106",
+      "target": "scripts_test_assert_no_inline_credential_findoffenses_test_printf_salt_ellipsis_is_caught",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/test_assert_no_inline_credential.py",
+      "source_location": "L115",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "scripts_test_assert_no_inline_credential_rationale_115",
+      "target": "scripts_test_assert_no_inline_credential_findoffenses_test_printf_smtp_password_placeholder_is_caught",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/test_assert_no_inline_credential.py",
+      "source_location": "L126",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "scripts_test_assert_no_inline_credential_rationale_126",
+      "target": "scripts_test_assert_no_inline_credential_findoffenses_test_non_credential_export_is_not_flagged",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/test_assert_no_inline_credential.py",
+      "source_location": "L151",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "scripts_test_assert_no_inline_credential_main",
+      "target": "scripts_test_assert_no_inline_credential_main_test_a_missing_file_exits_one",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/test_assert_no_inline_credential.py",
+      "source_location": "L157",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "scripts_test_assert_no_inline_credential_main",
+      "target": "scripts_test_assert_no_inline_credential_main_test_clean_file_exits_zero",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/test_assert_no_inline_credential.py",
+      "source_location": "L154",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "scripts_test_assert_no_inline_credential_main",
+      "target": "scripts_test_assert_no_inline_credential_main_test_no_files_given_exits_two",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/test_assert_no_inline_credential.py",
+      "source_location": "L162",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "scripts_test_assert_no_inline_credential_main",
+      "target": "scripts_test_assert_no_inline_credential_main_test_offending_file_exits_one",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": ".github/workflows/infra-ci.yml",
+      "source": "github_workflows_infra_ci_yml",
+      "target": "ghost_platform_tenant_pkg"
     }
   ],
   "hyperedges": [
+    {
+      "id": "tenant_onboarding_flow",
+      "label": "Tenant Onboarding Flow",
+      "nodes": [
+        "runbook_bootstrap_md",
+        "github_workflows_infra_ci_yml",
+        "pulumi_stack"
+      ],
+      "relation": "participate_in",
+      "confidence": "EXTRACTED",
+      "confidence_score": 0.95,
+      "source_file": "RUNBOOK-bootstrap.md"
+    },
     {
       "id": "dependency_management_strategy",
       "label": "Dependency Management Strategy",
@@ -6463,5 +7427,5 @@
       "source_file": ".github/dependabot.yml"
     }
   ],
-  "built_at_commit": "77372cc4062d6b0ee892381699ef0878e94c77a0"
+  "built_at_commit": "da19d89cb237e1a475486419fc1b3757b65abf93"
 }
