@@ -126,33 +126,6 @@
       "scripts_test_assert_no_committed_pulumi_secrets_rationale_84"
     ],
     "4": [
-      "scripts_test_generate_tenant_repo",
-      "scripts_test_generate_tenant_repo_copy_repo",
-      "scripts_test_generate_tenant_repo_generate",
-      "scripts_test_generate_tenant_repo_generate_test_a_failure_before_the_rename_leaves_a_re_runnable_tree",
-      "scripts_test_generate_tenant_repo_generate_test_a_listed_file_that_moved_refuses_rather_than_skipping",
-      "scripts_test_generate_tenant_repo_generate_test_a_missing_tenant_readme_refuses_rather_than_skipping",
-      "scripts_test_generate_tenant_repo_generate_test_a_placeholder_in_a_markdown_heading_is_not_mistaken_for_a_comment",
-      "scripts_test_generate_tenant_repo_generate_test_a_placeholder_in_an_unlisted_file_fails_generation",
-      "scripts_test_generate_tenant_repo_generate_test_a_reserved_slug_is_refused_before_anything_is_written",
-      "scripts_test_generate_tenant_repo_generate_test_generating_this_repos_own_tree_leaves_no_token",
-      "scripts_test_generate_tenant_repo_generate_test_template_only_artefacts_do_not_reach_a_tenant",
-      "scripts_test_generate_tenant_repo_generate_test_the_generated_claude_md_does_not_point_at_a_deleted_graph",
-      "scripts_test_generate_tenant_repo_generate_test_the_generated_repo_passes_its_own_ci",
-      "scripts_test_generate_tenant_repo_generate_test_the_pulumi_project_name_is_substituted",
-      "scripts_test_generate_tenant_repo_generate_test_the_tenant_readme_replaces_the_template_one",
-      "scripts_test_generate_tenant_repo_main",
-      "scripts_test_generate_tenant_repo_main_test_exit_one_on_a_refusal",
-      "scripts_test_generate_tenant_repo_main_test_exit_zero_on_a_clean_generation",
-      "scripts_test_generate_tenant_repo_py_path",
-      "scripts_test_generate_tenant_repo_rationale_1",
-      "scripts_test_generate_tenant_repo_rationale_149",
-      "scripts_test_generate_tenant_repo_substitutions",
-      "scripts_test_generate_tenant_repo_substitutions_test_project_name_is_the_slug_plus_infra",
-      "scripts_test_generate_tenant_repo_substitutions_test_tenant_name_is_the_bare_slug",
-      "scripts_test_generate_tenant_repo_tracked_files"
-    ],
-    "5": [
       "path",
       "scripts_assert_no_committed_pulumi_secrets",
       "scripts_assert_no_committed_pulumi_secrets_check",
@@ -177,7 +150,49 @@
       "scripts_assert_placeholders_substituted_rationale_158",
       "scripts_assert_placeholders_substituted_rationale_93"
     ],
+    "5": [
+      "scripts_test_generate_tenant_repo",
+      "scripts_test_generate_tenant_repo_component_accepts_battery",
+      "scripts_test_generate_tenant_repo_component_constants",
+      "scripts_test_generate_tenant_repo_component_installed",
+      "scripts_test_generate_tenant_repo_rationale_1",
+      "scripts_test_generate_tenant_repo_rationale_43",
+      "scripts_test_generate_tenant_repo_rationale_62",
+      "scripts_test_generate_tenant_repo_substitutions",
+      "scripts_test_generate_tenant_repo_substitutions_test_project_name_is_the_slug_plus_infra",
+      "scripts_test_generate_tenant_repo_substitutions_test_tenant_name_is_the_bare_slug",
+      "scripts_test_generate_tenant_repo_tracked_files",
+      "scripts_test_generate_tenant_repo_validateslug",
+      "scripts_test_generate_tenant_repo_validateslug_test_accepts_an_ordinary_slug",
+      "scripts_test_generate_tenant_repo_validateslug_test_bounds_match_the_installed_component",
+      "scripts_test_generate_tenant_repo_validateslug_test_charset_matches_the_installed_component_across_a_battery",
+      "scripts_test_generate_tenant_repo_validateslug_test_refuses_a_slug_past_the_mysql_identifier_bound",
+      "scripts_test_generate_tenant_repo_validateslug_test_refuses_a_trailing_hyphen_and_accepts_the_boundary",
+      "scripts_test_generate_tenant_repo_validateslug_test_refuses_every_reserved_stack_name",
+      "scripts_test_generate_tenant_repo_validateslug_test_refuses_uppercase_underscores_and_a_leading_digit"
+    ],
     "6": [
+      "scripts_test_generate_tenant_repo_copy_repo",
+      "scripts_test_generate_tenant_repo_generate",
+      "scripts_test_generate_tenant_repo_generate_test_a_failure_before_the_rename_leaves_a_re_runnable_tree",
+      "scripts_test_generate_tenant_repo_generate_test_a_listed_file_that_moved_refuses_rather_than_skipping",
+      "scripts_test_generate_tenant_repo_generate_test_a_missing_tenant_readme_refuses_rather_than_skipping",
+      "scripts_test_generate_tenant_repo_generate_test_a_placeholder_in_a_markdown_heading_is_not_mistaken_for_a_comment",
+      "scripts_test_generate_tenant_repo_generate_test_a_placeholder_in_an_unlisted_file_fails_generation",
+      "scripts_test_generate_tenant_repo_generate_test_a_reserved_slug_is_refused_before_anything_is_written",
+      "scripts_test_generate_tenant_repo_generate_test_generating_this_repos_own_tree_leaves_no_token",
+      "scripts_test_generate_tenant_repo_generate_test_template_only_artefacts_do_not_reach_a_tenant",
+      "scripts_test_generate_tenant_repo_generate_test_the_generated_claude_md_does_not_point_at_a_deleted_graph",
+      "scripts_test_generate_tenant_repo_generate_test_the_generated_repo_passes_its_own_ci",
+      "scripts_test_generate_tenant_repo_generate_test_the_pulumi_project_name_is_substituted",
+      "scripts_test_generate_tenant_repo_generate_test_the_tenant_readme_replaces_the_template_one",
+      "scripts_test_generate_tenant_repo_main",
+      "scripts_test_generate_tenant_repo_main_test_exit_one_on_a_refusal",
+      "scripts_test_generate_tenant_repo_main_test_exit_zero_on_a_clean_generation",
+      "scripts_test_generate_tenant_repo_py_path",
+      "scripts_test_generate_tenant_repo_rationale_254"
+    ],
+    "7": [
       "exception",
       "scripts_generate_tenant_repo",
       "scripts_generate_tenant_repo_apply_renames",
@@ -186,16 +201,16 @@
       "scripts_generate_tenant_repo_generateerror",
       "scripts_generate_tenant_repo_main",
       "scripts_generate_tenant_repo_py_path",
-      "scripts_generate_tenant_repo_rationale_118",
-      "scripts_generate_tenant_repo_rationale_151",
-      "scripts_generate_tenant_repo_rationale_223",
+      "scripts_generate_tenant_repo_rationale_127",
+      "scripts_generate_tenant_repo_rationale_160",
+      "scripts_generate_tenant_repo_rationale_232",
       "scripts_generate_tenant_repo_remove_template_only",
       "scripts_generate_tenant_repo_strip_template_only_blocks",
       "scripts_generate_tenant_repo_substitutions",
       "scripts_generate_tenant_repo_sweep",
       "scripts_generate_tenant_repo_validate_slug"
     ],
-    "7": [
+    "8": [
       "ref_branchleft_tsconfig_pulumi_json",
       "ref_branchleft_tsconfig_strict_1_json",
       "ref_claude",
@@ -210,7 +225,7 @@
       "tsconfig_extends",
       "tsconfig_include"
     ],
-    "8": [
+    "9": [
       "scripts_test_assert_no_committed_pulumi_secrets_exitstatus",
       "scripts_test_assert_no_committed_pulumi_secrets_exitstatus_run",
       "scripts_test_assert_no_committed_pulumi_secrets_exitstatus_test_a_clean_file_exits_zero",
@@ -224,16 +239,6 @@
       "scripts_test_assert_no_committed_pulumi_secrets_exitstatus_test_the_three_exit_statuses_are_distinct_and_avoid_argparse",
       "scripts_test_assert_no_committed_pulumi_secrets_rationale_138"
     ],
-    "9": [
-      "scripts_test_generate_tenant_repo_component_constants",
-      "scripts_test_generate_tenant_repo_rationale_39",
-      "scripts_test_generate_tenant_repo_validateslug",
-      "scripts_test_generate_tenant_repo_validateslug_test_accepts_an_ordinary_slug",
-      "scripts_test_generate_tenant_repo_validateslug_test_bounds_match_the_installed_component",
-      "scripts_test_generate_tenant_repo_validateslug_test_refuses_a_slug_past_the_mysql_identifier_bound",
-      "scripts_test_generate_tenant_repo_validateslug_test_refuses_every_reserved_stack_name",
-      "scripts_test_generate_tenant_repo_validateslug_test_refuses_uppercase_underscores_and_a_leading_digit"
-    ],
     "10": [
       "ghost_tenant_component",
       "github_workflows_infra_ci",
@@ -241,49 +246,54 @@
       "scripts_test_unit"
     ],
     "11": [
+      "github_dependabot_actions_updates",
+      "github_dependabot_config",
+      "github_dependabot_npm_updates"
+    ],
+    "12": [
       "branchleft_github_workflows_docs_lint",
       "github_workflows_docs_lint_docs_lint"
     ],
-    "12": [
+    "13": [
       "branchleft_standards_standards",
       "github_workflows_standards_standards"
     ],
-    "13": [
+    "14": [
       "ghost_platform_repo",
       "runbook_bootstrap"
     ],
-    "14": [
+    "15": [
       "hetzner_object_storage",
       "pulumi_stack"
     ],
-    "15": [
+    "16": [
       "branchleft_deploy"
     ],
-    "16": [
+    "17": [
       "claude_md"
     ],
-    "17": [
+    "18": [
       "github_workflows_graphify"
     ],
-    "18": [
+    "19": [
       "google_cloud_platform"
     ],
-    "19": [
+    "20": [
       "pattern"
     ],
-    "20": [
+    "21": [
       "pre_commit_config_yaml"
     ],
-    "21": [
+    "22": [
       "pulumi_yaml"
     ],
-    "22": [
+    "23": [
       "readme_md"
     ],
-    "23": [
+    "24": [
       "readme_tenant_md"
     ],
-    "24": [
+    "25": [
       "scripts_assert_placeholders_substituted_py_path"
     ]
   },
@@ -292,14 +302,14 @@
     "1": 0.06896551724137931,
     "2": 0.08,
     "3": 0.12666666666666668,
-    "4": 0.17666666666666667,
-    "5": 0.19367588932806323,
-    "6": 0.2833333333333333,
-    "7": 0.15384615384615385,
-    "8": 0.2727272727272727,
-    "9": 0.25,
+    "4": 0.19367588932806323,
+    "5": 0.1286549707602339,
+    "6": 0.2573099415204678,
+    "7": 0.2833333333333333,
+    "8": 0.15384615384615385,
+    "9": 0.2727272727272727,
     "10": 0.5,
-    "11": 1.0,
+    "11": 0.6666666666666666,
     "12": 1.0,
     "13": 1.0,
     "14": 1.0,
@@ -312,7 +322,8 @@
     "21": 1.0,
     "22": 1.0,
     "23": 1.0,
-    "24": 1.0
+    "24": 1.0,
+    "25": 1.0
   },
   "gods": [
     {
@@ -351,6 +362,11 @@
       "degree": 8
     },
     {
+      "id": "scripts_test_generate_tenant_repo_validateslug",
+      "label": "ValidateSlug",
+      "degree": 8
+    },
+    {
       "id": "scripts_assert_no_committed_pulumi_secrets_self_test",
       "label": "_self_test()",
       "degree": 7
@@ -359,14 +375,21 @@
       "id": "scripts_test_assert_no_committed_pulumi_secrets_matcherdoesnotcrywolf",
       "label": "MatcherDoesNotCryWolf",
       "degree": 7
-    },
-    {
-      "id": "scripts_test_generate_tenant_repo_validateslug",
-      "label": "ValidateSlug",
-      "degree": 6
     }
   ],
-  "surprises": [],
+  "surprises": [
+    {
+      "source": "copy_repo()",
+      "target": "tracked_files()",
+      "source_files": [
+        "scripts/test_generate_tenant_repo.py",
+        "scripts/test_generate_tenant_repo.py"
+      ],
+      "confidence": "EXTRACTED",
+      "relation": "calls",
+      "note": "Bridges community 5 \u2192 community 6"
+    }
+  ],
   "tokens": {
     "input": 0,
     "output": 0
