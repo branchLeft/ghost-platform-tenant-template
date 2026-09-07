@@ -27,13 +27,25 @@ into it — after which the stack's checkpoint and its own config disagree about
 which key its secrets are under, and nothing says so until a deploy fails to
 decrypt them.
 
-```bash
-export PULUMI_CONFIG_PASSPHRASE='<the escrowed value, decrypted>'
-export AWS_ACCESS_KEY_ID='<Hetzner S3 access key id>'
-export AWS_SECRET_ACCESS_KEY='<Hetzner S3 secret access key>'
-pulumi login "$(gh variable get PULUMI_BACKEND_URL --repo branchLeft/<generated-repo>)"
+Run each `read` below on its own — paste that one line, then type or paste
+the value at the prompt it shows. Never `export VAR='value'` with the value
+written in: that line is what your shell just wrote, verbatim, to its own
+history file.
 
-printf '\nencryptionsalt: %s\n' '<this stack's salt>' >> Pulumi.<slug>.yaml
+```bash
+printf 'PULUMI_CONFIG_PASSPHRASE (the escrowed value, decrypted): '; read -rs PULUMI_CONFIG_PASSPHRASE; echo; export PULUMI_CONFIG_PASSPHRASE
+```
+
+```bash
+printf 'AWS_ACCESS_KEY_ID (Hetzner S3 access key id): '; read -rs AWS_ACCESS_KEY_ID; echo; export AWS_ACCESS_KEY_ID
+```
+
+```bash
+printf 'AWS_SECRET_ACCESS_KEY (Hetzner S3 secret access key): '; read -rs AWS_SECRET_ACCESS_KEY; echo; export AWS_SECRET_ACCESS_KEY
+```
+
+```bash
+pulumi login "$(gh variable get PULUMI_BACKEND_URL --repo branchLeft/<generated-repo>)"
 ```
 
 The salt is in this repo's `PULUMI_ENCRYPTION_SALT` environment secret, which is
@@ -42,6 +54,19 @@ write-only. If you no longer hold a copy, read it back out of the checkpoint:
 ```bash
 pulumi stack export --stack <slug> \
   | python3 -c 'import json,sys; print(json.load(sys.stdin)["deployment"]["secrets_providers"]["state"]["salt"])'
+```
+
+Read it into a variable rather than typing it straight into the `printf` below —
+the `read` line has to be pasted alone, same as the credentials above:
+
+```bash
+printf "this stack's salt: "; read -rs STACK_SALT; echo
+```
+
+Then append it, and drop the variable once it is written:
+
+```bash
+printf '\nencryptionsalt: %s\n' "$STACK_SALT" >> Pulumi.<slug>.yaml && unset STACK_SALT
 ```
 
 Then:

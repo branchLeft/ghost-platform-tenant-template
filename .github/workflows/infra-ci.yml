@@ -184,6 +184,14 @@ jobs:
           python3 scripts/assert-no-committed-pulumi-secrets.py --self-test
           python3 scripts/assert-no-committed-pulumi-secrets.py --scan-tree .
 
+      # Every tracked markdown file, not a fixed list -- a runbook added
+      # later is covered without this workflow needing an edit. Catches an
+      # `export CREDENTIAL=<placeholder>` or `printf`-into-a-credential-field
+      # paste-and-run instruction in either placeholder shape this estate has
+      # actually shipped, `<...>` and the Unicode ellipsis (`…`).
+      - name: Refuse an inline credential in a runbook
+        run: python3 scripts/assert-no-inline-credential.py $(git ls-files '*.md')
+
   deploy:
     name: Deploy
     runs-on: ubuntu-latest
