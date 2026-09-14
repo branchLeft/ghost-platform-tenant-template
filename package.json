@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "@branchleft/ghost-platform-tenant": "4.0.0",
-    "@pulumi/pulumi": "^3.255.0"
+    "@pulumi/pulumi": "^3.262.0"
   },
   "devDependencies": {
     "@branchleft/prettier-config": "^0.3.1",
