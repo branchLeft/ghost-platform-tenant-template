@@ -76,6 +76,7 @@ jobs:
   typecheck:
     name: Type check
     runs-on: ubuntu-latest
+    timeout-minutes: 10
 
     steps:
       - name: Checkout
@@ -163,6 +164,7 @@ jobs:
   secret-guard:
     name: Committed-secret guard
     runs-on: ubuntu-latest
+    timeout-minutes: 10
 
     steps:
       - name: Checkout
@@ -196,6 +198,15 @@ jobs:
     name: Deploy
     runs-on: ubuntu-latest
     needs: [typecheck]
+
+    # Not a contradiction of `cancel-in-progress: false` below: that refuses a
+    # cancel from a NEWER run, this bounds a run that has stopped progressing.
+    # Waiting on the `production` environment's reviewer does not count toward
+    # it, so this bounds execution time alone.
+    #
+    # If it fires mid-apply the stack lock survives, and every later deploy for
+    # this tenant fails at preview until it is cleared by hand on the stack.
+    timeout-minutes: 30
 
     # `!= true`, not `== false` -- see the type-check job's placeholder-guard
     # comment above for why an absent/null `is_template` must fail open into
