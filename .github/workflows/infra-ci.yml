@@ -198,6 +198,27 @@ jobs:
     name: Deploy
     runs-on: ubuntu-latest
     needs: [typecheck]
+
+    # Reads as a contradiction of the `cancel-in-progress: false` comment
+    # further down, and is not one. That comment refuses a cancel triggered by a
+    # *newer* run, which would interrupt a healthy apply for no reason. This
+    # bounds a run that has stopped making progress -- which holds the same
+    # stack lock and the same concurrency slot either way -- at 30 minutes
+    # rather than at GitHub's 360-minute default.
+    #
+    # 30 is roughly ten times the plausible worst case: this stack declares no
+    # cloud resources, so `pulumi up` renders configuration rather than waiting
+    # on any provider, and the host step pins a digest and restarts one unit.
+    # Time spent waiting on the `production` environment's required reviewer is
+    # not counted against this bound -- measured on an apply job elsewhere in
+    # this estate carrying the same value, which sat 42 hours in the approval
+    # queue and then ran -- so what is bounded here is execution time alone.
+    #
+    # If it ever does fire mid-apply, the stack lock survives the cancelled run
+    # and every later deploy for this tenant fails at `pulumi preview` until
+    # `pulumi cancel` is run by hand against this stack. That recovery is the
+    # accepted cost of bounding the job; the unbounded default buys the same
+    # recovery after six hours instead of thirty minutes.
     timeout-minutes: 30
 
     # `!= true`, not `== false` -- see the type-check job's placeholder-guard
