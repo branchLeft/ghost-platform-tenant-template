@@ -76,6 +76,7 @@ jobs:
   typecheck:
     name: Type check
     runs-on: ubuntu-latest
+    timeout-minutes: 10
 
     steps:
       - name: Checkout
@@ -163,6 +164,7 @@ jobs:
   secret-guard:
     name: Committed-secret guard
     runs-on: ubuntu-latest
+    timeout-minutes: 10
 
     steps:
       - name: Checkout
@@ -196,6 +198,7 @@ jobs:
     name: Deploy
     runs-on: ubuntu-latest
     needs: [typecheck]
+    timeout-minutes: 30
 
     # `!= true`, not `== false` -- see the type-check job's placeholder-guard
     # comment above for why an absent/null `is_template` must fail open into
