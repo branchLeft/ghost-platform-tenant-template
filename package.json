@@ -1,6 +1,7 @@
 {
   "name": "ghost-platform-tenant",
   "private": true,
+  "license": "SEE LICENSE IN LICENSE",
   "main": "index.ts",
   "prettier": "@branchleft/prettier-config",
   "scripts": {
