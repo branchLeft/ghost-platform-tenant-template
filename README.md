@@ -284,5 +284,5 @@ scripts — is source-available under the [PolyForm Shield License
 named in `TEMPLATE_ONLY_PATHS` or `SUBSTITUTED_FILES`, so `gh repo create
 --template` — which is what provisions a tenant repo, not this repo's own
 generator script — copies both, unchanged, into every repo generated from this
-template. Until Rob decides otherwise, a generated tenant repo therefore
-inherits the Shield licence via both files, byte for byte.
+template. Until the platform owner decides otherwise, a generated tenant repo
+therefore inherits the Shield licence via both files, byte for byte.
