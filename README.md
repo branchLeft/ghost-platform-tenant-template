@@ -275,3 +275,14 @@ python3 "$GUARD" --verify-coverage node_modules/@branchleft/ghost-platform-tenan
 `dist/index.js` beneath what it is given, so pointing it at `dist` asks for
 `dist/dist/index.js` and it reports a missing tree rather than a coverage
 result.
+
+## License
+
+This repo's own source — the template scaffolding, its Pulumi program and its
+scripts — is source-available under the [PolyForm Shield License
+1.0.0](LICENSE). Neither `LICENSE` nor `package.json`'s `license` field is
+named in `TEMPLATE_ONLY_PATHS` or `SUBSTITUTED_FILES`, so `gh repo create
+--template` — which is what provisions a tenant repo, not this repo's own
+generator script — copies both, unchanged, into every repo generated from this
+template. Until Rob decides otherwise, a generated tenant repo therefore
+inherits the Shield licence via both files, byte for byte.
