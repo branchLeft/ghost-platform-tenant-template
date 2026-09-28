@@ -431,14 +431,27 @@ jobs:
           fi
 
           HEAD_OID="$(git rev-parse HEAD)"
-          CONTENT_B64="$(base64 -w0 pnpm-lock.yaml)"
+
+          # Written straight to a file, never captured into a shell variable
+          # that could then be handed to a command as one argv value or one
+          # env var: Linux caps a single argv/environ value at 128 KiB
+          # (MAX_ARG_STRLEN), and this repo's own pnpm-lock.yaml will cross
+          # that once it names enough dependencies -- it's ~84 KB of base64
+          # today. `base64 -w0` still ends its output with one trailing
+          # newline; left in, that newline would land inside the JSON string
+          # below as literal (invalid) base64. Stripped by jq's `rtrimstr`
+          # on the value it reads back out of the file, not by a second
+          # shell command substitution -- that would put the whole string
+          # back on this job's own argv/environ, the exact thing this
+          # rewrite exists to avoid.
+          base64 -w0 pnpm-lock.yaml > "$RUNNER_TEMP/pnpm-lock.b64"
 
           # shellcheck disable=SC2016
           # Single-quoted deliberately: every `$name` below is a GraphQL
-          # variable reference for `gh api graphql` to substitute via the
-          # `-f` flags after it, not a shell variable -- double-quoting
-          # this would have the shell expand them to nothing before gh ever
-          # saw the query.
+          # variable reference for the request body's own `variables` object
+          # to fill in, not a shell variable -- double-quoting this would
+          # have the shell expand them to nothing before the query was ever
+          # sent.
           QUERY='mutation($repo: String!, $branch: String!, $headline: String!, $content: Base64String!, $oid: GitObjectID!) {
             createCommitOnBranch(input: {
               branch: {repositoryNameWithOwner: $repo, branchName: $branch}
@@ -453,13 +466,34 @@ jobs:
             }
           }'
 
-          RESPONSE="$(gh api graphql \
-            -f query="$QUERY" \
-            -f repo="$REPO" \
-            -f branch="$BRANCH" \
-            -f headline="ci: generate pnpm-lock.yaml, remove package-lock.json" \
-            -f content="$CONTENT_B64" \
-            -f oid="$HEAD_OID")"
+          # The whole request -- query and variables together -- is built
+          # into a file and sent with `--input`, never as `-f`/`-F` fields on
+          # `gh`'s own command line: those go through `gh`'s argv exactly
+          # like any other subprocess call, so passing the base64 content
+          # that way would only move the 128 KiB problem from `git`/`push`
+          # onto `gh` instead of fixing it. `--rawfile` reads
+          # `pnpm-lock.b64`'s bytes directly into the `content` variable;
+          # `jq` never receives them as a command-line argument or an
+          # environment variable either.
+          jq -n \
+            --arg query "$QUERY" \
+            --arg repo "$REPO" \
+            --arg branch "$BRANCH" \
+            --arg headline "ci: generate pnpm-lock.yaml, remove package-lock.json" \
+            --rawfile content "$RUNNER_TEMP/pnpm-lock.b64" \
+            --arg oid "$HEAD_OID" \
+            '{
+              query: $query,
+              variables: {
+                repo: $repo,
+                branch: $branch,
+                headline: $headline,
+                content: ($content | rtrimstr("\n")),
+                oid: $oid
+              }
+            }' > "$RUNNER_TEMP/graphql-request.json"
+
+          RESPONSE="$(gh api graphql --input "$RUNNER_TEMP/graphql-request.json")"
 
           NEW_OID="$(printf '%s' "$RESPONSE" | jq -r '.data.createCommitOnBranch.commit.oid // empty')"
           if [ -z "$NEW_OID" ]; then
