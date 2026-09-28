@@ -1,16 +1,15 @@
 name: Generate pnpm lockfile in CI
 
-# Owner ruling (branchLeft/workspace#620, comment 5859923259): make a
-# lockfile in CI with the workflow's own token, not a personal one. This
-# repo depends on private `@branchleft/*` GitHub Packages packages
-# (`ghost-platform-tenant`, `prettier-config`, `tsconfig`), and a workstation
-# with no GitHub Packages read credential cannot authenticate the registry
-# read `pnpm import`/`pnpm install` needs to produce `pnpm-lock.yaml` --
-# there is nothing to seed a lockfile from locally. This is the pnpm variant
-# of `branchLeft/ghost-platform`'s `generate-lockfile.yml` (PR
-# branchLeft/ghost-platform#287): same trigger, same isolation, same guards,
-# adapted for a single root package and a pnpm lockfile instead of an npm
-# one in a `services/*`/`adapters/*` subdirectory.
+# Makes a lockfile in CI with the workflow's own token, rather than a
+# personal one. This repo depends on private `@branchleft/*` GitHub Packages
+# packages (`ghost-platform-tenant`, `prettier-config`, `tsconfig`), and a
+# workstation with no GitHub Packages read credential cannot authenticate
+# the registry read `pnpm import`/`pnpm install` needs to produce
+# `pnpm-lock.yaml` -- there is nothing to seed a lockfile from locally. This
+# workflow follows the same trigger, isolation and guard shape as this
+# org's other CI-side npm-lockfile generator, adapted for a single root
+# package and a pnpm lockfile instead of an npm one in a package
+# subdirectory.
 #
 # `workflow_dispatch` only, never `push` or `pull_request`, and certainly
 # never `pull_request_target`: the `generate` job holds `contents: write`
@@ -204,8 +203,14 @@ jobs:
       # `pnpm import` seeds `pnpm-lock.yaml` from `package-lock.json`'s own
       # already-resolved versions; the `pnpm install --lockfile-only` after
       # it is pnpm's normal lockfile finalisation, not a fresh resolution --
-      # together they are conversion, not an upgrade. Nothing here runs a
-      # lifecycle script and nothing here installs to `node_modules`.
+      # together they are conversion, not an upgrade. `pnpm install
+      # --lockfile-only` takes `--ignore-scripts`, matching the isolation
+      # above rather than substituting for it: registry metadata alone can't
+      # run code, but nothing here forces that to stay true forever. `pnpm
+      # import` does not take that flag -- it only ever reads and rewrites a
+      # lockfile file, touching no `node_modules` and running no install, so
+      # there is no script for it to ignore (pnpm itself refuses the flag on
+      # this subcommand: `Unknown option: 'ignore-scripts'`).
       - name: Generate pnpm-lock.yaml in an isolated directory
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -217,7 +222,7 @@ jobs:
           cp package-lock.json "$WORKDIR/package-lock.json"
           printf '@branchleft:registry=https://npm.pkg.github.com\n' > "$WORKDIR/.npmrc"
           (cd "$WORKDIR" && pnpm import)
-          (cd "$WORKDIR" && pnpm install --lockfile-only)
+          (cd "$WORKDIR" && pnpm install --lockfile-only --ignore-scripts)
           cp "$WORKDIR/pnpm-lock.yaml" "$GITHUB_WORKSPACE/generated-pnpm-lock.yaml"
 
       # The one gate between "pnpm resolved something" and a commit: every
@@ -232,10 +237,27 @@ jobs:
       # dispatched, and a script has to exist on that branch to be `run:`
       # from it -- this way there is nothing for an arbitrary target branch
       # to be missing or to have tampered with.
+      #
+      # A structural parse of the `packages:` block, not a single regex that
+      # tries to both find a key line and split it in one pattern: pnpm's
+      # own lockfile writer emits every package as its own line at exactly
+      # 2-space indent, "<key>:" (the key optionally single-quoted),
+      # followed by its resolution at deeper indent. This classifies the
+      # LINE first (exactly 2 spaces, ends in a bare ':'), then splits name
+      # from version separately -- the earlier version of this check folded
+      # both into one regex whose name group excluded a leading
+      # quote-then-'@', which silently dropped every scoped package (pnpm
+      # always quotes a scoped key: '@scope/name@x.y.z':), including every
+      # @branchleft/* package this workflow exists to protect, while still
+      # printing a clean "OK". A full YAML parser (PyYAML) was considered
+      # and rejected: it needs `pip install` on the runner, and GitHub's
+      # `ubuntu-latest` Python has, at times, refused a plain `pip install`
+      # as an externally-managed environment -- a dependency this guard
+      # does not need to carry.
       - name: Refuse a version pnpm resolved that package-lock.json did not lock
         run: |
           python3 - "package-lock.json" "generated-pnpm-lock.yaml" <<'PYEOF'
-          import json, re, sys
+          import json, sys
 
           npm_path, pnpm_path = sys.argv[1], sys.argv[2]
 
@@ -254,23 +276,40 @@ jobs:
               print(f"::error::{npm_path} named no packages; refusing to trust an empty comparison")
               sys.exit(1)
 
-          entry_re = re.compile(r"^  '?([^@'][^']*?)@([^:'\s]+)'?:\s*$")
           pnpm_versions = {}
           in_packages = False
-          with open(pnpm_path, encoding="utf-8") as f:
-              for line in f:
-                  stripped = line.rstrip("\n")
-                  if stripped == "packages:":
-                      in_packages = True
-                      continue
-                  if in_packages:
-                      if stripped and not stripped.startswith(" "):
-                          break
-                      if not stripped.strip():
-                          continue
-                      m = entry_re.match(stripped)
-                      if m:
-                          pnpm_versions[m.group(1)] = m.group(2)
+          for raw_line in open(pnpm_path, encoding="utf-8"):
+              line = raw_line.rstrip("\n")
+              if line == "packages:":
+                  in_packages = True
+                  continue
+              if not in_packages:
+                  continue
+              if line and not line.startswith(" "):
+                  break  # a new top-level section (snapshots:), or EOF
+              if not line.strip():
+                  continue
+              if not line.startswith("  ") or line.startswith("   "):
+                  continue  # not an exactly-2-space top-level key line
+              key_part = line[2:]
+              if not key_part.endswith(":"):
+                  continue
+              key = key_part[:-1]
+              if len(key) >= 2 and key[0] == "'" and key[-1] == "'":
+                  key = key[1:-1]
+              # Every packages: key is "<name>@<version>". A scoped name
+              # ("@scope/x") carries its own leading '@', so splitting at
+              # the RIGHTMOST '@' always isolates the version, scoped or
+              # not -- verified against a real pnpm-lock.yaml naming
+              # @types/node and an npm: alias, where the resolved
+              # package's own key is still plain "<name>@<version>",
+              # never the alias's spelling (pnpm records an alias only in
+              # importers:, which this does not read).
+              name, sep, version = key.rpartition("@")
+              if not sep or not name or not version:
+                  print(f"::error::could not parse a name/version out of pnpm-lock.yaml package key {key!r}")
+                  sys.exit(2)
+              pnpm_versions[name] = version
 
           if not pnpm_versions:
               print(f"::error::{pnpm_path} named no packages; refusing to trust an empty comparison")
