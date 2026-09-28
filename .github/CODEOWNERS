@@ -5,7 +5,14 @@
 # the tree: the reviewer account, plus the admin team so Rob's own approval
 # path is unchanged.
 #
-# The shared line above stays. SYNC-1 is `contains`, not `identical`: a repo may
-# add to this file and may never drop a shared line, and rewriting that line in
-# place is dropping it.
+# The shared line above stays. SYNC-1 is `suffix` for this file: GitHub applies
+# the LAST matching pattern, so the shared escape-hatch lines below have to stay
+# the final lines here, not merely present -- a repo may add its own patterns
+# above them but never after or between them.
 * @reviewer-agent-branchLeft @branchLeft/branchleft-admin
+
+/.standardsignore        @branchLeft/branchleft-admin
+/.standards.mode         @branchLeft/branchleft-admin
+/.docs-lint*             @branchLeft/branchleft-admin
+/tools/floors.tsv        @branchLeft/branchleft-admin
+/.github/                @branchLeft/branchleft-admin
