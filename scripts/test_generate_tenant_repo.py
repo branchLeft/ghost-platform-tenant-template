@@ -174,7 +174,7 @@ class ValidateSlug(unittest.TestCase):
         # draft of this test passed against the wrong value.
         constants = component_constants()
         if constants is None:
-            self.skipTest("component not installed or node unavailable; run npm ci")
+            self.skipTest("component not installed or node unavailable; run pnpm install --frozen-lockfile")
         self.assertEqual(
             sorted(constants["reserved"]),
             sorted(module.RESERVED_SLUGS),
@@ -196,7 +196,7 @@ class ValidateSlug(unittest.TestCase):
         slugs = [slug for slug, _ in CHARSET_BATTERY]
         accepted = component_accepts_battery(slugs)
         if accepted is None:
-            self.skipTest("component not installed or node unavailable; run npm ci")
+            self.skipTest("component not installed or node unavailable; run pnpm install --frozen-lockfile")
         for (slug, expected), component_accepted in zip(CHARSET_BATTERY, accepted):
             with self.subTest(slug=slug):
                 self.assertEqual(

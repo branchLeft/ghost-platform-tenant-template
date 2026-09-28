@@ -178,21 +178,27 @@ what the environment buys, and it is still the property that matters.
 public key, and publishing it is what pinning means. The deploy job refuses
 while it carries no key line.
 
-`npm ci` installs `@branchleft/ghost-platform-tenant` using the workflow run's
-own `GITHUB_TOKEN`. The package is public on GitHub Packages, but that registry
-rejects an unauthenticated request, so *any* valid token works — a generated
-repo holds no long-lived package-read credential, and none is copied into it.
+`pnpm install --frozen-lockfile` installs `@branchleft/ghost-platform-tenant`
+using the workflow run's own `GITHUB_TOKEN`. The package is public on GitHub
+Packages, but that registry rejects an unauthenticated request, so *any* valid
+token works — a generated repo holds no long-lived package-read credential,
+and none is copied into it.
 
 ## Running this locally
 
 ```bash
 git clone https://github.com/branchLeft/<generated-repo>.git
 cd <generated-repo>
-npm ci
+nvm use   # or: corepack enable
+pnpm install --frozen-lockfile
 npx tsc --noEmit          # type-check only, no credentials needed
 ```
 
-`npm ci` needs a GitHub PAT with `read:packages` scope (see `.npmrc`).
+`pnpm install` needs a GitHub PAT with `read:packages` scope (see `.npmrc`).
+Worktrees of this repo share pnpm's global content-addressable store
+(`~/Library/pnpm/store` by default), so a second worktree's install hard-links
+its dependencies from the first rather than downloading and copying them
+again — see this repo's `CLAUDE.md`.
 `pulumi preview`/`up` additionally need this stack's passphrase, its salt and the
 Object Storage credentials for the state backend — see `RUNBOOK-bootstrap.md`.
 
