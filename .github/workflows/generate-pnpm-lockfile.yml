@@ -11,17 +11,23 @@ name: Generate pnpm lockfile in CI
 # package and a pnpm lockfile instead of an npm one in a package
 # subdirectory.
 #
-# The commit this workflow pushes carries `github-actions[bot]` as its
-# author but is authenticated with `GITHUB_TOKEN`, and GitHub does not fire
-# `push`/`pull_request` events for a `GITHUB_TOKEN`-authenticated push --
-# a loop-prevention rule, not a bug. A pull request already open on the
-# target branch does not pick up new required-check runs from this commit
-# on its own; closing and reopening the PR (or pushing an ordinary commit
-# from a real account) is what starts CI against it.
+# The commit this workflow writes is made through the GitHub API
+# (`createCommitOnBranch`), not `git commit`/`git push` -- a raw push
+# produces a commit that is authored correctly but never signed, and a
+# `main` ruleset requiring signed commits refuses to merge anything built
+# on one, discovered when exactly that happened. GitHub signs every commit
+# this API makes, and the job reads that back and fails closed if it isn't
+# signed; see the `generate` job's last step. It is still
+# `GITHUB_TOKEN`-authenticated underneath, and GitHub does not fire
+# `push`/`pull_request` events for that -- a loop-prevention rule, not a
+# bug. A pull request already open on the target branch does not pick up
+# new required-check runs from this commit on its own; closing and
+# reopening the PR (or pushing an ordinary commit from a real account) is
+# what starts CI against it.
 #
 # `workflow_dispatch` only, never `push` or `pull_request`, and certainly
 # never `pull_request_target`: the `generate` job holds `contents: write`
-# and ends by pushing a commit, and a repository write is not something any
+# and ends by writing a commit, and a repository write is not something any
 # push or PR event should trigger on someone else's say-so. Dispatching it
 # is itself the authorisation -- a person with write access, acting in the
 # Actions tab (or `gh workflow run`) on this repository. `workflow_dispatch`
@@ -144,7 +150,7 @@ jobs:
           echo "OK: no ruleset rule currently applies to '$BRANCH'"
 
   generate:
-    name: Generate and push pnpm-lock.yaml
+    name: Generate and commit pnpm-lock.yaml
     needs: validate
     runs-on: ubuntu-latest
     timeout-minutes: 10
@@ -163,11 +169,11 @@ jobs:
       # says.
       #
       # `persist-credentials: false`: this job's token is `contents: write`,
-      # and `pnpm import`/`pnpm install` run before the one step that needs
-      # to push. The token is never in this job's git config while an
-      # install (reading a package.json and a branch-supplied .npmrc) runs
-      # -- it is added back, scoped to a single command, only in the push
-      # step below.
+      # and `pnpm import`/`pnpm install` run before anything that writes to
+      # the repository. The commit itself never goes through `git push` --
+      # it's submitted over the GitHub API, authenticated by `GH_TOKEN` in
+      # that one step's own environment -- so the token never needs to
+      # reach this checkout's git config at all.
       - name: Checkout target branch
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -384,10 +390,38 @@ jobs:
             exit 1
           fi
 
-      - name: Commit and push the lockfile swap, if it happened
+      # A `git commit` + `git push` here produces a commit GitHub does not
+      # sign: it's authored as `github-actions[bot]` but not GPG/SSH-signed,
+      # and a `main` ruleset requiring signed commits (this repo's does)
+      # refuses to merge anything built on one -- discovered the hard way,
+      # after this exact step generated `pnpm-lock.yaml` correctly and the
+      # PR carrying it still couldn't land. `createCommitOnBranch` is
+      # GitHub's own API for writing a commit; every commit it makes is
+      # signed by GitHub itself and verifies, because GitHub is both the
+      # author of the signature and the one checking it, the same way a
+      # web-UI edit or a squash-merge already does. Nothing here runs `git
+      # commit` or `git push` at all -- the working tree's `pnpm-lock.yaml`
+      # (already written by the isolated generation step) and the known
+      # deletion of `package-lock.json` are submitted as one GraphQL
+      # mutation instead.
+      #
+      # `expectedHeadOid` is this job's own `git rev-parse HEAD` -- the
+      # commit `validate` approved and this job checked out -- not a value
+      # read back from GitHub at this point in the job. GitHub rejects the
+      # mutation outright if the branch has moved past that commit by the
+      # time it runs, which is what the `concurrency` group above exists to
+      # make unlikely, and what this catches when it happens anyway.
+      #
+      # A commit this API produces still doesn't fire `push`/`pull_request`
+      # -- it's GITHUB_TOKEN-authenticated underneath the GraphQL call, the
+      # same loop-prevention rule the old `git push` hit. An open PR on the
+      # target branch still needs closing and reopening (or an ordinary
+      # commit) to pick up a new CI run.
+      - name: Commit the lockfile swap via the GitHub API, if it happened
         env:
           BRANCH: ${{ needs.validate.outputs.branch }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
         run: |
           set -euo pipefail
           CHANGE="$(git status --porcelain)"
@@ -396,23 +430,54 @@ jobs:
             exit 0
           fi
 
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add pnpm-lock.yaml package-lock.json
-          git commit -m "ci: generate pnpm-lock.yaml, remove package-lock.json"
+          HEAD_OID="$(git rev-parse HEAD)"
+          CONTENT_B64="$(base64 -w0 pnpm-lock.yaml)"
 
-          # Checkout ran with persist-credentials: false, so nothing has
-          # written this token to .git/config yet. `-c` scopes it to this
-          # one `git push` process only -- it never touches a file on disk,
-          # and no later step (or a lifecycle script, had one run earlier)
-          # can read it back out of the working tree's git config.
-          #
-          # `-w0`, not plain `base64`: GNU coreutils' base64 (this runner's
-          # default) wraps its output at 76 columns unless told not to,
-          # which puts a newline in the middle of the header value -- git
-          # then sends a malformed Authorization header and fails with
-          # "Failed sending HTTP request", not an authentication error, so
-          # the real cause doesn't show up in the failure it causes.
-          AUTH_HEADER="$(printf 'x-access-token:%s' "$GH_TOKEN" | base64 -w0)"
-          git -c http.https://github.com/.extraheader="AUTHORIZATION: basic $AUTH_HEADER" \
-            push origin "HEAD:refs/heads/$BRANCH"
+          # shellcheck disable=SC2016
+          # Single-quoted deliberately: every `$name` below is a GraphQL
+          # variable reference for `gh api graphql` to substitute via the
+          # `-f` flags after it, not a shell variable -- double-quoting
+          # this would have the shell expand them to nothing before gh ever
+          # saw the query.
+          QUERY='mutation($repo: String!, $branch: String!, $headline: String!, $content: Base64String!, $oid: GitObjectID!) {
+            createCommitOnBranch(input: {
+              branch: {repositoryNameWithOwner: $repo, branchName: $branch}
+              message: {headline: $headline}
+              fileChanges: {
+                additions: [{path: "pnpm-lock.yaml", contents: $content}]
+                deletions: [{path: "package-lock.json"}]
+              }
+              expectedHeadOid: $oid
+            }) {
+              commit { oid url }
+            }
+          }'
+
+          RESPONSE="$(gh api graphql \
+            -f query="$QUERY" \
+            -f repo="$REPO" \
+            -f branch="$BRANCH" \
+            -f headline="ci: generate pnpm-lock.yaml, remove package-lock.json" \
+            -f content="$CONTENT_B64" \
+            -f oid="$HEAD_OID")"
+
+          NEW_OID="$(printf '%s' "$RESPONSE" | jq -r '.data.createCommitOnBranch.commit.oid // empty')"
+          if [ -z "$NEW_OID" ]; then
+            echo "::error::createCommitOnBranch returned no commit oid; response: $RESPONSE"
+            exit 1
+          fi
+
+          # The one gate that matters: this step exists to make the commit
+          # signed, so it refuses to declare success on one that isn't --
+          # read back from the API rather than assumed from "the mutation
+          # didn't error", which proves only that GitHub accepted the
+          # write, not what it did with the signature.
+          VERIFICATION="$(gh api "repos/$REPO/commits/$NEW_OID")"
+          VERIFIED="$(printf '%s' "$VERIFICATION" | jq -r '.commit.verification.verified')"
+          if [ "$VERIFIED" != "true" ]; then
+            REASON="$(printf '%s' "$VERIFICATION" | jq -r '.commit.verification.reason')"
+            echo "::error::commit $NEW_OID is not signed (verification.verified=$VERIFIED, reason=$REASON) -- refusing to report success on an unsigned commit"
+            exit 1
+          fi
+
+          echo "OK: committed $NEW_OID, verification.verified=true"
