@@ -1,0 +1,14 @@
+# pnpm 11 blocks a dependency's build/postinstall scripts by default
+# (ERR_PNPM_IGNORED_BUILDS) unless named here. protobufjs's postinstall
+# (scripts/postinstall.js) only writes a stderr warning if a *dependent*
+# pinned it with the wrong semver-range character for its own recommended
+# scheme -- it builds nothing, generates nothing, and this program's
+# typecheck and Pulumi runtime read none of its output. Read from the
+# published package before excluding it, not assumed.
+#
+# `false`, not omission: an entry here is the recorded decision either way
+# (`pnpm approve-builds` writes this file), so a reviewer can see the
+# dependency was considered and refused, rather than wondering whether it
+# was simply missed.
+allowBuilds:
+  protobufjs: false

@@ -1,0 +1,517 @@
+name: Generate pnpm lockfile in CI
+
+# Makes a lockfile in CI with the workflow's own token, rather than a
+# personal one. This repo depends on private `@branchleft/*` GitHub Packages
+# packages (`ghost-platform-tenant`, `prettier-config`, `tsconfig`), and a
+# workstation with no GitHub Packages read credential cannot authenticate
+# the registry read `pnpm import`/`pnpm install` needs to produce
+# `pnpm-lock.yaml` -- there is nothing to seed a lockfile from locally. This
+# workflow follows the same trigger, isolation and guard shape as this
+# org's other CI-side npm-lockfile generator, adapted for a single root
+# package and a pnpm lockfile instead of an npm one in a package
+# subdirectory.
+#
+# The commit this workflow writes is made through the GitHub API
+# (`createCommitOnBranch`), not `git commit`/`git push` -- a raw push
+# produces a commit that is authored correctly but never signed, and a
+# `main` ruleset requiring signed commits refuses to merge anything built
+# on one, discovered when exactly that happened. GitHub signs every commit
+# this API makes, and the job reads that back and fails closed if it isn't
+# signed; see the `generate` job's last step. It is still
+# `GITHUB_TOKEN`-authenticated underneath, and GitHub does not fire
+# `push`/`pull_request` events for that -- a loop-prevention rule, not a
+# bug. A pull request already open on the target branch does not pick up
+# new required-check runs from this commit on its own; closing and
+# reopening the PR (or pushing an ordinary commit from a real account) is
+# what starts CI against it.
+#
+# `workflow_dispatch` only, never `push` or `pull_request`, and certainly
+# never `pull_request_target`: the `generate` job holds `contents: write`
+# and ends by writing a commit, and a repository write is not something any
+# push or PR event should trigger on someone else's say-so. Dispatching it
+# is itself the authorisation -- a person with write access, acting in the
+# Actions tab (or `gh workflow run`) on this repository. `workflow_dispatch`
+# also only ever targets a ref that already lives in this repository; there
+# is no dispatch path that reaches a fork.
+#
+# Refuses `main` outright, and refuses any other branch a ruleset currently
+# protects, checked live rather than against a name hardcoded here -- so a
+# branch that becomes protected later is covered from the moment the
+# ruleset exists, not only once someone remembers to add it to a list here.
+on:
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: 'Branch (in this repository) to check out, generate pnpm-lock.yaml on, and push the commit to'
+        required: true
+
+# Deny by default; each job below states exactly what it needs.
+permissions: {}
+
+# One dispatch at a time per branch: two overlapping runs racing to commit
+# and push the same file would leave the loser's push rejected as
+# non-fast-forward, and there is no reason to allow the race in the first
+# place.
+concurrency:
+  group: generate-pnpm-lockfile-${{ inputs.branch }}
+  cancel-in-progress: false
+
+jobs:
+  validate:
+    name: Validate the branch and refuse a protected one
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    outputs:
+      branch: ${{ steps.shape.outputs.branch }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Validate branch shape and refuse main
+        id: shape
+        env:
+          BRANCH: ${{ inputs.branch }}
+        run: |
+          set -euo pipefail
+          fail() { echo "::error::$1"; exit 1; }
+
+          [ -n "$BRANCH" ] || fail "branch is empty"
+
+          # A qualified ref (e.g. `refs/heads/main`) passes the name check
+          # below (it's a valid ref-name string) and the live ruleset check
+          # below (that endpoint takes a short branch name, so a qualified
+          # form checks a ref that doesn't exist and comes back
+          # unprotected) -- but `actions/checkout` treats an already-
+          # qualified ref as literal, so `refs/heads/main` would check out
+          # `main` while this job believes it validated something else, and
+          # the later push would then write a new branch called
+          # `refs/heads/main` rather than touching `main` at all. Refused
+          # outright: every input here is a short branch name, never a
+          # qualified ref.
+          case "$BRANCH" in
+            refs/*)
+              fail "branch '$BRANCH' must be a short branch name, not a qualified ref -- pass 'main' style names, not 'refs/heads/...'"
+              ;;
+          esac
+
+          # A fixed refusal, ahead of and independent of the live ruleset
+          # check below: this workflow exists to unblock a feature branch's
+          # own lockfile, never to write to the branch every ruleset here
+          # protects, and that holds even if the ruleset check itself is
+          # ever misconfigured, rate-limited, or returns something this
+          # workflow doesn't recognise.
+          case "$BRANCH" in
+            main | master)
+              fail "branch '$BRANCH' is refused outright: this workflow pushes a commit, and main/master are never a target."
+              ;;
+          esac
+
+          # A conservative allow-list for a git ref name, not an attempt at
+          # the full git ref-name grammar: reject rather than guess at
+          # anything this doesn't recognise, since this value is about to be
+          # used as a checkout ref and a push refspec.
+          [[ "$BRANCH" =~ ^[A-Za-z0-9][A-Za-z0-9._/-]*$ ]] \
+            || fail "branch '$BRANCH' contains characters outside A-Za-z0-9._/- , or does not start with one of those -- refusing rather than passing it to git"
+          [[ "$BRANCH" != *..* ]] \
+            || fail "branch '$BRANCH' contains '..' -- not a well-formed ref name"
+          [[ "$BRANCH" != */ && "$BRANCH" != *.lock ]] \
+            || fail "branch '$BRANCH' is not a well-formed ref name"
+
+          echo "branch=$BRANCH" >> "$GITHUB_OUTPUT"
+
+      # `rules/branches/{branch}` is the live ruleset-evaluation endpoint --
+      # it answers with the rules that would apply to a push on that branch
+      # right now, for a branch name whether or not it currently exists, and
+      # (this repo is public) needs no elevated token permission to read.
+      # Any non-200 is treated the same as "protected": this job would
+      # rather block a legitimate branch than push to one it failed to prove
+      # is unprotected.
+      - name: Refuse a branch a ruleset currently protects
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BRANCH: ${{ steps.shape.outputs.branch }}
+          REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          if ! RULES_JSON="$(gh api "repos/$REPO/rules/branches/$BRANCH" 2>/tmp/rules-error.txt)"; then
+            echo "::error::could not read the ruleset rules that apply to '$BRANCH' ($(cat /tmp/rules-error.txt)); refusing rather than guessing whether it is protected"
+            exit 1
+          fi
+          RULE_COUNT="$(printf '%s' "$RULES_JSON" | jq 'length')"
+          if [ "$RULE_COUNT" -gt 0 ]; then
+            echo "::error::refusing '$BRANCH': $RULE_COUNT ruleset rule(s) currently apply to it. This workflow pushes a commit directly and never targets a branch a ruleset protects."
+            exit 1
+          fi
+          echo "OK: no ruleset rule currently applies to '$BRANCH'"
+
+  generate:
+    name: Generate and commit pnpm-lock.yaml
+    needs: validate
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+      packages: read
+
+    steps:
+      # Checks out the target branch directly -- not the ref this workflow
+      # was dispatched from. `ref:` is the qualified form, not the bare
+      # branch name `validate` produced: `actions/checkout` treats an
+      # already-qualified ref as literal and a bare name as ambiguous (it
+      # could resolve to a tag), and `validate` already refused any input
+      # starting with `refs/` itself, so qualifying it here is the only
+      # place this ref is assembled, and it always means the one thing it
+      # says.
+      #
+      # `persist-credentials: false`: this job's token is `contents: write`,
+      # and `pnpm import`/`pnpm install` run before anything that writes to
+      # the repository. The commit itself never goes through `git push` --
+      # it's submitted over the GitHub API, authenticated by `GH_TOKEN` in
+      # that one step's own environment -- so the token never needs to
+      # reach this checkout's git config at all.
+      - name: Checkout target branch
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: refs/heads/${{ needs.validate.outputs.branch }}
+          persist-credentials: false
+
+      - name: Confirm this branch has package.json, .nvmrc and package-lock.json
+        env:
+          BRANCH: ${{ needs.validate.outputs.branch }}
+        run: |
+          set -euo pipefail
+          for f in package.json .nvmrc package-lock.json; do
+            if [ ! -f "$f" ]; then
+              echo "::error::'$f' does not exist on branch '$BRANCH'"
+              exit 1
+            fi
+          done
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
+
+      - name: Setup Node
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version-file: .nvmrc
+          registry-url: https://npm.pkg.github.com
+          scope: '@branchleft'
+
+      # Generates in a copy under $RUNNER_TEMP, never in the checkout itself
+      # -- the checkout carries this branch's own committed `.npmrc`, and
+      # npm/pnpm's project-level config outranks the user-level config
+      # `setup-node` just wrote, in their own precedence order. A branch
+      # author's `.npmrc` could point `@branchleft:registry` at a foreign
+      # host paired with `_authToken=${NODE_AUTH_TOKEN}` and read this run's
+      # token straight out of the environment. The isolated directory gets
+      # only `package.json`, the existing `package-lock.json` (as the seed
+      # `pnpm import` reads) and a `.npmrc` this step writes itself, mapping
+      # the one scope this repo actually needs -- never the branch's own
+      # copy.
+      #
+      # `pnpm import` seeds `pnpm-lock.yaml` from `package-lock.json`'s own
+      # already-resolved versions; the `pnpm install --lockfile-only` after
+      # it is pnpm's normal lockfile finalisation, not a fresh resolution --
+      # together they are conversion, not an upgrade. `pnpm install
+      # --lockfile-only` takes `--ignore-scripts`, matching the isolation
+      # above rather than substituting for it: registry metadata alone can't
+      # run code, but nothing here forces that to stay true forever. `pnpm
+      # import` does not take that flag -- it only ever reads and rewrites a
+      # lockfile file, touching no `node_modules` and running no install, so
+      # there is no script for it to ignore (pnpm itself refuses the flag on
+      # this subcommand: `Unknown option: 'ignore-scripts'`).
+      - name: Generate pnpm-lock.yaml in an isolated directory
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          WORKDIR="$RUNNER_TEMP/pnpm-lockfile-generate"
+          mkdir -p "$WORKDIR"
+          cp package.json "$WORKDIR/package.json"
+          cp package-lock.json "$WORKDIR/package-lock.json"
+          printf '@branchleft:registry=https://npm.pkg.github.com\n' > "$WORKDIR/.npmrc"
+          (cd "$WORKDIR" && pnpm import)
+          (cd "$WORKDIR" && pnpm install --lockfile-only --ignore-scripts)
+          cp "$WORKDIR/pnpm-lock.yaml" "$GITHUB_WORKSPACE/generated-pnpm-lock.yaml"
+
+      # The one gate between "pnpm resolved something" and a commit: every
+      # package name package-lock.json and the freshly generated
+      # pnpm-lock.yaml both name must resolve to the same SET of versions.
+      # A name named by only one of the two is not itself a failure -- npm
+      # and pnpm can shape a dependency tree's entries differently (peer/
+      # optional dedup, platform-specific optional packages) without a
+      # version having moved -- but any name both agree on naming must
+      # agree on which version(s), or this refuses the commit. A set, not a
+      # single version: a name can be legitimately locked at more than one
+      # version at once, at different node_modules paths (npm) or as more
+      # than one packages: entry (pnpm), when two dependents each need a
+      # version the other can't share -- collapsing either side to "the"
+      # version and comparing scalars picks whichever instance the parse
+      # happened to see last, which flags a genuine duplicate as a false
+      # mismatch (seen on a real dispatch: @opentelemetry/sdk-trace,
+      # minipass and spdx-expression-parse, each legitimately locked at two
+      # versions, were each refused as if only one had been kept). Inline
+      # rather than a committed script: this job runs against whatever
+      # branch was dispatched, and a script has to exist on that branch to
+      # be `run:` from it -- this way there is nothing for an arbitrary
+      # target branch to be missing or to have tampered with.
+      #
+      # A structural parse of the `packages:` block, not a single regex that
+      # tries to both find a key line and split it in one pattern: pnpm's
+      # own lockfile writer emits every package as its own line at exactly
+      # 2-space indent, "<key>:" (the key optionally single-quoted),
+      # followed by its resolution at deeper indent. This classifies the
+      # LINE first (exactly 2 spaces, ends in a bare ':'), then splits name
+      # from version separately -- an earlier version of this check folded
+      # both into one regex whose name group excluded a leading
+      # quote-then-'@', which silently dropped every scoped package (pnpm
+      # always quotes a scoped key: '@scope/name@x.y.z':), including every
+      # @branchleft/* package this workflow exists to protect, while still
+      # printing a clean "OK". A full YAML parser (PyYAML) was considered
+      # and rejected: it needs `pip install` on the runner, and GitHub's
+      # `ubuntu-latest` Python has, at times, refused a plain `pip install`
+      # as an externally-managed environment -- a dependency this guard
+      # does not need to carry.
+      - name: Refuse a version pnpm resolved that package-lock.json did not lock
+        run: |
+          python3 - "package-lock.json" "generated-pnpm-lock.yaml" <<'PYEOF'
+          import json, sys
+
+          npm_path, pnpm_path = sys.argv[1], sys.argv[2]
+
+          with open(npm_path, encoding="utf-8") as f:
+              npm_data = json.load(f)
+          npm_versions = {}
+          for key, meta in npm_data.get("packages", {}).items():
+              if key == "" or "node_modules/" not in key:
+                  continue
+              tail = key.rsplit("node_modules/", 1)[1]
+              version = meta.get("version")
+              if version:
+                  npm_versions.setdefault(tail, set()).add(version)
+
+          if not npm_versions:
+              print(f"::error::{npm_path} named no packages; refusing to trust an empty comparison")
+              sys.exit(1)
+
+          pnpm_versions = {}
+          in_packages = False
+          for raw_line in open(pnpm_path, encoding="utf-8"):
+              line = raw_line.rstrip("\n")
+              if line == "packages:":
+                  in_packages = True
+                  continue
+              if not in_packages:
+                  continue
+              if line and not line.startswith(" "):
+                  break  # a new top-level section (snapshots:), or EOF
+              if not line.strip():
+                  continue
+              if not line.startswith("  ") or line.startswith("   "):
+                  continue  # not an exactly-2-space top-level key line
+              key_part = line[2:]
+              if not key_part.endswith(":"):
+                  continue
+              key = key_part[:-1]
+              if len(key) >= 2 and key[0] == "'" and key[-1] == "'":
+                  key = key[1:-1]
+              # Every packages: key is "<name>@<version>". A scoped name
+              # ("@scope/x") carries its own leading '@', so splitting at
+              # the RIGHTMOST '@' always isolates the version, scoped or
+              # not -- verified against a real pnpm-lock.yaml naming
+              # @types/node and an npm: alias, where the resolved
+              # package's own key is still plain "<name>@<version>",
+              # never the alias's spelling (pnpm records an alias only in
+              # importers:, which this does not read). Two versions of the
+              # same name are two distinct keys, so both land in the set.
+              name, sep, version = key.rpartition("@")
+              if not sep or not name or not version:
+                  print(f"::error::could not parse a name/version out of pnpm-lock.yaml package key {key!r}")
+                  sys.exit(2)
+              pnpm_versions.setdefault(name, set()).add(version)
+
+          if not pnpm_versions:
+              print(f"::error::{pnpm_path} named no packages; refusing to trust an empty comparison")
+              sys.exit(1)
+
+          mismatches = []
+          for name in sorted(set(npm_versions) & set(pnpm_versions)):
+              npm_set, pnpm_set = npm_versions[name], pnpm_versions[name]
+              if npm_set != pnpm_set:
+                  mismatches.append((
+                      name,
+                      sorted(npm_set),
+                      sorted(pnpm_set),
+                      sorted(pnpm_set - npm_set),
+                      sorted(npm_set - pnpm_set),
+                  ))
+
+          if mismatches:
+              print("::error::pnpm's resolved version set disagrees with package-lock.json for at least one package:")
+              for name, npm_list, pnpm_list, extra_in_pnpm, missing_from_pnpm in mismatches:
+                  print(f"  {name}: npm={npm_list} pnpm={pnpm_list}")
+                  if extra_in_pnpm:
+                      print(f"    pnpm resolved a version npm never locked: {extra_in_pnpm}")
+                  if missing_from_pnpm:
+                      print(f"    npm locked a version pnpm's resolution dropped: {missing_from_pnpm}")
+              sys.exit(1)
+
+          total = sum(len(v) for v in npm_versions.values())
+          print(f"OK: {total} package-lock.json version(s) across {len(npm_versions)} package(s) all agree with pnpm-lock.yaml where named in both")
+          PYEOF
+
+      - name: Apply the generated lockfile
+        run: |
+          set -euo pipefail
+          mv generated-pnpm-lock.yaml pnpm-lock.yaml
+          rm package-lock.json
+
+      # `pnpm import`/`pnpm install --lockfile-only` above only ever ran in
+      # the isolated directory; the two moves just made are the only change
+      # this checkout should show. An exact match against both porcelain
+      # forms, not a substring test -- a substring would also pass
+      # `pnpm-lock.yaml.bak` or a rename whose destination happens to
+      # contain one of these paths.
+      - name: Refuse any change beyond the lockfile swap
+        run: |
+          set -euo pipefail
+          CHANGED="$(git status --porcelain)"
+          OTHER="$(printf '%s\n' "$CHANGED" | grep -v -x -F \
+            -e '?? pnpm-lock.yaml' \
+            -e ' D package-lock.json' || true)"
+          if [ -n "$OTHER" ]; then
+            echo "::error::the lockfile generation changed something other than the pnpm-lock.yaml/package-lock.json swap; refusing to commit any of it:"
+            echo "$OTHER"
+            exit 1
+          fi
+
+      # A `git commit` + `git push` here produces a commit GitHub does not
+      # sign: it's authored as `github-actions[bot]` but not GPG/SSH-signed,
+      # and a `main` ruleset requiring signed commits (this repo's does)
+      # refuses to merge anything built on one -- discovered the hard way,
+      # after this exact step generated `pnpm-lock.yaml` correctly and the
+      # PR carrying it still couldn't land. `createCommitOnBranch` is
+      # GitHub's own API for writing a commit; every commit it makes is
+      # signed by GitHub itself and verifies, because GitHub is both the
+      # author of the signature and the one checking it, the same way a
+      # web-UI edit or a squash-merge already does. Nothing here runs `git
+      # commit` or `git push` at all -- the working tree's `pnpm-lock.yaml`
+      # (already written by the isolated generation step) and the known
+      # deletion of `package-lock.json` are submitted as one GraphQL
+      # mutation instead.
+      #
+      # `expectedHeadOid` is this job's own `git rev-parse HEAD` -- the
+      # commit `validate` approved and this job checked out -- not a value
+      # read back from GitHub at this point in the job. GitHub rejects the
+      # mutation outright if the branch has moved past that commit by the
+      # time it runs, which is what the `concurrency` group above exists to
+      # make unlikely, and what this catches when it happens anyway.
+      #
+      # A commit this API produces still doesn't fire `push`/`pull_request`
+      # -- it's GITHUB_TOKEN-authenticated underneath the GraphQL call, the
+      # same loop-prevention rule the old `git push` hit. An open PR on the
+      # target branch still needs closing and reopening (or an ordinary
+      # commit) to pick up a new CI run.
+      - name: Commit the lockfile swap via the GitHub API, if it happened
+        env:
+          BRANCH: ${{ needs.validate.outputs.branch }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          CHANGE="$(git status --porcelain)"
+          if [ -z "$CHANGE" ]; then
+            echo "no change to commit"
+            exit 0
+          fi
+
+          HEAD_OID="$(git rev-parse HEAD)"
+
+          # Written straight to a file, never captured into a shell variable
+          # that could then be handed to a command as one argv value or one
+          # env var: Linux caps a single argv/environ value at 128 KiB
+          # (MAX_ARG_STRLEN), and this repo's own pnpm-lock.yaml will cross
+          # that once it names enough dependencies -- it's ~84 KB of base64
+          # today. `base64 -w0` still ends its output with one trailing
+          # newline; left in, that newline would land inside the JSON string
+          # below as literal (invalid) base64. Stripped by jq's `rtrimstr`
+          # on the value it reads back out of the file, not by a second
+          # shell command substitution -- that would put the whole string
+          # back on this job's own argv/environ, the exact thing this
+          # rewrite exists to avoid.
+          base64 -w0 pnpm-lock.yaml > "$RUNNER_TEMP/pnpm-lock.b64"
+
+          # shellcheck disable=SC2016
+          # Single-quoted deliberately: every `$name` below is a GraphQL
+          # variable reference for the request body's own `variables` object
+          # to fill in, not a shell variable -- double-quoting this would
+          # have the shell expand them to nothing before the query was ever
+          # sent.
+          QUERY='mutation($repo: String!, $branch: String!, $headline: String!, $content: Base64String!, $oid: GitObjectID!) {
+            createCommitOnBranch(input: {
+              branch: {repositoryNameWithOwner: $repo, branchName: $branch}
+              message: {headline: $headline}
+              fileChanges: {
+                additions: [{path: "pnpm-lock.yaml", contents: $content}]
+                deletions: [{path: "package-lock.json"}]
+              }
+              expectedHeadOid: $oid
+            }) {
+              commit { oid url }
+            }
+          }'
+
+          # The whole request -- query and variables together -- is built
+          # into a file and sent with `--input`, never as `-f`/`-F` fields on
+          # `gh`'s own command line: those go through `gh`'s argv exactly
+          # like any other subprocess call, so passing the base64 content
+          # that way would only move the 128 KiB problem from `git`/`push`
+          # onto `gh` instead of fixing it. `--rawfile` reads
+          # `pnpm-lock.b64`'s bytes directly into the `content` variable;
+          # `jq` never receives them as a command-line argument or an
+          # environment variable either.
+          jq -n \
+            --arg query "$QUERY" \
+            --arg repo "$REPO" \
+            --arg branch "$BRANCH" \
+            --arg headline "ci: generate pnpm-lock.yaml, remove package-lock.json" \
+            --rawfile content "$RUNNER_TEMP/pnpm-lock.b64" \
+            --arg oid "$HEAD_OID" \
+            '{
+              query: $query,
+              variables: {
+                repo: $repo,
+                branch: $branch,
+                headline: $headline,
+                content: ($content | rtrimstr("\n")),
+                oid: $oid
+              }
+            }' > "$RUNNER_TEMP/graphql-request.json"
+
+          RESPONSE="$(gh api graphql --input "$RUNNER_TEMP/graphql-request.json")"
+
+          NEW_OID="$(printf '%s' "$RESPONSE" | jq -r '.data.createCommitOnBranch.commit.oid // empty')"
+          if [ -z "$NEW_OID" ]; then
+            echo "::error::createCommitOnBranch returned no commit oid; response: $RESPONSE"
+            exit 1
+          fi
+
+          # The one gate that matters: this step exists to make the commit
+          # signed, so it refuses to declare success on one that isn't --
+          # read back from the API rather than assumed from "the mutation
+          # didn't error", which proves only that GitHub accepted the
+          # write, not what it did with the signature.
+          VERIFICATION="$(gh api "repos/$REPO/commits/$NEW_OID")"
+          VERIFIED="$(printf '%s' "$VERIFICATION" | jq -r '.commit.verification.verified')"
+          if [ "$VERIFIED" != "true" ]; then
+            REASON="$(printf '%s' "$VERIFICATION" | jq -r '.commit.verification.reason')"
+            echo "::error::commit $NEW_OID is not signed (verification.verified=$VERIFIED, reason=$REASON) -- refusing to report success on an unsigned commit"
+            exit 1
+          fi
+
+          echo "OK: committed $NEW_OID, verification.verified=true"
