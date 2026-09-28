@@ -32,3 +32,14 @@ provider-enforced repository pin Workload Identity Federation used to give.
 
 **A hostname plus a slug is that tenant's identity.** Never carry it into a
 public repo, an issue, or a PR description outside this repo.
+
+## Dependencies: pnpm, one shared store
+
+`pnpm install --frozen-lockfile` from `.nvmrc`'s Node (`nvm use`) and
+`pnpm-lock.yaml`, never `npm ci` — `package-lock.json` is gone. Worktrees of
+this repo (and of every other repo on this machine) share pnpm's global
+content-addressable store, `~/Library/pnpm/store` by default: a package
+version already downloaded into it is hard-linked into a new worktree's
+`node_modules` rather than re-downloaded and copied. That is the point of the
+move — per-worktree `npm ci` was filling this Mac's disk with a full copy of
+`node_modules` per worktree.
