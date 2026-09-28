@@ -138,13 +138,13 @@ class ValidateSlug(unittest.TestCase):
             module.validate_slug("a" * (module.MAX_SLUG_LENGTH + 1))
 
     def test_refuses_a_trailing_hyphen_and_accepts_the_boundary(self) -> None:
-        # `branchLeft/workspace#681`'s acceptance test: this is the fourth (in
-        # fact fifth -- see the module's SLUG comment) copy of the charset
-        # rule found to accept a trailing hyphen, which fails downstream at
-        # `mediaBucketName()` -- after a repository already exists for it.
-        # The single-character and maximum-length acceptances are the
-        # control: the fix narrows what is accepted, it does not also start
-        # rejecting slugs that were always valid.
+        # This is at least the fourth (in fact fifth -- see the module's SLUG
+        # comment) copy of the charset rule found to accept a trailing
+        # hyphen, which fails downstream at `mediaBucketName()` -- after a
+        # repository already exists for it. The single-character and
+        # maximum-length acceptances are the control: the fix narrows what
+        # is accepted, it does not also start rejecting slugs that were
+        # always valid.
         with self.assertRaises(module.GenerateError):
             module.validate_slug("blog-")
         self.assertEqual(module.validate_slug("a"), "a")
@@ -174,7 +174,7 @@ class ValidateSlug(unittest.TestCase):
         # draft of this test passed against the wrong value.
         constants = component_constants()
         if constants is None:
-            self.skipTest("component not installed or node unavailable; run npm ci")
+            self.skipTest("component not installed or node unavailable; run pnpm install --frozen-lockfile")
         self.assertEqual(
             sorted(constants["reserved"]),
             sorted(module.RESERVED_SLUGS),
@@ -188,15 +188,15 @@ class ValidateSlug(unittest.TestCase):
 
     def test_charset_matches_the_installed_component_across_a_battery(self) -> None:
         # The constants above cover length and the reserved list; neither
-        # proves the CHARSET itself still agrees; branchLeft/workspace#681 was
-        # exactly that -- a charset drift with an unchanged length and
-        # reserved list. Comparing decisions on a shared battery, rather than
-        # any regex text, is what still works if either side's pattern is
-        # rewritten to an equivalent but differently-spelled form.
+        # proves the CHARSET itself still agrees -- a charset drift with an
+        # unchanged length and reserved list is exactly the gap those
+        # constants miss. Comparing decisions on a shared battery, rather
+        # than any regex text, is what still works if either side's pattern
+        # is rewritten to an equivalent but differently-spelled form.
         slugs = [slug for slug, _ in CHARSET_BATTERY]
         accepted = component_accepts_battery(slugs)
         if accepted is None:
-            self.skipTest("component not installed or node unavailable; run npm ci")
+            self.skipTest("component not installed or node unavailable; run pnpm install --frozen-lockfile")
         for (slug, expected), component_accepted in zip(CHARSET_BATTERY, accepted):
             with self.subTest(slug=slug):
                 self.assertEqual(
@@ -243,16 +243,11 @@ class Generate(unittest.TestCase):
             self.assertTrue(readme.startswith("# acme-blog "))
 
     def test_the_generated_repo_passes_its_own_ci(self) -> None:
-        """The finding this test exists for: every tenant repo was red from birth.
+        """Runs what a generated repo's own CI runs, not just asserts on files.
 
-        The template's own suite asserts template-only facts -- that
-        `README.tenant.md` exists, that `Pulumi.yaml` still carries an
-        unsubstituted placeholder -- and both jobs in the generated
-        `infra-ci.yml` run `unittest discover -s scripts`. Left in place they
-        fail in every generated repo, `deploy` never runs because it
-        `needs: [typecheck]`, and no tenant ever deploys. Asserting on files is
-        what missed it; running what the generated repo's CI runs is what
-        catches it.
+        The template's own suite asserts template-only facts, which a
+        generated repo's `infra-ci.yml` fails on from birth -- see the
+        module docstring's "Removal is not tidiness" paragraph.
         """
         with tempfile.TemporaryDirectory() as tmp:
             root = copy_repo(pathlib.Path(tmp))

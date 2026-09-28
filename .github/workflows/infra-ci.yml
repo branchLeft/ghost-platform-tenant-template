@@ -52,15 +52,16 @@ name: Infra CI
 # provider-enforced repository pin those gave is not replaced like for like; the
 # environment scoping above is the replacement.
 #
-# `npm ci` authenticates with the run's own GITHUB_TOKEN.
-# @branchleft/ghost-platform-tenant is a public package, and any authenticated
-# token can read one, so a tenant repo holds no long-lived package credential.
-# GitHub Packages' npm registry still rejects anonymous requests, which is why a
-# token is needed at all.
+# `pnpm install --frozen-lockfile` authenticates with the run's own
+# GITHUB_TOKEN. @branchleft/ghost-platform-tenant is a public package, and any
+# authenticated token can read one, so a tenant repo holds no long-lived
+# package credential. GitHub Packages' npm registry still rejects anonymous
+# requests, which is why a token is needed at all.
 #
 # Both checkout steps set `persist-credentials: false` regardless: without it,
 # the token GitHub issues for checkout would sit on disk for every later step in
-# the job -- including `npm ci`'s transitive postinstall scripts -- to read.
+# the job -- including `pnpm install`'s transitive postinstall scripts -- to
+# read.
 
 on:
   push:
@@ -84,16 +85,18 @@ jobs:
         with:
           persist-credentials: false
 
+      - name: Setup pnpm
+        uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
+
       - name: Setup Node
         uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version-file: .nvmrc
-          cache: npm
-          cache-dependency-path: package-lock.json
+          cache: pnpm
           registry-url: https://npm.pkg.github.com
 
       - name: Install dependencies
-        run: npm ci
+        run: pnpm install --frozen-lockfile
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -254,16 +257,18 @@ jobs:
       - name: Verify no template placeholder was mangled
         run: python3 scripts/assert-placeholders-substituted.py --mangled
 
+      - name: Setup pnpm
+        uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
+
       - name: Setup Node
         uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version-file: .nvmrc
-          cache: npm
-          cache-dependency-path: package-lock.json
+          cache: pnpm
           registry-url: https://npm.pkg.github.com
 
       - name: Install dependencies
-        run: npm ci
+        run: pnpm install --frozen-lockfile
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 

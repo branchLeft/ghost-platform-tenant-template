@@ -9,7 +9,7 @@ __pycache__/
 
 graphify-out/
 
-# This repo tracks package-lock.json and CI runs `npm ci`; a pnpm install
-# here is a mistake, and its lockfile must not get committed.
-pnpm-lock.yaml
-pnpm-workspace.yaml
+# This repo tracks pnpm-lock.yaml and CI runs `pnpm install --frozen-lockfile`;
+# an npm install here is a mistake, and its lockfile must not get committed --
+# ignored so a stray `npm install` can't silently reintroduce it.
+package-lock.json
