@@ -26,14 +26,14 @@ repos:
       # from the repo root, so a hook invoked with paths would reformat vendor/.
       - id: prettier
         name: prettier
-        entry: pnpm run format --silent
+        entry: pnpm --silent run format
         language: system
         files: \.(ts|md|ya?ml|json)$
         pass_filenames: false
 
       - id: typecheck
         name: typecheck
-        entry: pnpm run typecheck --silent
+        entry: pnpm --silent run typecheck
         language: system
         files: \.ts$
         pass_filenames: false
