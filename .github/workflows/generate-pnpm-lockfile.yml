@@ -11,6 +11,14 @@ name: Generate pnpm lockfile in CI
 # package and a pnpm lockfile instead of an npm one in a package
 # subdirectory.
 #
+# The commit this workflow pushes carries `github-actions[bot]` as its
+# author but is authenticated with `GITHUB_TOKEN`, and GitHub does not fire
+# `push`/`pull_request` events for a `GITHUB_TOKEN`-authenticated push --
+# a loop-prevention rule, not a bug. A pull request already open on the
+# target branch does not pick up new required-check runs from this commit
+# on its own; closing and reopening the PR (or pushing an ordinary commit
+# from a real account) is what starts CI against it.
+#
 # `workflow_dispatch` only, never `push` or `pull_request`, and certainly
 # never `pull_request_target`: the `generate` job holds `contents: write`
 # and ends by pushing a commit, and a repository write is not something any
