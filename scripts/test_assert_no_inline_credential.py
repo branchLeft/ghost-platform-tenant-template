@@ -1,12 +1,6 @@
 """Unit tests for assert-no-inline-credential.py.
 
-The interesting tests are the two placeholder shapes
-(`test_ellipsis_form_is_caught`, matching `test_angle_bracket_form_is_caught`)
-and the two must-not-flag controls: a non-credential export
-(`test_non_credential_export_is_not_flagged`, the "address half" the owner's
-principle deliberately leaves alone) and the safe `read`-based replacement
-itself (`test_the_safe_read_pattern_is_not_flagged`) -- a guard that flags its
-own remedy would train people to route around it.
+See assert-no-inline-credential.md's "Tests" section for what each covers.
 """
 
 from __future__ import annotations

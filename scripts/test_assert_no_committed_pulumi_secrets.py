@@ -1,17 +1,8 @@
 #!/usr/bin/env python3
-"""Unit tests for assert-no-committed-pulumi-secrets.
+"""Unit tests for assert-no-committed-pulumi-secrets.py.
 
-The guard has no second line of defence: a salt it clears is a salt that
-reaches a tree anyone can clone, and no later gate looks for one. So the
-failure shape every test below is aimed at is a *false pass* -- a key the
-matcher does not recognise, a file the walker does not visit, a path it cannot
-read and treats as clean, or an exit status that says nothing was found when
-nothing was looked at.
-
-The script's own `--self-test` covers the same matcher from the inside, and
-both are kept: CI and the pre-commit hook invoke the script rather than this
-runner, and a check whose only verification lives in a second tool is one that
-stops being verified the first time the two are wired differently.
+Every test targets a false pass. See assert-no-committed-pulumi-secrets.md's
+"Tests" section for why, and why `--self-test` is kept alongside this runner.
 """
 
 import contextlib

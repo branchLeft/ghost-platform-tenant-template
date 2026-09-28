@@ -1,10 +1,7 @@
 """Unit tests for generate-tenant-repo.py.
 
-The load-bearing one is `test_generating_this_repos_own_tree_leaves_no_token`:
-it runs the real generation against a copy of this repo's actual tracked files,
-so a placeholder added to a file nobody remembered to list fails here rather
-than shipping into a tenant repo. That is the whole reason the substitution set
-lives in this repository instead of in the provisioning workflow.
+The load-bearing one is `test_generating_this_repos_own_tree_leaves_no_token`.
+See generate-tenant-repo.md's "Tests" section for why.
 """
 
 from __future__ import annotations
@@ -60,14 +57,7 @@ def component_constants() -> dict | None:
 
 def component_accepts_battery(slugs: list[str]) -> list[bool] | None:
     """Whether the installed component's `validateTenantSlug` accepts each
-    slug, or None when the component is not installed.
-
-    Executes the installed package rather than parsing anything out of it,
-    for the same reason `component_constants` does: a regex over compiled
-    output can match the wrong assignment. This is the mechanism that spans
-    the boundary `branchLeft/workspace#681` could not close with a unit test
-    in either repo alone -- it runs the *published artefact* this template
-    actually depends on, not this repository's copy of its source.
+    slug, or None when the component is not installed. See generate-tenant-repo.md.
     """
     if not _component_installed():
         return None
@@ -138,13 +128,11 @@ class ValidateSlug(unittest.TestCase):
             module.validate_slug("a" * (module.MAX_SLUG_LENGTH + 1))
 
     def test_refuses_a_trailing_hyphen_and_accepts_the_boundary(self) -> None:
-        # This is at least the fourth (in fact fifth -- see the module's SLUG
-        # comment) copy of the charset rule found to accept a trailing
-        # hyphen, which fails downstream at `mediaBucketName()` -- after a
-        # repository already exists for it. The single-character and
-        # maximum-length acceptances are the control: the fix narrows what
-        # is accepted, it does not also start rejecting slugs that were
-        # always valid.
+        # The trailing-hyphen regression's acceptance test -- see
+        # generate-tenant-repo.md's "Tests" section. The single-character and
+        # maximum-length acceptances are the control: the fix narrows what is
+        # accepted, it does not also start rejecting slugs that were always
+        # valid.
         with self.assertRaises(module.GenerateError):
             module.validate_slug("blog-")
         self.assertEqual(module.validate_slug("a"), "a")
@@ -187,12 +175,9 @@ class ValidateSlug(unittest.TestCase):
         )
 
     def test_charset_matches_the_installed_component_across_a_battery(self) -> None:
-        # The constants above cover length and the reserved list; neither
-        # proves the CHARSET itself still agrees -- a charset drift with an
-        # unchanged length and reserved list is exactly the gap those
-        # constants miss. Comparing decisions on a shared battery, rather
-        # than any regex text, is what still works if either side's pattern
-        # is rewritten to an equivalent but differently-spelled form.
+        # The constants above cover length and the reserved list, not the
+        # charset itself -- see generate-tenant-repo.md's "Tests" section for
+        # the regression this battery exists to catch.
         slugs = [slug for slug, _ in CHARSET_BATTERY]
         accepted = component_accepts_battery(slugs)
         if accepted is None:
@@ -243,12 +228,8 @@ class Generate(unittest.TestCase):
             self.assertTrue(readme.startswith("# acme-blog "))
 
     def test_the_generated_repo_passes_its_own_ci(self) -> None:
-        """Runs what a generated repo's own CI runs, not just asserts on files.
-
-        The template's own suite asserts template-only facts, which a
-        generated repo's `infra-ci.yml` fails on from birth -- see the
-        module docstring's "Removal is not tidiness" paragraph.
-        """
+        """Every tenant repo was red from birth. See generate-tenant-repo.md's
+        "Tests" section for why."""
         with tempfile.TemporaryDirectory() as tmp:
             root = copy_repo(pathlib.Path(tmp))
             module.generate(root, "acme-blog")

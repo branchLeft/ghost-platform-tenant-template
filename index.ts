@@ -20,16 +20,8 @@ import {
   uploadCeilingMib,
 } from './config';
 
-/**
- * Registry host and path, an optional tag, and a mandatory `sha256` digest.
- * Deliberately the same shape `branchleft-deploy` enforces on the host: a tag
- * alone is a mutable pointer, so a stack deployed by tag has no answer to "what
- * is running" and a restart months later can silently change the image.
- *
- * Checked here as well as there because the two refusals land in different
- * places. The host's refusal fails a deploy that has already been merged; this
- * one fails the pull request that would have merged it.
- */
+/** Registry host and path, an optional tag, and a mandatory `sha256` digest —
+ * the same shape `branchleft-deploy` enforces on the host. See index.md. */
 const DIGEST_PINNED_IMAGE =
   /^[a-z0-9]+(?:[._-][a-z0-9]+)*(?::[0-9]+)?(?:\/[a-z0-9]+(?:[._-][a-z0-9]+)*)*(?::[A-Za-z0-9_][A-Za-z0-9._-]{0,127})?@sha256:[0-9a-f]{64}$/;
 

@@ -1,10 +1,7 @@
 """Unit tests for assert-placeholders-substituted.py.
 
-The interesting test is not that the script finds a placeholder in a file it
-was handed -- it is `test_default_files_covers_every_placeholder_in_the_tree`,
-which is the only thing standing between a future edit and a placeholder that
-travels into a generated tenant repo unchecked. `DEFAULT_FILES` is a hand-kept
-list, and a file dropped from it stops being covered silently.
+See assert-placeholders-substituted.md's "Tests" section for the interesting
+one: `test_default_files_covers_every_placeholder_in_the_tree`.
 """
 
 from __future__ import annotations
