@@ -1,33 +1,10 @@
 #!/usr/bin/env python3
 """Refuse a credential presented as a paste-and-run inline assignment.
 
-`export SOME_PASSWORD='<placeholder>'` and `export SOME_PASSWORD='…'` both
-read as copy-pasteable instructions, and both fail the same way: pasted
-verbatim, the variable is set to the literal placeholder text rather than a
-real credential. That failure is silent -- no error, nothing distinguishes it
-from a working assignment -- and it surfaces later, somewhere else, as an
-unexplained auth failure or (worse) a malformed value appended to a committed
-config file.
-
-The fix this guard enforces is not "add a comment" -- it is: never type a
-credential after an `=`. Read it into a variable with a prompt that does not
-echo (`read -rs`, one line, pasted alone) and export that instead. A runbook
-following that shape never has a literal secret, real or placeholder, sitting
-in an `export NAME=...` or a `printf ... >>` line in the first place.
-
-Two placeholder shapes both have to be caught, not just the obvious one: the
-angle-bracket form (`<the value>`) and the ellipsis form (`'…'`), because a
-token-shape guard that only knows about `<...>` misses the second one
-entirely -- proven by `ghost-tenant-blog`'s README, which used it.
-
-Scope: markdown files only (RUNBOOK*.md, README*.md, *.md generally) -- this
-is a guard on instructions meant to be pasted into a shell, not on committed
-config or code, which `assert-no-committed-pulumi-secrets.py` already covers.
-
-Usage:
-    assert-no-inline-credential.py [file ...]
-
-Exit status 0 if no file carries the pattern, 1 if any does.
+Usage: assert-no-inline-credential.py [file ...]
+Exit status 0 if no file carries the pattern, 1 if any does. Markdown files
+only. See assert-no-inline-credential.md for why, and the two placeholder
+shapes this catches.
 """
 
 from __future__ import annotations
