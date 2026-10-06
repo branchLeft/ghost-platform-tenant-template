@@ -7,7 +7,6 @@ Pulumi.*.yaml.bak
 /deploy_key
 __pycache__/
 
-graphify-out/
 
 # This repo tracks pnpm-lock.yaml and CI runs `pnpm install --frozen-lockfile`;
 # an npm install here is a mistake, and its lockfile must not get committed --
