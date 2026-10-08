@@ -85,6 +85,13 @@ Then:
    pulumi config set --secret mediaSecretAccessKey --stack <slug>
    ```
 
+   **The owner's email address**, secret because it is a person's: a plain
+   value would be committed to this repo in `Pulumi.<slug>.yaml`.
+
+   ```bash
+   pulumi config set --secret ownerEmail --stack <slug>
+   ```
+
    This tenant's media bucket, `branchleft-media-<slug>`, and the bucket policy
    that fences this key to it must already exist —
    `branchLeft/ghost-platform`'s `RUNBOOK-tenant-onboarding.md` §6 creates and

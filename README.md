@@ -109,9 +109,8 @@ pull request's diff:
 | `uid` | This tenant's reserved UID on its app host. **Allocated against the host**, never derived — see below. |
 | `appHostPrivateIp` | The app host's **private** address. Every published port binds this alone. Not the address CI connects to. |
 | `hostPort`, `hostPortB`, `healthPort` | This tenant's host-side ports, distinct per tenant on that host: blue/green slot A, slot B, and the sidecar port the edge probes. All three differ and are at least 1024. |
-| `ownerEmail` | The address Ghost creates the owner account with. |
 | `databasePort` | Optional, defaults to `3306`. |
-| `zones` | The render core's `ZoneConfig` as an object: `demoZone`, `platformZone`, `ownedDomains`, `demoMailDomain`, `mailSpoolBaseUrl`. Platform-wide, identical across tenants. |
+| `zones` | The render core's `ZoneConfig` as an object: `demoZone`, `platformZone`, `ownedDomains`, `demoMailDomain`. Platform-wide, identical across tenants. 7.0.0 dropped `mailSpoolBaseUrl`; a stale one is ignored. |
 | `hostnameVerifiedAt` | Only when `siteUrl` is outside `zones.platformZone` (a custom domain): the ISO instant it was verified. |
 | `backupEncryptionRecipient` | This tenant's own single backup encryption recipient. |
 | `imageRef` | The image this tenant runs, digest-pinned. Refused at preview if it carries no `@sha256:`. |
@@ -126,6 +125,7 @@ plaintext in the run's API response and its form:
 | Key | Where the value comes from |
 |---|---|
 | `databasePassword` | Printed **once** by `db/provision/provision_tenant_db.py` on `db1`. Printed by nothing afterwards; a re-run leaves an existing password alone and says nothing about it. |
+| `ownerEmail` | The address Ghost creates the owner account with. A person's address, so secret config, never plain: since tenant 7.0.0 it reaches the host only as `GHOST_OWNER_EMAIL` in the secrets file, where `provision-owner.mjs --email` takes it from. |
 | `mediaAccessKeyId`, `mediaSecretAccessKey` | This tenant's Object Storage key pair, created in the Hetzner Cloud Console — no API mints one — and allowlisted by bucket policy to this tenant's bucket alone. Both are secret config, including the id: holding the pair together is what makes a rotation one edit rather than two. |
 
 `uid` deserves its own note. It is host state: `provision_tenant_volume.py
@@ -140,7 +140,8 @@ deploy to.
 The descriptor always carries a mail transport and a sending identity, so mail
 is no longer optional. `mailFrom`, `bulkEmailBaseUrl`, `uploadCeilingMib` and
 `rssBudgetMib` are gone: the sending address is derived by the render core, bulk
-mail goes through the host's mail spool (`zones.mailSpoolBaseUrl`), and the
+mail goes through the host's mail spool (by its service name on the tenant's
+own mail network since tenant 7.0.0), and the
 upload limits and caps are the render core's defaults.
 
 | Key | Meaning |

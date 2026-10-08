@@ -4,7 +4,7 @@ import {
   GhostTenant,
   databaseAndUserName,
   mediaBucketName,
-  type TenantDescriptor,
+  type TenantStackDescriptor,
 } from '@branchleft/ghost-platform-tenant';
 import {
   appHostPrivateIp,
@@ -52,10 +52,10 @@ if (!DIGEST_PINNED_IMAGE.test(imageRef)) {
 
 /** Where a descriptor's hostname sits: under the platform zone ("ours"), or a
  * verified custom domain ("theirs"). Derived from `siteUrl`, so the two cannot
- * disagree; `validate()` checks the result against `siteUrl` again. */
-type Instant = Extract<TenantDescriptor['hostname'], { kind: 'theirs' }>['verifiedAt'];
+ * disagree; `validateTenantStack()` checks the result against `siteUrl` again. */
+type Instant = Extract<TenantStackDescriptor['hostname'], { kind: 'theirs' }>['verifiedAt'];
 
-function hostnameOf(url: string): TenantDescriptor['hostname'] {
+function hostnameOf(url: string): TenantStackDescriptor['hostname'] {
   const host = new URL(url).hostname;
   const suffix = `.${zones.platformZone}`;
   if (host.endsWith(suffix)) {
@@ -73,14 +73,15 @@ function hostnameOf(url: string): TenantDescriptor['hostname'] {
 // The fixed halves of a paying tenant's descriptor: every value here is the
 // only one a `tenant` kind may carry or the platform default, so none is a
 // config key. `as unknown as` because the render core brands its string and
-// number fields; `validate()` inside the component is what proves them.
+// number fields; `validateTenantStack()` inside the component is what proves
+// them. No `ownerEmail`: it is a person's address, so it travels as a secret
+// beside the descriptor, never in it.
 const descriptor = {
   version: 1,
   kind: 'tenant',
   slug,
   siteUrl,
   image: imageRef,
-  ownerEmail,
   uid,
   ports: { a: hostPort, b: hostPortB, health: healthPort },
   appHostIp: appHostPrivateIp,
@@ -118,7 +119,7 @@ const descriptor = {
   safety: { near: true, exact: true },
   breakGlass: { kind: 'disabled' },
   expiresAt: null,
-} as unknown as TenantDescriptor;
+} as unknown as TenantStackDescriptor;
 
 const tenant = new GhostTenant(slug, {
   descriptor,
@@ -129,6 +130,7 @@ const tenant = new GhostTenant(slug, {
     s3SecretAccessKey: mediaSecretAccessKey,
     mailPassword,
     bulkEmailApiKey,
+    ownerEmail,
   },
   ...(databaseMaxUserConnections === undefined
     ? {}
@@ -137,8 +139,9 @@ const tenant = new GhostTenant(slug, {
 
 /**
  * The exact content of `/etc/branchleft/<slug>.env`, root-owned `0600` on the
- * app host. A Pulumi secret: it carries this tenant's database password and,
- * where configured, its SMTP and bulk-mail credentials.
+ * app host. A Pulumi secret: it carries this tenant's database password, its
+ * SMTP and bulk-mail credentials, and the owner's email address
+ * (`GHOST_OWNER_EMAIL`), which is how that address reaches the host.
  *
  * Read with `pulumi stack output --show-secrets secretsEnvFile`. Written to the
  * host by an operator alone — no automated path may write this file, which is

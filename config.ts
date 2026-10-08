@@ -35,8 +35,11 @@ export const hostPortB = config.requireNumber('hostPortB');
 /** The sidecar port the edge probes (`ports.health`); not Ghost's own port. */
 export const healthPort = config.requireNumber('healthPort');
 
-/** The address Ghost creates the owner account with (`ownerEmail`). */
-export const ownerEmail = config.require('ownerEmail');
+/** The address Ghost creates the owner account with. A person's address, so
+ * secret config (`pulumi config set --secret ownerEmail`), never plain: since
+ * 7.0.0 the component takes it as `secrets.ownerEmail` and writes it only into
+ * the secrets file. See config.md. */
+export const ownerEmail = config.requireSecret('ownerEmail');
 
 /** The image this tenant runs, always digest-pinned — config rather than a
  * repository variable, so which image runs is a reviewed diff. See config.md. */
@@ -72,8 +75,9 @@ export const mediaSecretAccessKey = config.requireSecret('mediaSecretAccessKey')
 
 /**
  * The zones every hostname and sending domain is checked against: `demoZone`,
- * `platformZone`, `ownedDomains`, `demoMailDomain` and `mailSpoolBaseUrl`,
- * the render core's `ZoneConfig`. Platform-wide facts, identical across
+ * `platformZone`, `ownedDomains` and `demoMailDomain`, the render core's
+ * `ZoneConfig`. 7.0.0 dropped `mailSpoolBaseUrl`: Ghost reaches the host's
+ * mail spool by its service name on the tenant's own mail network. Platform-wide facts, identical across
  * tenants; `imagesWithBreakGlassAdapter` is optional.
  */
 export const zones = config.requireObject<ZoneConfig>('zones');

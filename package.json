@@ -7,11 +7,12 @@
   "prettier": "@branchleft/prettier-config",
   "scripts": {
     "typecheck": "tsc --noEmit",
+    "test:render": "vitest run test/render.test.ts",
     "format": "prettier --write . --ignore-path .gitignore --ignore-path .prettierignore --ignore-path node_modules/@branchleft/prettier-config/prettierignore",
     "format:check": "prettier --check . --ignore-path .gitignore --ignore-path .prettierignore --ignore-path node_modules/@branchleft/prettier-config/prettierignore"
   },
   "dependencies": {
-    "@branchleft/ghost-platform-tenant": "6.0.0",
+    "@branchleft/ghost-platform-tenant": "7.0.0",
     "@pulumi/pulumi": "^3.262.0"
   },
   "devDependencies": {
@@ -19,6 +20,7 @@
     "@branchleft/tsconfig": "^0.3.1",
     "@types/node": "^26.5.1",
     "prettier": "^3.9.6",
-    "typescript": "^5.9.0"
+    "typescript": "^5.9.0",
+    "vitest": "^4.1.11"
   }
 }

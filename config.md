@@ -37,11 +37,23 @@ only one valid value for (kind, gate, code injection, break-glass, safety,
 limits, caps, media resize and srcsets, expiry) are constants in `index.ts`, not
 keys. The database name and user, and the media bucket, are derived from the
 slug, never settable here. `hostname` is derived from `siteUrl` and
-`zones.platformZone`. New keys: `hostPortB`, `healthPort`, `ownerEmail`,
-`zones`, `backupEncryptionRecipient`, `mailDkimSelector`, `mailCeiling`,
+`zones.platformZone`. New keys: `hostPortB`, `healthPort`, `ownerEmail`
+(secret since 7.0.0, below), `zones`, `backupEncryptionRecipient`, `mailDkimSelector`, `mailCeiling`,
 `mailEstateCeiling`, and optionally `databasePort` and `hostnameVerifiedAt`.
 Mail is now required. Removed: `mailFrom`, `bulkEmailBaseUrl`,
 `uploadCeilingMib`, `rssBudgetMib`.
+
+## Since 7.0.0: `ownerEmail` is secret
+
+The owner's email address is a person's, so it is secret config
+(`pulumi config set --secret ownerEmail`), read with `requireSecret`, and it is
+not a descriptor field: `index.ts` passes it to the component as
+`secrets.ownerEmail`, and the component writes it only into the secrets file as
+`GHOST_OWNER_EMAIL`. A plain value would sit in this repo's committed
+`Pulumi.<stack>.yaml`. `zones.mailSpoolBaseUrl` is gone: Ghost reaches the
+host's mail spool by its service name. `pnpm test:render`
+(`test/render.test.ts`) loads this program under Pulumi's mocks and checks
+that the address appears in no plain output.
 
 ## `imageRef`
 
