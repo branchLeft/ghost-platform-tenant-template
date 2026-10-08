@@ -1,23 +1,41 @@
 import * as pulumi from '@pulumi/pulumi';
-import { GhostTenant } from '@branchleft/ghost-platform-tenant';
+import {
+  DEFAULT_RESOURCE_CAPS,
+  GhostTenant,
+  databaseAndUserName,
+  mediaBucketName,
+  type TenantDescriptor,
+} from '@branchleft/ghost-platform-tenant';
 import {
   appHostPrivateIp,
-  bulkEmail,
+  backupEncryptionRecipient,
+  bulkEmailApiKey,
+  bulkEmailDomain,
   databaseHost,
   databaseMaxUserConnections,
   databasePassword,
+  databasePort,
+  healthPort,
   hostPort,
+  hostPortB,
+  hostnameVerifiedAt,
   imageRef,
-  mail,
+  mailCeiling,
+  mailDkimSelector,
+  mailEstateCeiling,
+  mailHost,
+  mailPassword,
+  mailPort,
+  mailUser,
   mediaAccessKeyId,
   mediaEndpoint,
   mediaRegion,
   mediaSecretAccessKey,
-  rssBudgetMib,
+  ownerEmail,
   siteUrl,
   slug,
   uid,
-  uploadCeilingMib,
+  zones,
 } from './config';
 
 /** Registry host and path, an optional tag, and a mandatory `sha256` digest —
@@ -32,33 +50,89 @@ if (!DIGEST_PINNED_IMAGE.test(imageRef)) {
   );
 }
 
-const tenant = new GhostTenant(slug, {
+/** Where a descriptor's hostname sits: under the platform zone ("ours"), or a
+ * verified custom domain ("theirs"). Derived from `siteUrl`, so the two cannot
+ * disagree; `validate()` checks the result against `siteUrl` again. */
+type Instant = Extract<TenantDescriptor['hostname'], { kind: 'theirs' }>['verifiedAt'];
+
+function hostnameOf(url: string): TenantDescriptor['hostname'] {
+  const host = new URL(url).hostname;
+  const suffix = `.${zones.platformZone}`;
+  if (host.endsWith(suffix)) {
+    return { kind: 'ours', sub: host.slice(0, -suffix.length), gated: false };
+  }
+  if (hostnameVerifiedAt === undefined) {
+    throw new Error(
+      `siteUrl ${url} is outside ${zones.platformZone}; set hostnameVerifiedAt to when the ` +
+        `custom domain was verified.`
+    );
+  }
+  return { kind: 'theirs', fqdn: host, verifiedAt: hostnameVerifiedAt as Instant };
+}
+
+// The fixed halves of a paying tenant's descriptor: every value here is the
+// only one a `tenant` kind may carry or the platform default, so none is a
+// config key. `as unknown as` because the render core brands its string and
+// number fields; `validate()` inside the component is what proves them.
+const descriptor = {
+  version: 1,
+  kind: 'tenant',
   slug,
   siteUrl,
+  image: imageRef,
+  ownerEmail,
   uid,
-  appHostPrivateIp,
-  hostPort,
+  ports: { a: hostPort, b: hostPortB, health: healthPort },
+  appHostIp: appHostPrivateIp,
   database: {
+    kind: 'mysql',
     host: databaseHost,
-    password: databasePassword,
-    ...(databaseMaxUserConnections === undefined
-      ? {}
-      : { maxUserConnections: databaseMaxUserConnections }),
+    port: databasePort,
+    name: databaseAndUserName(slug),
+    user: databaseAndUserName(slug),
   },
-  // The bucket and the public base URL are derived from the slug by the
-  // component, so this stack holds no value that could name another tenant's
-  // media. `mediaBucket` and `mediaPublicBaseUrl` below are exported for the
-  // operator who has to create that bucket, not read back as inputs.
+  // The bucket is derived from the slug, so this stack holds no value that
+  // could name another tenant's media. `mediaBucket` and `mediaPublicBaseUrl`
+  // below are exported for the operator who has to create that bucket.
   media: {
+    kind: 's3',
     endpoint: mediaEndpoint,
     region: mediaRegion,
-    accessKeyId: mediaAccessKeyId,
-    secretAccessKey: mediaSecretAccessKey,
+    bucket: mediaBucketName(slug),
+    resize: true,
+    srcsets: true,
   },
-  ...(mail === undefined ? {} : { mail }),
-  ...(bulkEmail === undefined ? {} : { bulkEmail }),
-  ...(uploadCeilingMib === undefined ? {} : { uploadCeilingMib }),
-  ...(rssBudgetMib === undefined ? {} : { rssBudgetMib }),
+  transport: { kind: 'smtp', host: mailHost, port: mailPort, user: mailUser },
+  mail: {
+    enabled: true,
+    ceiling: mailCeiling,
+    estateCeiling: mailEstateCeiling,
+    identity: { kind: 'tenant', domain: bulkEmailDomain, dkimSelector: mailDkimSelector },
+  },
+  hostname: hostnameOf(siteUrl),
+  gate: { kind: 'none' },
+  backup: { kind: 'bucket-native', encryptionRecipient: backupEncryptionRecipient },
+  codeInjection: { kind: 'blocked' },
+  limits: { membersCap: null, staffCap: null },
+  caps: DEFAULT_RESOURCE_CAPS,
+  safety: { near: true, exact: true },
+  breakGlass: { kind: 'disabled' },
+  expiresAt: null,
+} as unknown as TenantDescriptor;
+
+const tenant = new GhostTenant(slug, {
+  descriptor,
+  zones,
+  secrets: {
+    databasePassword,
+    s3AccessKeyId: mediaAccessKeyId,
+    s3SecretAccessKey: mediaSecretAccessKey,
+    mailPassword,
+    bulkEmailApiKey,
+  },
+  ...(databaseMaxUserConnections === undefined
+    ? {}
+    : { maxUserConnections: databaseMaxUserConnections }),
 });
 
 /**
@@ -77,10 +151,21 @@ export const secretsEnvFile = tenant.secretsEnvFile;
  * runtime-isolation control, and a stack that omits one still starts. */
 export const composeFile = tenant.composeFile;
 
-/** The root-run command that must create this tenant's volumes before its unit
+/** The root-run script that must create this tenant's volumes before its unit
  * is enabled. The rendered stack declares both volumes `external`, so skipping
- * it fails the unit start rather than coming up on a volume Docker seeded. */
-export const hostProvisioningCommand = tenant.hostProvisioningCommand;
+ * it fails the unit start rather than coming up on a volume Docker seeded.
+ * Replaces 4.x's `hostProvisioningCommand`. */
+export const provisionScript = tenant.provisionScript;
+
+/** The exact content of `/etc/branchleft/<slug>.image.env`. Today written by
+ * `branchleft-deploy`, not by an operator from this output. */
+export const imageEnvFile = tenant.imageEnvFile;
+
+/** This tenant's site block for the edge's site registry, as JSON. */
+export const edgeSiteBlock = tenant.edgeSiteBlock;
+
+/** This tenant's Ghost settings document, as JSON. */
+export const ghostSettings = tenant.ghostSettings;
 
 /** This tenant's Caddy `request_body max_size`, for its site block in the
  * edge's site registry in `branchLeft/shared-infra`. Derived from the same

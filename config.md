@@ -29,16 +29,30 @@ computed here would collide the first time two hosts disagreed about who
 lives where. Recorded in config so the value this stack renders is the value
 the host was provisioned with, and a drift between them is a diff.
 
+## Since 6.0.0: a descriptor
+
+`index.ts` builds the render core's `TenantDescriptor` from these keys and hands
+it to the component, which validates and renders it. Fields a paying tenant has
+only one valid value for (kind, gate, code injection, break-glass, safety,
+limits, caps, media resize and srcsets, expiry) are constants in `index.ts`, not
+keys. The database name and user, and the media bucket, are derived from the
+slug, never settable here. `hostname` is derived from `siteUrl` and
+`zones.platformZone`. New keys: `hostPortB`, `healthPort`, `ownerEmail`,
+`zones`, `backupEncryptionRecipient`, `mailDkimSelector`, `mailCeiling`,
+`mailEstateCeiling`, and optionally `databasePort` and `hostnameVerifiedAt`.
+Mail is now required. Removed: `mailFrom`, `bulkEmailBaseUrl`,
+`uploadCeilingMib`, `rssBudgetMib`.
+
 ## `imageRef`
 
 The image this tenant runs, always digest-pinned.
 
 Config rather than a repository variable so that changing which image a
 tenant runs is a reviewed diff on a branch, the way it was when the GCP-era
-stack passed a reference to Cloud Run. Nothing in the rendered Compose file
-carries it — `branchleft-deploy` writes it to
-`/etc/branchleft/<slug>.image.env` on the host — so this stack exports it for
-the deploy job to read rather than handing it to the component.
+stack passed a reference to Cloud Run. It now reaches the component as the descriptor's `image` and renders into
+`imageEnvFile`; `branchleft-deploy` still writes
+`/etc/branchleft/<slug>.image.env` on the host, and this stack still exports
+`image` for the deploy job to read.
 
 ## `mediaEndpoint` / `mediaRegion`
 

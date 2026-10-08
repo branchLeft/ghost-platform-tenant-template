@@ -35,7 +35,8 @@ operator places on the host by hand:
 |---|---|
 | `composeFile` | `/opt/branchleft/<slug>/compose.yml`, root-owned |
 | `secretsEnvFile` (a Pulumi secret) | `/etc/branchleft/<slug>.env`, root-owned `0600` |
-| `hostProvisioningCommand` | run as root on the app host, before the unit is enabled |
+| `provisionScript` | run as root on the app host, before the unit is enabled (was `hostProvisioningCommand` before 6.0.0) |
+| `imageEnvFile`, `edgeSiteBlock`, `ghostSettings` | new in 6.0.0: the image env file, the tenant's edge site block (JSON) and its Ghost settings (JSON) |
 | `edgeRequestBodyMaxSize` | this tenant's site block in the edge's site registry, in `branchLeft/shared-infra` |
 | `image` | read by the deploy job and piped to `branchleft-deploy` over this repo's slot key |
 
@@ -107,12 +108,16 @@ pull request's diff:
 | `siteUrl` | `https://<hostname>` this tenant serves. |
 | `uid` | This tenant's reserved UID on its app host. **Allocated against the host**, never derived — see below. |
 | `appHostPrivateIp` | The app host's **private** address. Every published port binds this alone. Not the address CI connects to. |
-| `hostPort` | This tenant's host-side port, distinct per tenant on that host. |
+| `hostPort`, `hostPortB`, `healthPort` | This tenant's host-side ports, distinct per tenant on that host: blue/green slot A, slot B, and the sidecar port the edge probes. All three differ and are at least 1024. |
+| `ownerEmail` | The address Ghost creates the owner account with. |
+| `databasePort` | Optional, defaults to `3306`. |
+| `zones` | The render core's `ZoneConfig` as an object: `demoZone`, `platformZone`, `ownedDomains`, `demoMailDomain`, `mailSpoolBaseUrl`. Platform-wide, identical across tenants. |
+| `hostnameVerifiedAt` | Only when `siteUrl` is outside `zones.platformZone` (a custom domain): the ISO instant it was verified. |
+| `backupEncryptionRecipient` | This tenant's own single backup encryption recipient. |
 | `imageRef` | The image this tenant runs, digest-pinned. Refused at preview if it carries no `@sha256:`. |
 | `databaseHost` | `db1`'s private address. |
 | `databaseMaxUserConnections` | Optional. The cap applied on `db1`, recorded so it is visible here. |
 | `mediaEndpoint`, `mediaRegion` | Object Storage addressing, platform-wide. The endpoint host and the region must name the same location, or the failure is a 403 that reads as a credential problem. **There is no `mediaBucket` and no `mediaPublicBaseUrl`**: this tenant's bucket is `branchleft-media-<slug>`, derived from the slug inside the component. The bucket is the only boundary between this tenant's media and another tenant's, so it is deliberately not something a stack can set. |
-| `uploadCeilingMib`, `rssBudgetMib` | Optional. Left unset, the component's defaults apply. |
 
 **Set by an operator** with `pulumi config set --secret`, in that same pull
 request — never by the provisioning flow, because a `workflow_dispatch` input is
@@ -130,30 +135,24 @@ tenant's UID because that is a data loss rather than an update. Nothing in a
 config file can answer the allocation question for a host several tenant repos
 deploy to.
 
-## Optional mail config
+## Mail config (required since 6.0.0)
 
-Ordinary stack config keys, set by hand once, if and when a tenant needs
-outbound mail. Omitting `mailHost` sends no `mail` block to the component at all
-and the tenant boots exactly as it did without mail. Setting `mailHost` makes
-the rest `require`d, so a half-configured block fails at preview.
+The descriptor always carries a mail transport and a sending identity, so mail
+is no longer optional. `mailFrom`, `bulkEmailBaseUrl`, `uploadCeilingMib` and
+`rssBudgetMib` are gone: the sending address is derived by the render core, bulk
+mail goes through the host's mail spool (`zones.mailSpoolBaseUrl`), and the
+upload limits and caps are the render core's defaults.
 
-| Key | Required once mail is enabled | Becomes |
-|---|---|---|
-| `mailHost` | — (this is the toggle) | `GhostTenantMailArgs.host` |
-| `mailPort` | No — defaults to `587` | `GhostTenantMailArgs.port` |
-| `mailUser` | Yes | `GhostTenantMailArgs.user` |
-| `mailFrom` | Yes | `GhostTenantMailArgs.from` |
-| `mailPassword` | Yes, as a secret | `GhostTenantMailArgs.password`, emitted into the secrets file |
-
-## Optional bulk-email config
-
-Same all-or-nothing shape.
-
-| Key | Required once bulk email is enabled | Becomes |
-|---|---|---|
-| `bulkEmailBaseUrl` | — (this is the toggle) | `GhostTenantBulkEmailArgs.baseUrl` |
-| `bulkEmailDomain` | Yes | `GhostTenantBulkEmailArgs.domain` |
-| `bulkEmailApiKey` | Yes, as a secret | `GhostTenantBulkEmailArgs.apiKey` |
+| Key | Meaning |
+|---|---|
+| `mailHost` | SMTP submission host. |
+| `mailPort` | Optional, defaults to `587`. |
+| `mailUser` | SMTP user. |
+| `mailPassword` | Secret. |
+| `bulkEmailDomain` | The tenant's own sending domain, outside every domain the platform owns. |
+| `mailDkimSelector` | DKIM selector for that domain. |
+| `bulkEmailApiKey` | Secret. The mail spool's API key. |
+| `mailCeiling`, `mailEstateCeiling` | Per-tenant and estate-wide send ceilings; the first must not exceed the second. |
 
 ## Repo variables and environment secrets
 
