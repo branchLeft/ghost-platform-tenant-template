@@ -9,7 +9,7 @@
 # the LAST matching pattern, so the shared escape-hatch lines below have to stay
 # the final lines here, not merely present -- a repo may add its own patterns
 # above them but never after or between them.
-* @reviewer-agent-branchLeft @branchLeft/branchleft-admin
+* @branchLeft/branchleft-admin
 
 /.standardsignore        @branchLeft/branchleft-admin
 /.standards.mode         @branchLeft/branchleft-admin
