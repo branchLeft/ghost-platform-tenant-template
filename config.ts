@@ -1,4 +1,5 @@
 import * as pulumi from '@pulumi/pulumi';
+import type { ZoneConfig } from '@branchleft/ghost-platform-tenant';
 
 const config = new pulumi.Config();
 
@@ -22,8 +23,23 @@ export const uid = config.requireNumber('uid');
 /** The app host's private address. Every published port binds this alone. */
 export const appHostPrivateIp = config.require('appHostPrivateIp');
 
-/** This tenant's host-side port, distinct per tenant on that host. */
+/** This tenant's host-side port for blue/green slot A (`ports.a`), distinct per
+ * tenant on that host. Slot B and the health port follow. */
 export const hostPort = config.requireNumber('hostPort');
+
+/** Blue/green slot B's host-side port (`ports.b`). New with 6.0.0: the component
+ * renders two Ghost services, so a tenant holds a pair of ports and a health
+ * port, all three distinct. */
+export const hostPortB = config.requireNumber('hostPortB');
+
+/** The sidecar port the edge probes (`ports.health`); not Ghost's own port. */
+export const healthPort = config.requireNumber('healthPort');
+
+/** The address Ghost creates the owner account with. A person's address, so
+ * secret config (`pulumi config set --secret ownerEmail`), never plain: since
+ * 7.0.0 the component takes it as `secrets.ownerEmail` and writes it only into
+ * the secrets file. See config.md. */
+export const ownerEmail = config.requireSecret('ownerEmail');
 
 /** The image this tenant runs, always digest-pinned — config rather than a
  * repository variable, so which image runs is a reviewed diff. See config.md. */
@@ -31,6 +47,9 @@ export const imageRef = config.require('imageRef');
 
 /** `db1`'s private address. */
 export const databaseHost = config.require('databaseHost');
+
+/** `db1`'s MySQL port. */
+export const databasePort = config.getNumber('databasePort') ?? 3306;
 
 /** Printed once by `db/provision/provision_tenant_db.py`; a re-run leaves an
  * existing password alone. Lose this value and the recovery is a password
@@ -54,30 +73,39 @@ export const mediaRegion = config.require('mediaRegion');
 export const mediaAccessKeyId = config.requireSecret('mediaAccessKeyId');
 export const mediaSecretAccessKey = config.requireSecret('mediaSecretAccessKey');
 
-/** The single number every upload-related limit derives from, in MiB. Left
- * unset, the component's own default applies. */
-export const uploadCeilingMib = config.getNumber('uploadCeilingMib');
-export const rssBudgetMib = config.getNumber('rssBudgetMib');
+/**
+ * The zones every hostname and sending domain is checked against: `demoZone`,
+ * `platformZone`, `ownedDomains` and `demoMailDomain`, the render core's
+ * `ZoneConfig`. 7.0.0 dropped `mailSpoolBaseUrl`: Ghost reaches the host's
+ * mail spool by its service name on the tenant's own mail network. Platform-wide facts, identical across
+ * tenants; `imagesWithBreakGlassAdapter` is optional.
+ */
+export const zones = config.requireObject<ZoneConfig>('zones');
 
-/** Optional mail, all-or-nothing: once `mailHost` is set the rest is
- * `require`d, so a half-configured block fails at preview, not silently. */
-const mailHost = config.get('mailHost');
-export const mail = mailHost
-  ? {
-      host: mailHost,
-      port: config.getNumber('mailPort') ?? 587,
-      user: config.require('mailUser'),
-      from: config.require('mailFrom'),
-      password: config.requireSecret('mailPassword'),
-    }
-  : undefined;
+/** When this tenant's custom domain was verified (an ISO instant). Required
+ * only when `siteUrl` is outside `zones.platformZone`. */
+export const hostnameVerifiedAt = config.get('hostnameVerifiedAt');
 
-/** Optional bulk email, same all-or-nothing shape as mail above. */
-const bulkEmailBaseUrl = config.get('bulkEmailBaseUrl');
-export const bulkEmail = bulkEmailBaseUrl
-  ? {
-      baseUrl: bulkEmailBaseUrl,
-      domain: config.require('bulkEmailDomain'),
-      apiKey: config.requireSecret('bulkEmailApiKey'),
-    }
-  : undefined;
+/** The tenant's own backup encryption recipient (a single age public
+ * recipient). Exactly one per tenant, which is what makes erasure a key
+ * destruction. */
+export const backupEncryptionRecipient = config.require('backupEncryptionRecipient');
+
+/** SMTP submission. Required since 6.0.0: the descriptor always carries a mail
+ * transport. */
+export const mailHost = config.require('mailHost');
+export const mailPort = config.getNumber('mailPort') ?? 587;
+export const mailUser = config.require('mailUser');
+export const mailPassword = config.requireSecret('mailPassword');
+
+/** The tenant's own sending identity: the domain it signs and the DKIM
+ * selector. The domain must sit outside every domain the platform owns. */
+export const bulkEmailDomain = config.require('bulkEmailDomain');
+export const mailDkimSelector = config.require('mailDkimSelector');
+
+/** The mail spool's Mailgun-shaped API key. */
+export const bulkEmailApiKey = config.requireSecret('bulkEmailApiKey');
+
+/** Per-tenant and estate-wide send ceilings. */
+export const mailCeiling = config.requireNumber('mailCeiling');
+export const mailEstateCeiling = config.requireNumber('mailEstateCeiling');
