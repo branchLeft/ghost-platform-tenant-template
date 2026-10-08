@@ -103,6 +103,13 @@ jobs:
       - name: Type check
         run: npx tsc --noEmit
 
+      # Runs index.ts under Pulumi's mock runtime with placeholder config, so
+      # the component's validateTenantStack() and render() run on this program
+      # before any deploy does, and a sentinel owner address is checked
+      # against every plain output. No engine, stack or credential.
+      - name: Render the program under mocks
+        run: pnpm run test:render
+
       # The pre-commit hook runs `prettier --write .`, covering YAML and JSON
       # as well as TS/JS (LINT-4). This is the read-only half of that pair:
       # without it, a file a contributor forgot to run pre-commit on merges
