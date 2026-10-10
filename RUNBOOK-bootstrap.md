@@ -142,7 +142,7 @@ the Compose file is not on the host, or if the volumes were never provisioned.
 Merging is itself the test. A healthy first run:
 
 - applies the stack, reporting the component and its outputs;
-- reads `image` from the applied stack;
+- reads `imageRef` from this commit's stack config, not from a stack output;
 - pipes it over the slot key, and `branchleft-deploy` pins the digest and
   restarts `branchleft-compose@<slug>`.
 
