@@ -465,9 +465,13 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.HETZNER_S3_SECRET_ACCESS_KEY }}
         run: pulumi up --stack __TENANT_NAME__ --yes
 
-      # Read from the applied stack rather than from the config file, so what is
-      # deployed is what the apply above recorded -- a config value the apply
-      # rejected must not reach the host.
+      # Read from this commit's own stack config, never from a stack output.
+      # The apply above fails the job on a value the program rejects (the
+      # digest-pin check in index.ts throws), so a value that reaches this step
+      # is one that apply accepted. A stack output lives in the checkpoint, and
+      # the state credential every tenant repository holds can rewrite it
+      # between the apply and this read; what is read here becomes the image
+      # pin on the host, so its source must be a file reviewed in this repo.
       - name: Read the image this stack pins
         id: image
         env:
@@ -477,12 +481,12 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.HETZNER_S3_SECRET_ACCESS_KEY }}
         run: |
           set -euo pipefail
-          image=$(pulumi stack output image --stack __TENANT_NAME__)
+          image=$(pulumi config get imageRef --stack __TENANT_NAME__)
           # A failing command substitution inside a here-doc or an `echo` does
           # not trip errexit, so the value is captured and checked before it can
           # flow into an ssh invocation as an empty string.
           if [ -z "$image" ]; then
-            echo "::error::the stack output 'image' is empty; refusing to deploy"
+            echo "::error::the stack config value 'imageRef' is empty; refusing to deploy"
             exit 1
           fi
           echo "ref=$image" >> "$GITHUB_OUTPUT"

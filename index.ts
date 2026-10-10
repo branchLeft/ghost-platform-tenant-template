@@ -192,9 +192,10 @@ export const databaseUser = tenant.databaseUser;
 export const mediaBucket = tenant.mediaBucket;
 export const mediaPublicBaseUrl = tenant.mediaPublicBaseUrl;
 
-/** Read by the deploy job, which pipes it to `branchleft-deploy` over this
- * repo's own slot key. Exported rather than read from config by the job so that
- * what is deployed is what this stack's last successful apply recorded. */
+/** The image this stack pins, for an operator to read. The deploy job does not
+ * read this output: it reads `imageRef` from this commit's config, because a
+ * stack output lives in the checkpoint and can be rewritten by anything holding
+ * the state credential. */
 export const image = imageRef;
 
 /** Read by `scripts/assert-no-tenant-deletes.py` out of this stack's own

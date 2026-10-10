@@ -27,7 +27,10 @@ pulumi stack output composeFile                      # /opt/branchleft/__TENANT_
 pulumi stack output --show-secrets secretsEnvFile    # /etc/branchleft/__TENANT_NAME__.env, 0600
 ```
 
-Both are root-owned and operator-written. No automated path may write either:
+Both are root-owned and operator-written. A stack output lives in the
+checkpoint, which anything holding the state credential can rewrite, so apply
+immediately before reading `composeFile` and preview again after placing it:
+a changed `composeFile` means do not enable the unit. No automated path may write either:
 between them they are the runtime-isolation posture, and a stack that quietly
 loses one line of it still starts, still serves, and has dropped a boundary.
 
