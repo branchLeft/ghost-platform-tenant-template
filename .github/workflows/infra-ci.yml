@@ -256,7 +256,28 @@ jobs:
         with:
           persist-credentials: false
 
-      # Ahead of every other step -- a literal `__TENANT_NAME__` must never
+      # First after checkout, which reads no environment secret and brings the
+      # script. An environment with no rule pauses nothing and says nothing,
+      # and a custom app's rule is listed only by the second read. Any failed
+      # or malformed read refuses. Who approves is not decided here.
+      - name: Refuse to deploy through an ungated environment
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -eu
+          env_json=$(mktemp)
+          rules_json=$(mktemp)
+          gh api "repos/${GITHUB_REPOSITORY}/environments/production" > "$env_json" \
+            || { echo "::error::could not read the production environment" >&2; exit 1; }
+          gh api "repos/${GITHUB_REPOSITORY}/environments/production/deployment_protection_rules" > "$rules_json" \
+            || { echo "::error::could not read the production deployment protection rules" >&2; exit 1; }
+          python3 scripts/assert-environment-gated.py --self-test > /dev/null
+          if ! python3 scripts/assert-environment-gated.py "$env_json" "$rules_json"; then
+            echo "::error::the production environment has neither a required-reviewer rule nor an enabled branchleft-reviewer deployment protection rule, so nothing would pause this deploy. Configure the gate in repo settings first." >&2
+            exit 1
+          fi
+
+      # Ahead of every other step but the gate -- a literal `__TENANT_NAME__` must never
       # reach `pulumi preview` (it would select a stack that does not exist) let
       # alone `pulumi up`, and this check needs no dependencies and no
       # credentials to run.
