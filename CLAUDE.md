@@ -30,6 +30,13 @@ repository secret — a repository secret is readable by any workflow run,
 including one from a branch. That scoping is the replacement for the
 provider-enforced repository pin Workload Identity Federation used to give.
 
+**The plan is made before the approval, on a second environment.** The `plan`
+job previews on main ahead of the deploy job's gate and prints the plan, so an
+approver reads it first. It holds the state credentials, passphrase and salt as
+environment secrets on `production-plan`, limited to the branch `main` (it
+refuses to run otherwise), and never the host key or a `pulumi up`. The deploy
+job still previews and checks again after approval. See `README.md`.
+
 **A hostname plus a slug is that tenant's identity.** Never carry it into a
 public repo, an issue, or a PR description outside this repo.
 

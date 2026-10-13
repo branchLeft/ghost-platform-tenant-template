@@ -135,6 +135,11 @@ anyone needs it being an incident.
 and the deploy fails — loudly, which is the intent — if the slot has no key, if
 the Compose file is not on the host, or if the volumes were never provisioned.
 
+The plan job runs first, on the `production-plan` environment, and fails the run
+before the deploy is offered for approval if that environment is missing, has no
+deployment branch policy naming `main` alone, or lacks the four state and
+passphrase secrets (see README.md). Set it up before merging.
+
 ---
 
 ## The confirmation test
@@ -207,9 +212,13 @@ The order, from a checkout with the _old_ value exported:
 pulumi stack change-secrets-provider passphrase --stack <slug>   # prompts for the new value
 gh secret set PULUMI_CONFIG_PASSPHRASE --repo branchLeft/<generated-repo> --env production
 gh secret set PULUMI_ENCRYPTION_SALT  --repo branchLeft/<generated-repo> --env production
+gh secret set PULUMI_CONFIG_PASSPHRASE --repo branchLeft/<generated-repo> --env production-plan
+gh secret set PULUMI_ENCRYPTION_SALT  --repo branchLeft/<generated-repo> --env production-plan
 ```
 
-The salt changes with the passphrase, so both secrets move together. Escrow the
+The salt changes with the passphrase, so both secrets move together, and on both
+environments: the plan job reads `production-plan`, and a plan made with the old
+value fails before the deploy job is ever offered for approval. Escrow the
 new value before deleting the old one from wherever it is held.
 
 ---

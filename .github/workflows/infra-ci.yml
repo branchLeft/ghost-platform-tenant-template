@@ -1,8 +1,10 @@
 name: Infra CI
 
 # Type-checks this repo's Pulumi program on every PR, and on every push to main
-# applies its one stack and then deploys the pinned image to this tenant's
-# Compose slot on its app host.
+# previews its one stack (the `plan` job, before any approval), then applies it
+# and deploys the pinned image to this tenant's Compose slot on its app host
+# (the `deploy` job, behind the `production` approval gate, which also waits
+# for the plan job to succeed).
 #
 # WHAT THIS STACK IS. The `GhostTenant` component declares no cloud resources.
 # Everything durable a tenant uses already exists and is shared -- the app host,
@@ -22,7 +24,9 @@ name: Infra CI
 # secret on `production`, never a repository secret. A repository secret is
 # readable by any workflow run in this repo, including one from a branch; an
 # environment secret is readable only by a job that declares that environment,
-# which is only the deploy job below. On a public repo the environment also
+# which is only the deploy job below (and, for the four state and passphrase
+# secrets alone, the plan job, on its own `production-plan` environment, which
+# only the branch main can use). On a public repo the environment also
 # carries a required-reviewer rule. On a private one it cannot (that is a plan
 # tier limit, not a configuration mistake), and the scoping above is then the
 # whole of what the environment buys -- which is still the property that matters
@@ -211,10 +215,205 @@ jobs:
       - name: Refuse an inline credential in a runbook
         run: python3 scripts/assert-no-inline-credential.py $(git ls-files '*.md')
 
+  # The plan, made BEFORE the deploy job below waits for its approval, so that
+  # whoever approves (the owner, or the deploy-approval App on the owner's
+  # behalf) can read what the apply would do instead of approving blind. The
+  # deploy job still previews and checks again after approval, because state
+  # can move while a run waits; this job is the copy that exists in time.
+  #
+  # It cannot run on a pull request. A preview reads the state backend and
+  # decrypts the stack's secrets, so it needs the state credentials, the
+  # passphrase and the salt, and none of those may be readable from a branch.
+  # So it runs on main only, after the merge and before the gate. That is
+  # after the code is merged, not before: the gate is still the last stop, and
+  # a pull request is still checked by `typecheck`'s render under mocks.
+  #
+  # CREDENTIALS. The same four secret names `deploy` reads (never
+  # APP_HOST_DEPLOY_KEY, which stays on `production` alone), held as
+  # environment secrets on a SECOND environment, `production-plan`. It carries
+  # no reviewer, because a reviewer rule on it would stop this job before the
+  # plan exists, which is the thing it is here to avoid. What stands in for a
+  # reviewer is a deployment branch policy naming `main` alone, which the first
+  # step enforces: without it any branch could declare this environment and
+  # read the state credentials. This job holds no host key, runs no `pulumi up`
+  # and writes nothing to the state, so what it adds to the reach of those
+  # secrets is a read of the plan. See README.md, "Repo variables and
+  # environment secrets".
+  #
+  # THE LINE THE APPROVER READS. `summarise-plan.py` prints one line with the
+  # plan's per-kind step counts, in the shape the deploy-approval script parses
+  # out of this job's log. No `run` body in this job may spell that marker out:
+  # the runner echoes a `run` body into the log, and the script wants exactly
+  # one line carrying it.
+  plan:
+    name: Plan (tenant, pulumi preview)
+    runs-on: ubuntu-latest
+    needs: [typecheck, secret-guard]
+    timeout-minutes: 15
+
+    # Exactly the deploy job's condition, so the two are created together or
+    # not at all, and the deploy job can wait on this one.
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && github.event.repository.is_template != true
+
+    environment: production-plan
+
+    permissions:
+      actions: read
+      contents: read
+      packages: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Verify template placeholders are substituted
+        run: python3 scripts/assert-placeholders-substituted.py
+
+      - name: Verify no template placeholder was mangled
+        run: python3 scripts/assert-placeholders-substituted.py --mangled
+
+      # Before anything reads a secret. An environment with no branch policy
+      # hands its secrets to a job from any branch, and says nothing. Any failed
+      # or malformed read refuses.
+      - name: Refuse a plan environment that any branch can use
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -eu
+          env_json=$(mktemp)
+          policies_json=$(mktemp)
+          gh api "repos/${GITHUB_REPOSITORY}/environments/production-plan" > "$env_json" \
+            || { echo "::error::could not read the production-plan environment" >&2; exit 1; }
+          gh api "repos/${GITHUB_REPOSITORY}/environments/production-plan/deployment-branch-policies" > "$policies_json" \
+            || { echo "::error::could not read the production-plan deployment branch policies" >&2; exit 1; }
+          python3 scripts/assert-plan-environment-main-only.py --self-test > /dev/null
+          if ! python3 scripts/assert-plan-environment-main-only.py "$env_json" "$policies_json"; then
+            echo "::error::the production-plan environment is not limited to the branch main, so a job from any branch could read its secrets. Set its deployment branch policy to main alone in repo settings first." >&2
+            exit 1
+          fi
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
+
+      - name: Setup Node
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+          registry-url: https://npm.pkg.github.com
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Install Pulumi CLI
+        uses: pulumi/actions@8e5e406f4007fca908480587cb9893c07090f58d # v7.0.0
+
+      # The next four steps are the deploy job's own, word for word, and a test
+      # holds them to it (scripts/test_plan_job.py): a plan made with a
+      # different login or salt than the apply would be a plan of something
+      # else. The reasons are written out once, in the deploy job.
+      - name: Confirm this stack's secrets passphrase is set
+        env:
+          PULUMI_CONFIG_PASSPHRASE: ${{ secrets.PULUMI_CONFIG_PASSPHRASE }}
+        run: |
+          if [ -z "$PULUMI_CONFIG_PASSPHRASE" ]; then
+            echo "::error::PULUMI_CONFIG_PASSPHRASE is empty or unset on this repository's production environment. Refusing to continue: Pulumi would treat an empty value as a valid passphrase rather than failing closed."
+            exit 1
+          fi
+
+      - name: Log in to the Pulumi state backend
+        env:
+          PULUMI_BACKEND_URL: ${{ vars.PULUMI_BACKEND_URL }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.HETZNER_S3_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.HETZNER_S3_SECRET_ACCESS_KEY }}
+        run: |
+          if [ -z "$PULUMI_BACKEND_URL" ]; then
+            echo "::error::the PULUMI_BACKEND_URL repository variable is unset or empty"
+            exit 1
+          fi
+          case "$PULUMI_BACKEND_URL" in
+            s3://*) ;;
+            *)
+              echo "::error::PULUMI_BACKEND_URL must be an s3:// backend. A gs:// backend would give this tenant a GCP dependency, which the Hetzner migration exists to remove."
+              exit 1
+              ;;
+          esac
+          if [ -z "$AWS_ACCESS_KEY_ID" ] || [ -z "$AWS_SECRET_ACCESS_KEY" ]; then
+            echo "::error::HETZNER_S3_ACCESS_KEY_ID / HETZNER_S3_SECRET_ACCESS_KEY are empty or unset on this repository's production environment; the state backend is unreachable without them."
+            exit 1
+          fi
+          pulumi login "$PULUMI_BACKEND_URL"
+
+      - name: Restore the stack's encryption salt
+        env:
+          PULUMI_ENCRYPTION_SALT: ${{ secrets.PULUMI_ENCRYPTION_SALT }}
+        run: |
+          config=Pulumi.__TENANT_NAME__.yaml
+          if [ ! -f "$config" ]; then
+            echo "::error::$config is missing. The provisioning flow commits this stack's config, and without it there is nothing for this job to deploy."
+            exit 1
+          fi
+          salt_status=0
+          salt_report=$(python3 scripts/assert-no-committed-pulumi-secrets.py "$config" 2>&1) || salt_status=$?
+          if [ "$salt_status" -eq 1 ]; then
+            echo "::warning::$config already carries an encryptionsalt, so none was restored and this stack still decrypts with the committed value. Move that value into the PULUMI_ENCRYPTION_SALT environment secret and delete the line from the file; the Committed-secret guard job fails while it is there."
+            exit 0
+          fi
+          if [ "$salt_status" -ne 0 ]; then
+            printf '%s\n' "$salt_report"
+            echo "::error::scripts/assert-no-committed-pulumi-secrets.py exited $salt_status. That is neither 'no salt committed' (0) nor 'a salt is committed' (1), so whether $config carries one is unknown and this refuses to guess. The output above is the script's own."
+            exit 1
+          fi
+          if [ -z "$PULUMI_ENCRYPTION_SALT" ]; then
+            echo "::error::the PULUMI_ENCRYPTION_SALT environment secret is empty or unset, and $config carries no salt of its own. Set the secret to this stack's encryption salt before deploying."
+            exit 1
+          fi
+          case "$PULUMI_ENCRYPTION_SALT" in
+            v1:*) ;;
+            *)
+              echo "::error::the PULUMI_ENCRYPTION_SALT environment secret does not look like a Pulumi-generated salt (expected a 'v1:' prefix). Set it to the value alone, without the 'encryptionsalt: ' key in front of it."
+              exit 1
+              ;;
+          esac
+          printf '\nencryptionsalt: %s\n' "$PULUMI_ENCRYPTION_SALT" >> "$config"
+
+      # `--show-sames` for the reason given on the deploy job's preview.
+      - name: Preview the plan
+        env:
+          PULUMI_CONFIG_PASSPHRASE: ${{ secrets.PULUMI_CONFIG_PASSPHRASE }}
+          PULUMI_BACKEND_URL: ${{ vars.PULUMI_BACKEND_URL }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.HETZNER_S3_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.HETZNER_S3_SECRET_ACCESS_KEY }}
+        run: pulumi preview --stack __TENANT_NAME__ --json --show-sames > preview.json
+
+      # The component's own guard, as on the deploy job. A plan that fails it
+      # fails this job, which the deploy job waits on, so nothing reaches the
+      # approval gate.
+      - name: Refuse to apply a plan carrying a delete or replace
+        run: |
+          set -euo pipefail
+          GUARD=node_modules/@branchleft/ghost-platform-tenant/scripts/assert-no-tenant-deletes.py
+          python3 "$GUARD" --self-test
+          python3 "$GUARD" --verify-coverage node_modules/@branchleft/ghost-platform-tenant
+          python3 "$GUARD" preview.json
+
+      # What the approver reads. Resource type and name per step, never a
+      # property value: this stack's outputs include a Pulumi secret, and on a
+      # public tenant repo a log is public. The script refuses a delete or a
+      # replace again for itself and fails closed on a plan it cannot read.
+      - name: Print the plan
+        run: |
+          python3 scripts/summarise-plan.py --self-test > /dev/null
+          python3 scripts/summarise-plan.py preview.json
+
   deploy:
     name: Deploy
     runs-on: ubuntu-latest
-    needs: [typecheck, secret-guard]
+    needs: [typecheck, secret-guard, plan]
 
     # Not a contradiction of `cancel-in-progress: false` below: that refuses a
     # cancel from a NEWER run, this bounds a run that has stopped progressing.

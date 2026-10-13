@@ -166,10 +166,29 @@ upload limits and caps are the render core's defaults.
 | `HETZNER_S3_ACCESS_KEY_ID` / `HETZNER_S3_SECRET_ACCESS_KEY` | `production` env secrets | Reach the state backend. Not scoped per stack — they reach every tenant stack in that bucket, which is why that bucket holds tenant stacks alone and never the estate's own. | provisioning |
 | `APP_HOST_DEPLOY_KEY` | `production` env secret | This tenant's own ed25519 slot key. **Written by an operator, never by provisioning** — minting a host credential and writing it to a repository in one unattended run is a credential-creating credential, which the deploy design exists to not have. | operator |
 
+**A second environment, `production-plan`, for the plan job.** The `plan` job
+previews the stack on main before the deploy job waits for its approval, so
+whoever approves can read what the apply would do. A preview needs the same four
+secrets as the apply (`PULUMI_CONFIG_PASSPHRASE`, `PULUMI_ENCRYPTION_SALT` and
+the two `HETZNER_S3_*` keys), and no job outside the gated one may read them
+from `production`. So the same four secret names are also set, with the same
+values, on `production-plan`. That environment carries no reviewer (it would stop
+the job before the plan exists) and **must** have a deployment branch policy
+naming `main` alone; the plan job's first step refuses to run otherwise. It
+holds no `APP_HOST_DEPLOY_KEY`, and the job runs no `pulumi up`. It cannot run
+on a pull request, because a branch must not read these secrets: a pull request
+is checked by the render under mocks, and the plan is made after the merge.
+
+| Name                                        | Where                         | Set by                                                |
+| ------------------------------------------- | ----------------------------- | ----------------------------------------------------- |
+| the four state and passphrase secrets above | `production-plan` env secrets | an operator, until provisioning is taught to write it |
+| deployment branch policy: `main` alone      | `production-plan` environment | an owner, in repo settings                            |
+
 **Environment secrets, never repository secrets.** A repository secret is
 readable by any workflow run in the repo, including one added on a branch; an
 environment secret is readable only by a job declaring that environment, which
-here is the deploy job alone. On a public tenant repo the environment also
+here is the deploy job (and, for the four secrets above, the plan job on its
+main-only environment). On a public tenant repo the environment also
 carries a required-reviewer rule; on a private one it cannot, which is a plan
 tier limit rather than a misconfiguration — the scoping is then the whole of
 what the environment buys, and it is still the property that matters.
