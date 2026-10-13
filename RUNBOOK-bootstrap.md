@@ -138,7 +138,10 @@ the Compose file is not on the host, or if the volumes were never provisioned.
 The plan job runs first, on the `production-plan` environment, and fails the run
 before the deploy is offered for approval if that environment is missing, has no
 deployment branch policy naming `main` alone, or lacks the four state and
-passphrase secrets (see README.md). Set it up before merging.
+passphrase secrets (see README.md). Set it up before merging, in this order:
+create the environment with no reviewer; set its deployment branch policy to
+`main` alone; only then set the four secrets. Until the policy is set, any branch
+could read those secrets, so the secrets are the last step.
 
 ---
 

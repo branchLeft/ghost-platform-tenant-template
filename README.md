@@ -179,10 +179,14 @@ holds no `APP_HOST_DEPLOY_KEY`, and the job runs no `pulumi up`. It cannot run
 on a pull request, because a branch must not read these secrets: a pull request
 is checked by the render under mocks, and the plan is made after the merge.
 
-| Name                                        | Where                         | Set by                                                |
-| ------------------------------------------- | ----------------------------- | ----------------------------------------------------- |
-| the four state and passphrase secrets above | `production-plan` env secrets | an operator, until provisioning is taught to write it |
-| deployment branch policy: `main` alone      | `production-plan` environment | an owner, in repo settings                            |
+Set them in this order. Until the branch policy names `main` alone, any branch
+could read the four secrets, so the secrets come last.
+
+| Step | What                                        | Where                         | Set by                                                |
+| ---- | ------------------------------------------- | ----------------------------- | ----------------------------------------------------- |
+| 1    | create the `production-plan` environment, with no reviewer | repo settings  | an owner                                              |
+| 2    | deployment branch policy: `main` alone      | `production-plan` environment | an owner, in repo settings                            |
+| 3    | the four state and passphrase secrets above | `production-plan` env secrets | an operator, until provisioning is taught to write it |
 
 **Environment secrets, never repository secrets.** A repository secret is
 readable by any workflow run in the repo, including one added on a branch; an
