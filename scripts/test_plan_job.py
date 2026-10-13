@@ -228,9 +228,9 @@ class TheBranchPolicyGuard(unittest.TestCase):
         self.assertIn(f'environments/{declared}/deployment-branch-policies"', body)
 
     def test_the_refusal_step_calls_the_guard_and_stops_the_job_on_its_exit_status(self) -> None:
-        # Sabotage S1: replacing the guard call with `if false` left every other
-        # test green. The step must call the guard as the condition of an `if`
-        # whose body exits 1, so a refusal ends the job before the secrets are read.
+        # With the guard call replaced by `if false`, every other test in this
+        # module stays green. The step must call the guard as the condition of an
+        # `if` whose body exits 1, so a refusal ends the job before the secrets are read.
         body = _code(_step_named(_job("plan"), "Refuse a plan environment that any branch can use"))
         self.assertRegex(
             body,
