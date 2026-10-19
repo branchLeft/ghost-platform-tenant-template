@@ -59,6 +59,29 @@ def ok(name: str) -> tuple[int, bytes]:
     return 200, fixture(name)
 
 
+PENDING = ("waiting", "queued", "in_progress")
+EMPTY_LISTING = b'{"total_count": 0, "workflow_runs": []}'
+
+
+def run_entry(run_id: int, number: int, status: str, conclusion: str | None, sha: str) -> dict:
+    """One workflow run in the shape the API lists it."""
+    return {
+        "id": run_id,
+        "name": "Infra CI",
+        "run_number": number,
+        "run_attempt": 1,
+        "event": "push",
+        "head_branch": "main",
+        "head_sha": sha,
+        "status": status,
+        "conclusion": conclusion,
+    }
+
+
+def listing(entries: list[dict], total: int | None = None) -> tuple[int, bytes]:
+    return 200, json.dumps({"total_count": len(entries) if total is None else total, "workflow_runs": entries}).encode()
+
+
 class FakeApi:
     """The three reads the script makes, answered from fixtures; logs every request.
 
@@ -67,8 +90,9 @@ class FakeApi:
     answer for the stack config at that commit, and `redirect_contents` answers
     the contents read with a redirect."""
 
-    def __init__(self, success, recent, contents, redirect_contents=False, config_name=CONFIG):
+    def __init__(self, success, recent, contents, redirect_contents=False, config_name=CONFIG, pending=None):
         self.requests: list[dict[str, str]] = []
+        pending = pending or {}
         api = self
         contents_path = f"/repos/{REPOSITORY}/contents/{config_name}"
 
@@ -91,9 +115,15 @@ class FakeApi:
                 if parsed.path == RUNS_PATH:
                     expected = {"branch": ["main"], "event": ["push"], "per_page": ["30"]}
                     listed = {k: v for k, v in query.items() if k != "status"}
-                    if listed != expected or query.get("status", ["success"]) != ["success"]:
+                    asked = query.get("status", [""])[0]
+                    if listed != expected or asked not in ("", "success", *PENDING):
                         return self.reply(400, b'{"message":"unexpected query"}')
-                    status, body = success if "status" in query else recent
+                    if asked == "":
+                        status, body = recent
+                    elif asked == "success":
+                        status, body = success
+                    else:
+                        status, body = pending.get(asked, (200, EMPTY_LISTING))
                     return self.reply(status, body)
                 if parsed.path == contents_path:
                     if redirect_contents:
@@ -226,24 +256,142 @@ class TheLastDeployedRead(ImageCase):
 
     def test_the_baseline_comes_from_the_success_listing_alone(self) -> None:
         # Run 11 failed and sits between 10 and 12 in the unfiltered listing. The
-        # success listing names run 10 only, so the baseline is run 10: a failed
-        # or unlisted run is never read, whatever its commit holds.
-        contents = {OLDER_SHA: (200, fixture(PIN_B)), "1111111111111111111111111111111111111111": (200, fixture(PIN_A))}
-        outcome = self.run_script(PIN_B, self.serve(success=ok("runs-success-pending-12-baseline-10.json"), recent=ok("runs-recent-quiet.json"), contents=contents))
-        self.assertEqualPins(outcome)
+        # success listing names run 10 only (pin A), so that is the baseline. Were
+        # the failed run 11 (pin B, equal to the current pin) taken as the
+        # baseline, this would be a `false`.
+        contents = {OLDER_SHA: (200, fixture(PIN_A)), "1111111111111111111111111111111111111111": (200, fixture(PIN_B))}
+        outcome = self.run_script(PIN_B, self.serve(success=ok("runs-success-only-10.json"), recent=ok("runs-recent-quiet.json"), contents=contents))
+        self.assertAsks(outcome, "pin-differs")
 
     def test_the_requests_are_reads_that_carry_the_token_in_a_header_only(self) -> None:
+        # Six GETs on a quiet history: the success listing, the unfiltered
+        # listing, the waiting, queued and in-progress listings, and the stack
+        # config at the baseline's commit (one more per failed run after it).
         outcome = self.verdict(PIN_A, PIN_A)
-        self.assertEqual(len(outcome.requests), 3)
+        self.assertEqual(len(outcome.requests), 6)
         for request in outcome.requests:
             self.assertEqual(request["method"], "GET")
             self.assertEqual(request["authorization"], f"Bearer {TOKEN}")
             self.assertNotIn(TOKEN, request["path"] + request["query"])
-        self.assertIn("application/vnd.github.raw", outcome.requests[2]["accept"])
+        self.assertEqual(
+            [urllib.parse.parse_qs(r["query"]).get("status") for r in outcome.requests[:5]],
+            [["success"], None, ["waiting"], ["queued"], ["in_progress"]],
+        )
+        self.assertIn("application/vnd.github.raw", outcome.requests[5]["accept"])
 
     def test_it_asks_for_the_config_by_its_own_name_and_the_runs_of_the_workflow_on_main(self) -> None:
         outcome = self.verdict(PIN_A, PIN_A)
         self.assertEqual({r["path"] for r in outcome.requests}, {RUNS_PATH, CONTENTS_PATH})
+
+
+FAILED_SHA = "1212121212121212121212121212121212121212"
+SECOND_FAILED_SHA = "1111111111111111111111111111111111111111"
+
+
+class AFailedRunBetweenTwoSuccessesIsNotSkippedOver(ImageCase):
+    """Run 10 succeeded, a later run did not, and this is run 13. A stopped deploy can leave
+    the host on that run's pin, so the baseline's pin alone does not say what is there."""
+
+    def between(self, current, baseline, failed, recent="runs-recent-failed-between.json", extra=None):
+        contents = {OLDER_SHA: (200, baseline if isinstance(baseline, bytes) else fixture(baseline))}
+        contents[FAILED_SHA] = failed if isinstance(failed, tuple) else (200, fixture(failed))
+        contents.update(extra or {})
+        return self.run_script(current, self.serve(success=ok("runs-success-only-10.json"), recent=ok(recent), contents=contents))
+
+    def test_a_failed_run_with_another_pin_asks(self) -> None:
+        # The reproduced shape: success pin A, failure pin B, current pin A.
+        self.assertAsks(self.between(PIN_A, PIN_A, PIN_B), "intervening-run-pin-differs")
+
+    def test_a_failed_run_with_the_other_pin_asks_in_the_other_direction_too(self) -> None:
+        self.assertAsks(self.between(PIN_B, PIN_B, PIN_A), "intervening-run-pin-differs")
+
+    def test_a_failed_run_with_the_same_pin_is_the_only_false(self) -> None:
+        self.assertEqualPins(self.between(PIN_A, PIN_A, PIN_A))
+        self.assertEqualPins(self.between(PIN_B, PIN_B, PIN_B))
+
+    def test_every_stopped_conclusion_counts(self) -> None:
+        for name, recent in (
+            ("cancelled", "runs-recent-cancelled-between.json"),
+            ("action_required", "runs-recent-action-required-between.json"),
+        ):
+            with self.subTest(conclusion=name):
+                self.assertAsks(self.between(PIN_A, PIN_A, PIN_B, recent=recent), "intervening-run-pin-differs")
+                self.assertEqualPins(self.between(PIN_A, PIN_A, PIN_A, recent=recent))
+
+    def test_two_stopped_runs_are_both_read(self) -> None:
+        recent = "runs-recent-two-failed-between.json"
+        second = {SECOND_FAILED_SHA: (200, fixture(PIN_B))}
+        self.assertAsks(self.between(PIN_A, PIN_A, PIN_A, recent=recent, extra=second), "intervening-run-pin-differs")
+        same = {SECOND_FAILED_SHA: (200, fixture(PIN_A))}
+        self.assertEqualPins(self.between(PIN_A, PIN_A, PIN_A, recent=recent, extra=same))
+
+    def test_a_stopped_run_whose_config_cannot_be_read_asks(self) -> None:
+        for name, failed, reason in (
+            ("404", (404, b'{"message":"Not Found"}'), "api-error"),
+            ("two pins", (200, fixture("stack-config-two-pins.yaml")), "pin-line-count"),
+            ("no pin", (200, fixture("stack-config-no-pin.yaml")), "pin-line-count"),
+            ("not utf-8", (200, b"\xff\xfe\x00"), "intervening-run-unreadable"),
+        ):
+            with self.subTest(case=name):
+                self.assertAsks(self.between(PIN_A, PIN_A, failed), reason)
+
+    def test_the_window_must_reach_back_to_the_baseline(self) -> None:
+        # The success listing names run 10, but the unfiltered window does not hold
+        # it, so a failed run between could be out of sight.
+        contents = {OLDER_SHA: (200, fixture(PIN_A))}
+        outcome = self.run_script(PIN_A, self.serve(success=ok("runs-success-only-10.json"), recent=ok("runs-recent-only-current.json"), contents=contents))
+        self.assertAsks(outcome, "history-window")
+
+    def test_a_failed_run_before_the_baseline_is_not_read(self) -> None:
+        # Run 11 failed before the baseline (run 12), so the host moved on after it.
+        api = self.serve(contents={BASELINE_SHA: (200, fixture(PIN_A))})
+        outcome = self.run_script(PIN_A, api)
+        self.assertEqualPins(outcome)
+        refs = [urllib.parse.parse_qs(r["query"])["ref"] for r in outcome.requests if r["path"] == CONTENTS_PATH]
+        self.assertEqual(refs, [[BASELINE_SHA]])
+
+
+class PendingRunsAreAskedForByStatus(ImageCase):
+    WINDOW_SHAS = [f"{n:040x}" for n in range(1, 40)]
+
+    def window(self, count=30):
+        """A full unfiltered window: the current run 100 (id 9100) and completed successes below it."""
+        entries = [run_entry(9100, 100, "in_progress", None, self.WINDOW_SHAS[0])]
+        entries += [run_entry(9100 - n, 100 - n, "completed", "success", self.WINDOW_SHAS[n]) for n in range(1, count)]
+        return entries
+
+    def run_window(self, pending):
+        entries = self.window()
+        contents = {entries[1]["head_sha"]: (200, fixture(PIN_A))}
+        api = self.serve(success=listing(entries[1:]), recent=listing(entries), contents=contents, pending=pending)
+        return self.run_script(PIN_A, api, env={"GITHUB_RUN_ID": "9100", "GITHUB_RUN_NUMBER": "100"})
+
+    def test_a_quiet_thirty_entry_window_is_a_false(self) -> None:
+        self.assertEqualPins(self.run_window({}))
+
+    def test_an_earlier_pending_run_outside_the_window_asks(self) -> None:
+        # Run 9 is waiting for an approval; thirty newer runs push it out of the unfiltered window.
+        for status in ("waiting", "queued", "in_progress"):
+            with self.subTest(status=status):
+                entries = [run_entry(8990, 9, status, None, "0909090909090909090909090909090909090909")]
+                self.assertAsks(self.run_window({status: listing(entries)}), "earlier-run-pending")
+
+    def test_a_later_pending_run_does_not_ask(self) -> None:
+        entries = [run_entry(9110, 110, "waiting", None, "1111111111111111111111111111111111111111")]
+        self.assertEqualPins(self.run_window({"waiting": listing(entries)}))
+
+    def test_an_api_error_on_a_pending_listing_asks(self) -> None:
+        for status in ("waiting", "queued", "in_progress"):
+            with self.subTest(status=status):
+                self.assertAsks(self.run_window({status: (500, b"{}")}), "api-error")
+
+    def test_a_pending_listing_cut_short_asks(self) -> None:
+        later = [run_entry(9110, 110, "waiting", None, "1111111111111111111111111111111111111111")]
+        self.assertAsks(self.run_window({"waiting": listing(later, total=40)}), "pending-listing-truncated")
+
+    def test_a_pending_listing_that_ignored_its_filter_is_refused(self) -> None:
+        done = [run_entry(8990, 9, "completed", "success", "0909090909090909090909090909090909090909")]
+        self.assertAsks(self.run_window({"queued": listing(done)}), "runs-unreadable")
 
 
 class EveryUnreadableInputAsks(ImageCase):
@@ -258,7 +406,8 @@ class EveryUnreadableInputAsks(ImageCase):
         self.assertAsks(outcome, "later-run-succeeded")
 
     def test_an_earlier_run_still_pending(self) -> None:
-        outcome = self.verdict(PIN_A, PIN_A, success=ok("runs-success-pending-12-baseline-10.json"), recent=ok("runs-recent-pending.json"))
+        # Seen in the unfiltered window, for a status the three pending listings do not name.
+        outcome = self.verdict(PIN_A, PIN_A, success=ok("runs-success-only-10.json"), recent=ok("runs-recent-pending.json"))
         self.assertAsks(outcome, "earlier-run-pending")
 
     def test_an_api_error_on_either_listing_or_the_contents(self) -> None:
@@ -412,6 +561,8 @@ class AnyExceptionAsks(unittest.TestCase):
         def fetch(path, accept):
             if "contents" in path:
                 return fixture(PIN_A)
+            if any(f"status={status}" in path for status in PENDING):
+                return EMPTY_LISTING
             return fixture(SUCCESS if "status=success" in path else RECENT)
 
         verdict = self.evaluate(fetch)

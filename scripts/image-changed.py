@@ -19,6 +19,7 @@ from typing import Callable, NamedTuple
 BRANCH = "main"
 EVENT = "push"
 PER_PAGE = 30
+PENDING_STATUSES = ("waiting", "queued", "in_progress")
 MAX_BODY = 1_048_576
 TIMEOUT_SECONDS = 20
 DEFAULT_API = "https://api.github.com"
@@ -83,16 +84,24 @@ class Run(NamedTuple):
     conclusion: str | None
 
 
-def _runs(raw: bytes, reason: str) -> list[Run]:
+class Listing(NamedTuple):
+    runs: list[Run]
+    total: int
+
+
+def _runs(raw: bytes, reason: str, status: str | None = None) -> Listing:
     """The runs of a workflow-run listing; any entry this does not understand is Unclear.
 
-    Every entry is held to the filter the request asked for, so a listing that
-    ignored the filter is refused rather than read."""
+    Every entry is held to the filter the request asked for (`status`, when one
+    was asked: a run status, or `success` for a completed success), so a listing
+    that ignored the filter is refused rather than read. `total` is the count
+    GitHub says match, which can exceed the entries returned."""
     try:
         doc = json.loads(raw.decode("utf-8"))
     except (ValueError, RecursionError) as error:  # a UnicodeDecodeError is a ValueError
         raise Unclear(reason) from error
     _require(isinstance(doc, dict) and isinstance(doc.get("workflow_runs"), list), reason)
+    _require(_is_int(doc.get("total_count")) and doc["total_count"] >= len(doc["workflow_runs"]), reason)
     found = []
     for entry in doc["workflow_runs"]:
         _require(isinstance(entry, dict), reason)
@@ -101,8 +110,13 @@ def _runs(raw: bytes, reason: str) -> list[Run]:
         _require(isinstance(entry.get("status"), str), reason)
         _require(entry.get("conclusion") is None or isinstance(entry["conclusion"], str), reason)
         _require(entry.get("event") == EVENT and entry.get("head_branch") == BRANCH, reason)
-        found.append(Run(entry["id"], entry["run_number"], entry["head_sha"], entry["status"], entry["conclusion"]))
-    return found
+        run = Run(entry["id"], entry["run_number"], entry["head_sha"], entry["status"], entry["conclusion"])
+        if status == "success":
+            _require(run.status == "completed" and run.conclusion == "success", reason)
+        elif status is not None:
+            _require(run.status == status, reason)
+        found.append(run)
+    return Listing(found, doc["total_count"])
 
 
 def _consistent(runs: list[Run]) -> None:
@@ -141,15 +155,24 @@ def _decide(config_path: str, workflow: str, environ: dict[str, str], fetch: Fet
 
     base = f"/repos/{repository}/actions/workflows/{workflow}/runs?branch={BRANCH}&event={EVENT}&per_page={PER_PAGE}"
     json_type = "application/vnd.github+json"
-    successes = _runs(fetch(base + "&status=success", json_type), "runs-unreadable")
-    recent = _runs(fetch(base, json_type), "runs-unreadable")
-    _consistent(successes + recent)
+    successes = _runs(fetch(base + "&status=success", json_type), "runs-unreadable", "success").runs
+    recent = _runs(fetch(base, json_type), "runs-unreadable").runs
+    pending = []
+    for status in PENDING_STATUSES:
+        listed = _runs(fetch(f"{base}&status={status}", json_type), "runs-unreadable", status)
+        # An earlier run that has not finished may still deploy an older image
+        # after this one, so no pin is trusted as the host's while one is pending.
+        # Asked for by status, not read from the recent window, so an old one is seen.
+        _require(not any(run.number < run_number for run in listed.runs), "earlier-run-pending")
+        # A listing that is cut short may be hiding an earlier run past its end.
+        _require(listed.total <= len(listed.runs), "pending-listing-truncated")
+        pending += listed.runs
+    _consistent(successes + recent + pending)
 
     mine = [run for run in recent if run.id == run_id]
     _require(len(mine) == 1 and mine[0].number == run_number, "current-run-unlocated")
 
-    # An earlier run that has not finished may still deploy an older image after
-    # this one, so no pin is trusted as the host's while one is pending.
+    # The same rule for a status the three listings above do not name.
     _require(not any(run.number < run_number and run.status != "completed" for run in recent), "earlier-run-pending")
     # A later run that already succeeded has put its own image on the host.
     _require(not any(run.number > run_number and run.conclusion == "success" for run in successes), "later-run-succeeded")
@@ -166,9 +189,28 @@ def _decide(config_path: str, workflow: str, environ: dict[str, str], fetch: Fet
     except UnicodeDecodeError as error:
         raise Unclear("baseline-unreadable") from error
 
-    if previous == current:
-        return Verdict(False, "pin-equal", baseline.id)
-    return Verdict(True, "pin-differs", baseline.id)
+    if previous != current:
+        return Verdict(True, "pin-differs", baseline.id)
+
+    # A deploy that failed or was stopped after the baseline can leave the host
+    # between a pin write and its restart, so the host may hold the pin of such a
+    # run, not the baseline's. Every finished run after the baseline that is not
+    # a success must carry the current pin too. The unfiltered window must reach
+    # back to the baseline, or a run between could be out of sight.
+    _require(baseline.id in {run.id for run in recent}, "history-window")
+    between = [
+        run
+        for run in recent
+        if baseline.number < run.number < run_number and run.status == "completed" and run.conclusion != "success"
+    ]
+    for sha in dict.fromkeys(run.sha for run in between):
+        raw = fetch(f"/repos/{repository}/contents/{quoted}?ref={sha}", "application/vnd.github.raw+json")
+        try:
+            held = pin_of(raw.decode("utf-8"))
+        except UnicodeDecodeError as error:
+            raise Unclear("intervening-run-unreadable") from error
+        _require(held == current, "intervening-run-pin-differs")
+    return Verdict(False, "pin-equal", baseline.id)
 
 
 class _NoRedirect(urllib.request.HTTPRedirectHandler):

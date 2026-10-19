@@ -4,6 +4,9 @@ See summarise-plan.md and assert-plan-environment-main-only.md. The workflow is
 read as text (stdlib only), the way test_assert_environment_gated.py reads the
 deploy job, so the credential-free `secret-guard` job runs these too.
 """
+
+from __future__ import annotations
+
 import json
 import os
 import re
@@ -152,6 +155,13 @@ class ThePlanJobCannotDeliver(unittest.TestCase):
         ]
         self.assertEqual(carriers, [SAVE_PLAN_STEP])
 
+    def test_the_deploy_job_swallows_no_failure_at_all(self) -> None:
+        # Strengthened beyond the plan job: the deploy job's apply, guard and SSH steps
+        # must each fail the job, so none may carry `continue-on-error` or `|| true`.
+        code = _code(_job("deploy"))
+        self.assertNotIn("continue-on-error", code)
+        self.assertNotIn("|| true", code)
+
 
 class ThePlanJobMakesTheDeployJobsPlan(unittest.TestCase):
     def test_the_shared_steps_are_equal_to_the_character(self) -> None:
@@ -201,8 +211,30 @@ class ThePlanJobMakesTheDeployJobsPlan(unittest.TestCase):
     def test_the_plan_is_printed_by_the_script_and_never_dumped_whole(self) -> None:
         code = _code(_step_named(_job("plan"), "Print the plan"))
         self.assertIn("scripts/summarise-plan.py preview.json", code)
-        for dumped in ("json.tool", "cat preview.json", "cat preview-plan.json"):
+        for dumped in ("json.tool", "cat preview.json"):
             self.assertNotIn(dumped, _code(_job("plan")))
+
+    def test_only_the_save_and_the_parser_ever_touch_the_saved_plan(self) -> None:
+        # The saved plan holds secrets-provider ciphertext. A spelling denylist (`cat`,
+        # `head -c`, `jq .`) misses the next spelling, so this is positive: outside the
+        # step that writes the file and the step whose script reads it, no step may name it
+        # or glob over the working directory's JSON, upload anything, or run another script
+        # that does.
+        job = _job("plan")
+        allowed = {SAVE_PLAN_STEP, PLAN_STEP}
+        for index, step in enumerate(_steps(job)):
+            name = _names(job)[index]
+            code = _code(step)
+            if name in allowed:
+                continue
+            self.assertNotIn("preview-plan", code, name)
+            self.assertNotRegex(code, r"\*\.json|preview[-.]?\*|\bpreview\*", name)
+            self.assertNotIn("upload-artifact", code, name)
+        self.assertEqual(_code(_step_named(job, PLAN_STEP)).count("preview-plan.json"), 1)
+        for script in sorted(SCRIPTS.glob("*.py")):
+            if script.name.startswith("test_") or script.name == "plan-has-changes.py":
+                continue
+            self.assertNotIn("preview-plan", script.read_text(encoding="utf-8"), script.name)
 
     def test_only_the_deciding_step_writes_the_job_summary(self) -> None:
         job = _job("plan")
@@ -311,23 +343,45 @@ def _config_name() -> str:
 
 
 def _clean_checkout(work: Path, preview: str | None, plan: str | None, config: str | None) -> None:
-    """The files the steps before the decision leave in the workspace, as fixtures."""
+    """The files the steps before the decision leave in the workspace, as fixtures.
+
+    The saved plan is not placed here: the plan-save step writes it, through a stub
+    `pulumi` that copies `stub-plan.json` to the path it is given (or fails, with none)."""
     os.symlink(SCRIPTS, work / "scripts")
-    for name, source in (("preview.json", preview), ("preview-plan.json", plan), (_config_name(), config)):
+    for name, source in (("preview.json", preview), ("stub-plan.json", plan), (_config_name(), config)):
         if source is not None:
             (work / name).write_bytes(fixture(source))
 
 
+# Stands in for `pulumi`: logs the call, makes a noise on stdout the step must discard,
+# and writes the plan fixture where `--save-plan` points, or exits 1 when there is none.
+STUB_PULUMI = """#!/bin/bash
+echo "$*" >> "$STUB_LOG"
+echo "PLAN_STDOUT_MARKER_MUST_BE_DISCARDED"
+[ "$1" = "preview" ] || exit 99
+path=
+while [ "$#" -gt 0 ]; do
+  if [ "$1" = "--save-plan" ]; then path="$2"; fi
+  shift
+done
+[ -n "$path" ] && [ -f stub-plan.json ] || exit 1
+cp stub-plan.json "$path"
+"""
+
+
 class TheStepsAsTheWorkflowRunsThem(unittest.TestCase):
-    """The real `run:` bodies of the four deciding steps, run in order under bash
-    against a local API, so what is asserted is what CI would execute."""
+    """The real `run:` bodies of the four deciding steps (the plan save, against a stub
+    `pulumi`; the parser; the image check, against a local API; the combine), run in order
+    under bash, so what is asserted is what CI would execute. `continue-on-error` is the
+    runner's, not bash's: a failing save step is run on regardless, as the runner would."""
 
     PIN_A = "stack-config-pin-a.yaml"
     PIN_B = "stack-config-pin-b.yaml"
     CLEAN_PREVIEW = "preview-all-same.json"
     CLEAN_PLAN = "plan-all-same.json"
+    ALL_STEPS = (SAVE_PLAN_STEP, PLAN_STEP, IMAGE_STEP, NOOP_STEP)
 
-    def run_steps(self, *, preview, plan, current, baseline, steps=(PLAN_STEP, IMAGE_STEP, NOOP_STEP), **api_kwargs):
+    def run_steps(self, *, preview, plan, current, baseline, steps=ALL_STEPS, **api_kwargs):
         success = api_kwargs.pop("success", ok("runs-success-12-10.json"))
         recent = api_kwargs.pop("recent", ok("runs-recent-quiet.json"))
         contents = {BASELINE_SHA: (200, fixture(baseline))} if isinstance(baseline, str) else baseline
@@ -338,10 +392,16 @@ class TheStepsAsTheWorkflowRunsThem(unittest.TestCase):
             temp = work / "runner-temp"
             temp.mkdir()
             _clean_checkout(work, preview, plan, current)
+            stubs = work / "stub-bin"
+            stubs.mkdir()
+            (stubs / "pulumi").write_text(STUB_PULUMI, encoding="utf-8")
+            (stubs / "pulumi").chmod(0o755)
+            stub_log = work / "pulumi-calls.log"
             github_output = work / "github-output"
             github_summary = work / "github-summary"
             environ = {
-                "PATH": os.environ["PATH"],
+                "PATH": f"{stubs}{os.pathsep}{os.environ['PATH']}",
+                "STUB_LOG": str(stub_log),
                 "RUNNER_TEMP": str(temp),
                 "GITHUB_OUTPUT": str(github_output),
                 "GITHUB_STEP_SUMMARY": str(github_summary),
@@ -352,10 +412,14 @@ class TheStepsAsTheWorkflowRunsThem(unittest.TestCase):
                 "GITHUB_API_URL": api.url,
             }
             codes = {}
+            stdouts = {}
             for name in steps:
                 text = _run_text(_step_named(_job("plan"), name)).replace("__TENANT_NAME__", "blog")
                 done = subprocess.run(["bash", "-e", "-c", text], cwd=work, capture_output=True, text=True, env=environ, check=False)
                 codes[name] = done.returncode
+                stdouts[name] = done.stdout
+            self.stub_calls = stub_log.read_text(encoding="utf-8").splitlines() if stub_log.exists() else []
+            self.stdouts = stdouts
             output = github_output.read_text(encoding="utf-8") if github_output.exists() else ""
             summary = github_summary.read_text(encoding="utf-8") if github_summary.exists() else ""
             return codes, output.splitlines(), summary.splitlines()
@@ -375,7 +439,32 @@ class TheStepsAsTheWorkflowRunsThem(unittest.TestCase):
             with self.subTest(case=name):
                 result = self.run_steps(preview=self.CLEAN_PREVIEW, plan=self.CLEAN_PLAN, current=pin, baseline=pin)
                 self.assertSkips(result)
-                self.assertEqual(result[0], {PLAN_STEP: 0, IMAGE_STEP: 0, NOOP_STEP: 0})
+                self.assertEqual(result[0], {SAVE_PLAN_STEP: 0, PLAN_STEP: 0, IMAGE_STEP: 0, NOOP_STEP: 0})
+
+    def test_the_plan_save_runs_a_preview_that_saves_the_plan_and_discards_its_output(self) -> None:
+        self.run_steps(
+            preview=self.CLEAN_PREVIEW, plan=self.CLEAN_PLAN, current=self.PIN_A, baseline=self.PIN_A, steps=(SAVE_PLAN_STEP,)
+        )
+        stack = _config_name().removeprefix("Pulumi.").removesuffix(".yaml")  # `blog` here, the slug in a generated repo
+        self.assertEqual(self.stub_calls, [f"preview --stack {stack} --save-plan preview-plan.json"])
+        self.assertEqual(self.stdouts[SAVE_PLAN_STEP], "")
+
+    def test_a_failed_run_between_two_successes_asks_over_a_clean_plan(self) -> None:
+        # The reproduced shape through the real steps: success pin A (run 10), failure pin B (run 12), this run pin A.
+        contents = {
+            OLDER_SHA: (200, fixture(self.PIN_A)),
+            "1212121212121212121212121212121212121212": (200, fixture(self.PIN_B)),
+        }
+        result = self.run_steps(
+            preview=self.CLEAN_PREVIEW,
+            plan=self.CLEAN_PLAN,
+            current=self.PIN_A,
+            baseline=contents,
+            success=ok("runs-success-only-10.json"),
+            recent=ok("runs-recent-failed-between.json"),
+        )
+        self.assertAsks(result, "Approval required: the pinned image is not shown")
+        self.assertIn("Image check: intervening-run-pin-differs", result[2])
 
     def test_an_image_only_change_with_an_all_same_preview_asks(self) -> None:
         # The sabotage case that matters: the Pulumi side reads a clean plan, so only the image clause asks.
@@ -402,7 +491,7 @@ class TheStepsAsTheWorkflowRunsThem(unittest.TestCase):
             ("not json", {"recent": (200, b"<html>")}, good),
             ("missing line", {}, {BASELINE_SHA: (200, fixture("stack-config-no-pin.yaml"))}),
             ("duplicate line", {}, {BASELINE_SHA: (200, fixture("stack-config-two-pins.yaml"))}),
-            ("pending earlier run", {"success": ok("runs-success-pending-12-baseline-10.json"), "recent": ok("runs-recent-pending.json")}, {OLDER_SHA: (200, fixture(self.PIN_A))}),
+            ("pending earlier run", {"success": ok("runs-success-only-10.json"), "recent": ok("runs-recent-pending.json")}, {OLDER_SHA: (200, fixture(self.PIN_A))}),
             ("unreadable baseline file", {}, {}),
         )
         for name, api, contents in cases:
@@ -412,7 +501,11 @@ class TheStepsAsTheWorkflowRunsThem(unittest.TestCase):
 
     def test_a_verdict_file_that_was_never_written_asks(self) -> None:
         # The parser step alone, then the image step alone: the missing half reads as "changes".
-        for name, steps in (("no image verdict", (PLAN_STEP, NOOP_STEP)), ("no plan verdict", (IMAGE_STEP, NOOP_STEP)), ("neither", (NOOP_STEP,))):
+        for name, steps in (
+            ("no image verdict", (SAVE_PLAN_STEP, PLAN_STEP, NOOP_STEP)),
+            ("no plan verdict", (IMAGE_STEP, NOOP_STEP)),
+            ("neither", (NOOP_STEP,)),
+        ):
             with self.subTest(case=name):
                 result = self.run_steps(preview=self.CLEAN_PREVIEW, plan=self.CLEAN_PLAN, current=self.PIN_A, baseline=self.PIN_A, steps=steps)
                 self.assertAsks(result)

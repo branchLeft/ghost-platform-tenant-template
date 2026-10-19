@@ -41,24 +41,36 @@ image.
 holds no host key and no write scope (it has `actions: read` and
 `contents: read`, and gains nothing):
 
-1. List the runs of `infra-ci.yml` on `main`, event `push`, newest 30, once
-   filtered to `status=success` and once unfiltered. Every entry in both must
-   carry a numeric `id` and `run_number`, a 40-hex `head_sha`, a `status`, a
-   `conclusion` and the event and branch asked for; one that does not is
-   refused, so a listing that ignored its filter is not read.
+1. List the runs of `infra-ci.yml` on `main`, event `push`, newest 30: filtered
+   to `status=success`, unfiltered, and once each for `status=waiting`,
+   `queued` and `in_progress`. Every entry must carry a numeric `id` and
+   `run_number`, a 40-hex `head_sha`, a `status`, a `conclusion` and the event
+   and branch asked for, and each listing a `total_count`; an entry that does
+   not match its own filter is refused, so a listing that ignored its filter is
+   not read.
 2. Find the current run in the unfiltered listing, by `GITHUB_RUN_ID`, with the
    `run_number` the runner reports. Absent or different: `true`.
-3. Any earlier run (a lower `run_number`) that is not `completed` is still
-   waiting, queued or running and may yet deploy an older image after this one:
-   `true`.
+3. Any earlier run (a lower `run_number`) in the waiting, queued or in-progress
+   listings, or not `completed` in the unfiltered one, may yet deploy an older
+   image after this one: `true`. These are asked for by status, so a pending run
+   older than the newest 30 is seen. A pending listing cut short (its
+   `total_count` above the entries returned) is `true`, as is an API error on
+   any of them.
 4. Any later run that succeeded has already put its own image on the host:
    `true`.
 5. The baseline is the earlier run with the highest `run_number` among the
-   successes. By induction its `head_sha` holds the pin that is on the host: its
-   deploy job succeeded, or was skipped because nothing changed. Failed,
-   rejected and cancelled runs are never read. None at all: `true`.
-6. Read the stack config at that sha through the contents API and compare the
-   `imageRef` value with the checkout's. Equal: `false`.
+   successes. None at all: `true`. Failed, cancelled and stopped runs are never
+   the baseline, because only a success proves the host got its image.
+6. Read the stack config at the baseline's sha through the contents API and
+   compare the `imageRef` value with the checkout's. Different: `true`.
+7. A deploy that failed or was stopped after the baseline can leave the host
+   between a pin write and its restart, so it may hold that run's pin and not
+   the baseline's. Every finished run after the baseline, and before this one,
+   whose conclusion is not `success` (failure, cancelled, timed out, action
+   required, anything else) must hold the current pin too, read the same way: a
+   different pin, or a config that cannot be read, is `true`. For that to be
+   complete the unfiltered window must reach back to the baseline; if it does
+   not, `true`. Only then, all equal: `false`.
 
 The `imageRef` line is read in one shape only: a non-comment line
 `<project>:imageRef: <ref>` whose value is a plain scalar ending in a
@@ -69,7 +81,11 @@ quoted value, a block scalar, a trailing comment or a non-UTF-8 file is `true`.
 
 - A host image changed by hand is never re-asserted: this compares commits, not
   the host. Pulumi drift detection has the same limit.
-- An earlier run older than the newest 30 that is still pending is not seen.
+- A history with more than 30 runs since the last success is `true`
+  (`history-window`): a `false` needs every run after the baseline in view.
+- A failed run since the baseline asks for the approval even if it stopped
+  before it touched the host (a type-check failure, say): this reads the pin of
+  the run, not how far it got. The next success moves the baseline past it.
 - A run whose records are gone (retention) leaves no baseline, which is `true`.
 - Whether the Pulumi plan carries the image as an output change is a separate
   question, answered by `plan-has-changes.py`; this check does not depend on it.
@@ -92,7 +108,9 @@ Appends two lines to the output file, `image_changed=<true|false>` and
 `reason=<code>`, and exits 1 only if that file cannot be written.
 
 Reason codes: `pin-equal`, `pin-differs`, `no-earlier-successful-run`,
-`earlier-run-pending`, `later-run-succeeded`, `current-run-unlocated`,
+`earlier-run-pending`, `pending-listing-truncated`, `later-run-succeeded`,
+`history-window`, `intervening-run-pin-differs`, `intervening-run-unreadable`,
+`current-run-unlocated`,
 `run-order-unknown`, `runs-unreadable`, `api-error`, `pin-line-count`,
 `pin-line-shape`, `config-unreadable`, `baseline-unreadable`, `bad-argument`,
 `bad-environment`, `internal-error`.
@@ -103,13 +121,21 @@ The script is run for real against a local HTTP server answering from
 `testdata/image-changed/`. The ones that matter: an image-only change gives
 `true` in both directions over an otherwise identical run; the only `false` is
 equal pins in a quiet history; each unreadable input (no earlier success, an API
-error on each of the three reads, a redirect, a reply that is not JSON, a run
-order that cannot be established, a pending earlier run, a later success, a
-missing, repeated or quoted pin line) gives `true` on its own.
+error on each listing and the contents read, a redirect, a reply that is not
+JSON, a run order that cannot be established, a pending earlier run (including
+one outside a full 30-entry window, for each of the three statuses), a pending
+listing cut short, a later success, a missing, repeated or quoted pin line) gives
+`true` on its own. A failed, cancelled, timed-out or action-required run between
+two successes gives `true` when its pin differs (both directions), `false` only
+when every such run holds the current pin, and `true` when one's config cannot be
+read.
 
 `test_plan_job.py` runs the four deciding steps' own `run:` bodies in order under
-bash, over an all-`same` preview and plan: an image-only change still gives
+bash (the plan save against a stub `pulumi`, the image check against the local
+API), over an all-`same` preview and plan: an image-only change still gives
 `has_changes=true`; a changed plan gives `true` with equal pins; a missing saved
 plan or a missing verdict file gives `true`; only a clean plan with equal pins
-gives `false`. `test_assert_environment_gated.py` fails if any job declaring the
-`production` environment lacks the has_changes operand in its `if:`.
+gives `false`. It also asserts that no step but the plan save and the parser
+names the saved plan, which holds secrets-provider ciphertext.
+`test_assert_environment_gated.py` fails if any job declaring the `production`
+environment lacks the has_changes operand in its `if:`.
