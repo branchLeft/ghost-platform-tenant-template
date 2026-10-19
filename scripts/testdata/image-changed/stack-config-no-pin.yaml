@@ -1,0 +1,8 @@
+config:
+  example-infra:slug: example
+  example-infra:siteUrl: https://example.invalid
+  example-infra:uid: '30001'
+  example-infra:hostPort: '8101'
+  example-infra:databasePassword:
+    secure: v1:PLACEHOLDER
+  example-infra:mailHost: mail.example.invalid

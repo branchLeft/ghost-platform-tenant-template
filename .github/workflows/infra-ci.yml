@@ -4,7 +4,9 @@ name: Infra CI
 # previews its one stack (the `plan` job, before any approval), then applies it
 # and deploys the pinned image to this tenant's Compose slot on its app host
 # (the `deploy` job, behind the `production` approval gate, which also waits
-# for the plan job to succeed).
+# for the plan job to succeed). A push whose plan changes nothing and whose
+# pinned image is the one last deployed skips the deploy job, and so its
+# approval, with the reason on the first line of the plan job's summary.
 #
 # WHAT THIS STACK IS. The `GhostTenant` component declares no cloud resources.
 # Everything durable a tenant uses already exists and is shared -- the app host,
@@ -251,8 +253,15 @@ jobs:
     needs: [typecheck, secret-guard]
     timeout-minutes: 15
 
-    # Exactly the deploy job's condition, so the two are created together or
-    # not at all, and the deploy job can wait on this one.
+    # The one value the deploy job reads from this job, written by the last
+    # step below and by no other. Only the string 'false' lets the deploy job be
+    # skipped; see the deploy job's `if:` and the last step's comment.
+    outputs:
+      has_changes: ${{ steps.noop.outputs.has_changes }}
+
+    # The deploy job's condition without its last operand (the has_changes
+    # test), so the two are created together or not at all, and the deploy job
+    # can wait on this one. A test holds the two to that.
     if: github.event_name == 'push' && github.ref == 'refs/heads/main' && github.event.repository.is_template != true
 
     environment: production-plan
@@ -410,6 +419,80 @@ jobs:
           python3 scripts/summarise-plan.py --self-test > /dev/null
           python3 scripts/summarise-plan.py preview.json
 
+      # The update plan is saved by a second preview, apart from the one above,
+      # so the preview.json the delete guard and the approver read is produced
+      # exactly as before. Best effort, and the only step in this job that is:
+      # a failure leaves no plan file, which the parser below reads as
+      # "changes", so the deploy job is asked for as before. The plan file can
+      # hold resource inputs and secrets-provider ciphertext, and is never
+      # uploaded, printed or summarised.
+      - name: Save the update plan for the no-change check
+        continue-on-error: true
+        env:
+          PULUMI_CONFIG_PASSPHRASE: ${{ secrets.PULUMI_CONFIG_PASSPHRASE }}
+          PULUMI_BACKEND_URL: ${{ vars.PULUMI_BACKEND_URL }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.HETZNER_S3_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.HETZNER_S3_SECRET_ACCESS_KEY }}
+        run: pulumi preview --stack __TENANT_NAME__ --save-plan preview-plan.json > /dev/null
+
+      # The Pulumi half of "would the deploy change anything". It writes its
+      # verdict and its headline to files of its own, never to the job's
+      # outputs or summary: the combining step below is the only writer of
+      # either, because this job's deploy delivers more than the plan shows.
+      # Fails closed: `has_changes=false` only for a plan that parsed and
+      # changes nothing, outputs included; plan-has-changes.md says what else
+      # counts.
+      - name: Decide whether the plan changes anything
+        run: python3 scripts/plan-has-changes.py preview.json preview-plan.json --github-output "$RUNNER_TEMP/plan-verdict.out" --github-summary "$RUNNER_TEMP/plan-verdict.summary"
+
+      # The other half. The deploy job also puts the pinned image on the app
+      # host over SSH, and a push that changes only the image shows a Pulumi plan
+      # of nothing but `same`. So the image this commit pins is compared with the
+      # one the last successful run of this workflow on main shipped, read from
+      # the run history with this job's own read-only token: no host key, no new
+      # scope. image-changed.md has the rules; anything it cannot establish is
+      # `image_changed=true`.
+      - name: Check the pinned image against the last deployed one
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: python3 -I scripts/image-changed.py --workflow infra-ci.yml --config Pulumi.__TENANT_NAME__.yaml --github-output "$RUNNER_TEMP/image-verdict.out"
+
+      # The only step that writes `has_changes`, and the only one that writes
+      # this job's summary. Both halves must say "no change" for it to be
+      # `false`; a missing or unreadable verdict file reads as `true`, so every
+      # other outcome asks for the approval as before. The first line of the
+      # summary says which way it went and why.
+      - name: Decide whether the deploy is needed
+        id: noop
+        if: always()
+        run: |
+          set -eu
+          plan_says=$(cat "$RUNNER_TEMP/plan-verdict.out" 2>/dev/null) || plan_says=
+          image_says=$(sed -n 1p "$RUNNER_TEMP/image-verdict.out" 2>/dev/null) || image_says=
+          image_reason=$(sed -n 2p "$RUNNER_TEMP/image-verdict.out" 2>/dev/null | grep -Ex 'reason=[a-z-]+') || image_reason='reason=unreadable'
+          if [ "$plan_says" = "has_changes=false" ] && [ "$image_says" = "image_changed=false" ]; then
+            has_changes=false
+            headline='No changes: the deploy job is skipped and no approval is requested (a clean plan, and the pinned image is the one last deployed).'
+          else
+            has_changes=true
+            if [ "$image_says" = "image_changed=false" ]; then
+              headline='Approval required: the plan changes something, or could not be read as clean.'
+            elif [ "$plan_says" = "has_changes=false" ]; then
+              headline='Approval required: the pinned image is not shown to be the one last deployed.'
+            else
+              headline='Approval required: the plan changes something or could not be read as clean, and the pinned image is not shown to be the one last deployed.'
+            fi
+          fi
+          echo "has_changes=$has_changes" >> "$GITHUB_OUTPUT"
+          {
+            printf '%s\n' "$headline"
+            printf 'Image check: %s\n' "${image_reason#reason=}"
+            if [ "$plan_says" != "has_changes=false" ] && [ -f "$RUNNER_TEMP/plan-verdict.summary" ]; then
+              cat "$RUNNER_TEMP/plan-verdict.summary"
+            fi
+            echo
+          } >> "$GITHUB_STEP_SUMMARY"
+
   deploy:
     name: Deploy
     runs-on: ubuntu-latest
@@ -427,7 +510,13 @@ jobs:
     # `!= true`, not `== false` -- see the type-check job's placeholder-guard
     # comment above for why an absent/null `is_template` must fail open into
     # running, not skipping.
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && github.event.repository.is_template != true
+    #
+    # The last operand skips this job, and so its approval, only when the plan
+    # job's verdict is exactly 'false': both a clean plan and a pinned image
+    # equal to the last deployed one. An unset output asks, and so does every
+    # verdict the plan job could not establish. This job delivers an image over
+    # SSH as well as the Pulumi apply, so an image-only change is a change.
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && github.event.repository.is_template != true && needs.plan.outputs.has_changes != 'false'
 
     # Load-bearing, not a deployment-history label: every secret this job reads
     # is scoped to this environment, so no other job in this repo -- including

@@ -5,6 +5,7 @@ read as text (stdlib only), the way test_assert_environment_gated.py reads the
 deploy job, so the credential-free `secret-guard` job runs these too.
 """
 import json
+import os
 import re
 import subprocess
 import sys
@@ -13,8 +14,24 @@ import unittest
 from pathlib import Path
 
 SCRIPTS = Path(__file__).resolve().parent
+sys.path.insert(0, str(SCRIPTS))
+
+from test_image_changed import (  # noqa: E402 -- after the path line above
+    BASELINE_SHA,
+    OLDER_SHA,
+    FakeApi,
+    fixture,
+    ok,
+)
+
 WORKFLOW = SCRIPTS.parent / ".github" / "workflows" / "infra-ci.yml"
 MAIN_ONLY = SCRIPTS / "assert-plan-environment-main-only.py"
+
+SAVE_PLAN_STEP = "Save the update plan for the no-change check"
+PLAN_STEP = "Decide whether the plan changes anything"
+IMAGE_STEP = "Check the pinned image against the last deployed one"
+NOOP_STEP = "Decide whether the deploy is needed"
+HAS_CHANGES_OPERAND = "needs.plan.outputs.has_changes != 'false'"
 
 # The steps the plan job repeats from the deploy job. A plan made with a
 # different login, salt, preview or guard than the apply is a plan of something
@@ -80,8 +97,10 @@ class ThePlanJobIsWiredAheadOfTheGate(unittest.TestCase):
         self.assertRegex(needs, r"\btypecheck\b")
         self.assertRegex(needs, r"\bsecret-guard\b")
 
-    def test_the_plan_job_has_exactly_the_deploy_jobs_condition(self) -> None:
-        self.assertEqual(_field(_job("plan"), "if"), _field(_job("deploy"), "if"))
+    def test_the_plan_job_has_the_deploy_jobs_condition_less_the_has_changes_operand(self) -> None:
+        # The two jobs are created together or not at all; the deploy job's one
+        # extra operand is the verdict, and it is the last (see TheDeployJobSkipsOnlyOnAnExplicitFalse).
+        self.assertEqual(_field(_job("plan"), "if") + f" && {HAS_CHANGES_OPERAND}", _field(_job("deploy"), "if"))
 
     def test_the_plan_job_never_runs_in_the_template_or_off_main(self) -> None:
         condition = _field(_job("plan"), "if")
@@ -122,10 +141,16 @@ class ThePlanJobCannotDeliver(unittest.TestCase):
         for line in match.group(1).splitlines():  # type: ignore[union-attr]
             self.assertRegex(line.strip(), r"^[a-z-]+: read$")
 
-    def test_no_step_swallows_a_failure(self) -> None:
+    def test_no_step_swallows_a_failure_but_the_best_effort_plan_save(self) -> None:
         code = _code(_job("plan"))
-        self.assertNotIn("continue-on-error", code)
         self.assertNotIn("|| true", code)
+        # The plan save is best effort because the decision step below it reads a
+        # missing plan as "changes"; no other step in this job may carry the key.
+        job = _job("plan")
+        carriers = [
+            _names(job)[index] for index, step in enumerate(_steps(job)) if "continue-on-error" in _code(step)
+        ]
+        self.assertEqual(carriers, [SAVE_PLAN_STEP])
 
 
 class ThePlanJobMakesTheDeployJobsPlan(unittest.TestCase):
@@ -154,6 +179,10 @@ class ThePlanJobMakesTheDeployJobsPlan(unittest.TestCase):
             "Preview the plan",
             "Refuse to apply a plan carrying a delete or replace",
             "Print the plan",
+            SAVE_PLAN_STEP,
+            PLAN_STEP,
+            IMAGE_STEP,
+            NOOP_STEP,
         ]
         positions = [names.index(n) for n in order]
         self.assertEqual(positions, sorted(positions))
@@ -172,8 +201,222 @@ class ThePlanJobMakesTheDeployJobsPlan(unittest.TestCase):
     def test_the_plan_is_printed_by_the_script_and_never_dumped_whole(self) -> None:
         code = _code(_step_named(_job("plan"), "Print the plan"))
         self.assertIn("scripts/summarise-plan.py preview.json", code)
-        for dumped in ("json.tool", "cat preview.json", "GITHUB_STEP_SUMMARY"):
+        for dumped in ("json.tool", "cat preview.json", "cat preview-plan.json"):
             self.assertNotIn(dumped, _code(_job("plan")))
+
+    def test_only_the_deciding_step_writes_the_job_summary(self) -> None:
+        job = _job("plan")
+        writers = [
+            _names(job)[index] for index, step in enumerate(_steps(job)) if "GITHUB_STEP_SUMMARY" in _code(step)
+        ]
+        self.assertEqual(writers, [NOOP_STEP])
+
+
+def _run_text(step: list[str]) -> str:
+    """The shell text of a step's `run:`, a one-line value or a `|` block."""
+    for index, line in enumerate(step):
+        block = re.fullmatch(r"        run: \|\s*", line)
+        if block:
+            body: list[str] = []
+            for rest in step[index + 1 :]:
+                if rest.strip() and not rest.startswith(" " * 10):
+                    break
+                body.append(rest[10:])
+            return "\n".join(body) + "\n"
+        single = re.fullmatch(r"        run: (\S.*)", line)
+        if single:
+            return single.group(1) + "\n"
+    raise AssertionError("the step has no run:")
+
+
+class TheDeployJobSkipsOnlyOnAnExplicitFalse(unittest.TestCase):
+    def test_the_deploy_jobs_condition_ends_in_the_has_changes_operand(self) -> None:
+        condition = _field(_job("deploy"), "if")
+        self.assertTrue(condition.endswith(f" && {HAS_CHANGES_OPERAND}"), condition)
+
+    def test_the_condition_is_one_conjunction_with_no_or_and_no_equality_to_true(self) -> None:
+        condition = _field(_job("deploy"), "if")
+        self.assertNotIn("||", condition)
+        self.assertNotIn("has_changes == 'true'", condition)
+        self.assertEqual(condition.count("has_changes"), 1)
+
+    def test_the_gates_are_untouched(self) -> None:
+        deploy = _job("deploy")
+        self.assertEqual(_field(deploy, "environment"), "production")
+        self.assertEqual(_field(deploy, "needs"), "[typecheck, secret-guard, plan]")
+        self.assertRegex("\n".join(deploy), r"group: deploy-\S+")
+        self.assertIn("cancel-in-progress: false", "\n".join(deploy))
+        self.assertEqual(_names(deploy)[1], "Refuse to deploy through an ungated environment")
+
+
+class ThePlanJobPublishesOneVerdictFromOneStep(unittest.TestCase):
+    def test_the_job_output_is_the_deciding_steps_and_nothing_else(self) -> None:
+        text = "\n".join(_job("plan"))
+        self.assertIn("    outputs:\n      has_changes: ${{ steps.noop.outputs.has_changes }}\n", text)
+        self.assertEqual(text.count("outputs.has_changes"), 1)
+
+    def test_only_the_deciding_step_writes_has_changes_to_the_job_output(self) -> None:
+        job = _job("plan")
+        for index, step in enumerate(_steps(job)):
+            name = _names(job)[index]
+            code = _code(step)
+            if name == NOOP_STEP:
+                self.assertEqual(code.count("GITHUB_OUTPUT"), 1)
+                self.assertIn('echo "has_changes=$has_changes" >> "$GITHUB_OUTPUT"', code)
+                self.assertIn("id: noop", code)
+            else:
+                self.assertNotIn("GITHUB_OUTPUT", code, name)
+                self.assertNotIn("id: noop", code, name)
+
+    def test_neither_half_writes_the_job_output_or_summary(self) -> None:
+        for name in (PLAN_STEP, IMAGE_STEP):
+            code = _code(_step_named(_job("plan"), name))
+            self.assertIn('"$RUNNER_TEMP/', code)
+            self.assertNotIn("GITHUB_OUTPUT", code)
+            self.assertNotIn("GITHUB_STEP_SUMMARY", code)
+
+    def test_the_image_check_runs_isolated_with_the_runs_own_token_and_no_other(self) -> None:
+        step = _step_named(_job("plan"), IMAGE_STEP)
+        code = _code(step)
+        self.assertIn("python3 -I scripts/image-changed.py", code)
+        self.assertIn("GITHUB_TOKEN: ${{ github.token }}", code)
+        self.assertNotIn("secrets.", code)
+
+    def test_the_plan_job_gains_no_permission_and_no_environment(self) -> None:
+        block = re.search(r"    permissions:\n((?:      .*\n?)+)", "\n".join(_job("plan")))
+        self.assertIsNotNone(block)
+        granted = sorted(line.strip() for line in block.group(1).splitlines())  # type: ignore[union-attr]
+        self.assertEqual(granted, ["actions: read", "contents: read", "packages: read"])
+        self.assertEqual(_field(_job("plan"), "environment"), "production-plan")
+
+    def test_the_plan_save_uses_the_previews_credentials_and_the_state_backend_only(self) -> None:
+        save = _code(_step_named(_job("plan"), SAVE_PLAN_STEP))
+        preview = _code(_step_named(_job("plan"), "Preview the plan"))
+        self.assertIn("--save-plan preview-plan.json", save)
+        self.assertEqual(_env_block(save), _env_block(preview))
+
+
+def _env_block(code: str) -> str:
+    match = re.search(r"        env:\n((?:          .*\n?)+)", code + "\n")
+    assert match is not None, code
+    return match.group(1)
+
+
+def _config_name() -> str:
+    """The stack config file the image step is told to read, as the workflow spells it
+    (a generated repo carries its own name where the template carries the placeholder)."""
+    match = re.search(r"--config (\S+)", _run_text(_step_named(_job("plan"), IMAGE_STEP)))
+    assert match is not None
+    return match.group(1).replace("__TENANT_NAME__", "blog")
+
+
+def _clean_checkout(work: Path, preview: str | None, plan: str | None, config: str | None) -> None:
+    """The files the steps before the decision leave in the workspace, as fixtures."""
+    os.symlink(SCRIPTS, work / "scripts")
+    for name, source in (("preview.json", preview), ("preview-plan.json", plan), (_config_name(), config)):
+        if source is not None:
+            (work / name).write_bytes(fixture(source))
+
+
+class TheStepsAsTheWorkflowRunsThem(unittest.TestCase):
+    """The real `run:` bodies of the four deciding steps, run in order under bash
+    against a local API, so what is asserted is what CI would execute."""
+
+    PIN_A = "stack-config-pin-a.yaml"
+    PIN_B = "stack-config-pin-b.yaml"
+    CLEAN_PREVIEW = "preview-all-same.json"
+    CLEAN_PLAN = "plan-all-same.json"
+
+    def run_steps(self, *, preview, plan, current, baseline, steps=(PLAN_STEP, IMAGE_STEP, NOOP_STEP), **api_kwargs):
+        success = api_kwargs.pop("success", ok("runs-success-12-10.json"))
+        recent = api_kwargs.pop("recent", ok("runs-recent-quiet.json"))
+        contents = {BASELINE_SHA: (200, fixture(baseline))} if isinstance(baseline, str) else baseline
+        api = FakeApi(success, recent, contents, config_name=_config_name())
+        self.addCleanup(api.close)
+        with tempfile.TemporaryDirectory() as tmp:
+            work = Path(tmp)
+            temp = work / "runner-temp"
+            temp.mkdir()
+            _clean_checkout(work, preview, plan, current)
+            github_output = work / "github-output"
+            github_summary = work / "github-summary"
+            environ = {
+                "PATH": os.environ["PATH"],
+                "RUNNER_TEMP": str(temp),
+                "GITHUB_OUTPUT": str(github_output),
+                "GITHUB_STEP_SUMMARY": str(github_summary),
+                "GITHUB_TOKEN": "stub-token-never-real",
+                "GITHUB_REPOSITORY": "example/tenant",
+                "GITHUB_RUN_ID": "9003",
+                "GITHUB_RUN_NUMBER": "13",
+                "GITHUB_API_URL": api.url,
+            }
+            codes = {}
+            for name in steps:
+                text = _run_text(_step_named(_job("plan"), name)).replace("__TENANT_NAME__", "blog")
+                done = subprocess.run(["bash", "-e", "-c", text], cwd=work, capture_output=True, text=True, env=environ, check=False)
+                codes[name] = done.returncode
+            output = github_output.read_text(encoding="utf-8") if github_output.exists() else ""
+            summary = github_summary.read_text(encoding="utf-8") if github_summary.exists() else ""
+            return codes, output.splitlines(), summary.splitlines()
+
+    def assertSkips(self, result) -> None:
+        codes, output, summary = result
+        self.assertEqual(output, ["has_changes=false"], (codes, summary))
+        self.assertTrue(summary[0].startswith("No changes: the deploy job is skipped"), summary)
+
+    def assertAsks(self, result, first_line_start="Approval required: ") -> None:
+        codes, output, summary = result
+        self.assertEqual(output, ["has_changes=true"], (codes, summary))
+        self.assertTrue(summary[0].startswith(first_line_start), summary)
+
+    def test_a_clean_plan_and_an_unchanged_image_skips_the_deploy(self) -> None:
+        for name, pin in (("pin a", self.PIN_A), ("pin b", self.PIN_B)):
+            with self.subTest(case=name):
+                result = self.run_steps(preview=self.CLEAN_PREVIEW, plan=self.CLEAN_PLAN, current=pin, baseline=pin)
+                self.assertSkips(result)
+                self.assertEqual(result[0], {PLAN_STEP: 0, IMAGE_STEP: 0, NOOP_STEP: 0})
+
+    def test_an_image_only_change_with_an_all_same_preview_asks(self) -> None:
+        # The sabotage case that matters: the Pulumi side reads a clean plan, so only the image clause asks.
+        for name, current, baseline in (("a to b", self.PIN_B, self.PIN_A), ("b to a", self.PIN_A, self.PIN_B)):
+            with self.subTest(case=name):
+                result = self.run_steps(preview=self.CLEAN_PREVIEW, plan=self.CLEAN_PLAN, current=current, baseline=baseline)
+                self.assertAsks(result, "Approval required: the pinned image is not shown")
+                self.assertIn("Image check: pin-differs", result[2])
+
+    def test_a_changed_plan_asks_whatever_the_image_says(self) -> None:
+        result = self.run_steps(preview="preview-one-update.json", plan=self.CLEAN_PLAN, current=self.PIN_A, baseline=self.PIN_A)
+        self.assertAsks(result, "Approval required: the plan changes something")
+        self.assertIn("Image check: pin-equal", result[2])
+
+    def test_a_missing_saved_plan_asks_even_with_equal_pins(self) -> None:
+        result = self.run_steps(preview=self.CLEAN_PREVIEW, plan=None, current=self.PIN_A, baseline=self.PIN_A)
+        self.assertAsks(result)
+
+    def test_every_image_side_failure_asks_even_over_a_clean_plan(self) -> None:
+        good = {BASELINE_SHA: (200, fixture(self.PIN_A))}
+        cases = (
+            ("no earlier success", {"success": ok("runs-empty.json"), "recent": ok("runs-recent-only-current.json")}, good),
+            ("api error", {"success": (500, b"{}")}, good),
+            ("not json", {"recent": (200, b"<html>")}, good),
+            ("missing line", {}, {BASELINE_SHA: (200, fixture("stack-config-no-pin.yaml"))}),
+            ("duplicate line", {}, {BASELINE_SHA: (200, fixture("stack-config-two-pins.yaml"))}),
+            ("pending earlier run", {"success": ok("runs-success-pending-12-baseline-10.json"), "recent": ok("runs-recent-pending.json")}, {OLDER_SHA: (200, fixture(self.PIN_A))}),
+            ("unreadable baseline file", {}, {}),
+        )
+        for name, api, contents in cases:
+            with self.subTest(case=name):
+                result = self.run_steps(preview=self.CLEAN_PREVIEW, plan=self.CLEAN_PLAN, current=self.PIN_A, baseline=contents, **api)
+                self.assertAsks(result, "Approval required: the pinned image is not shown")
+
+    def test_a_verdict_file_that_was_never_written_asks(self) -> None:
+        # The parser step alone, then the image step alone: the missing half reads as "changes".
+        for name, steps in (("no image verdict", (PLAN_STEP, NOOP_STEP)), ("no plan verdict", (IMAGE_STEP, NOOP_STEP)), ("neither", (NOOP_STEP,))):
+            with self.subTest(case=name):
+                result = self.run_steps(preview=self.CLEAN_PREVIEW, plan=self.CLEAN_PLAN, current=self.PIN_A, baseline=self.PIN_A, steps=steps)
+                self.assertAsks(result)
+                self.assertEqual(result[1], ["has_changes=true"])
 
 
 def _run_guard(env, policies):

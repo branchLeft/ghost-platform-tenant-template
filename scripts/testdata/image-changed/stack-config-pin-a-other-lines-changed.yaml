@@ -1,0 +1,10 @@
+config:
+  example-infra:slug: example
+  example-infra:siteUrl: https://changed.example.invalid
+  example-infra:uid: '30001'
+  example-infra:hostPort: '8102'
+  # example-infra:imageRef: ghcr.io/example/ghost-tenant@sha256:c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3
+  example-infra:imageRef: ghcr.io/example/ghost-tenant@sha256:a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1
+  example-infra:databasePassword:
+    secure: v1:PLACEHOLDER
+  example-infra:mailHost: mail.changed.example.invalid

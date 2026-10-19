@@ -1,0 +1,6 @@
+config:
+  example-infra:slug: example
+  example-infra:siteUrl: https://example.invalid
+  example-infra:imageRef: 'ghcr.io/example/ghost-tenant@sha256:a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1'
+  example-infra:databasePassword:
+    secure: v1:PLACEHOLDER
