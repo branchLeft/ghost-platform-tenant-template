@@ -90,7 +90,7 @@ def _runs(raw: bytes, reason: str) -> list[Run]:
     ignored the filter is refused rather than read."""
     try:
         doc = json.loads(raw.decode("utf-8"))
-    except (ValueError, UnicodeDecodeError, RecursionError) as error:
+    except (ValueError, RecursionError) as error:  # a UnicodeDecodeError is a ValueError
         raise Unclear(reason) from error
     _require(isinstance(doc, dict) and isinstance(doc.get("workflow_runs"), list), reason)
     found = []
