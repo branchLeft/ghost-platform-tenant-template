@@ -1,0 +1,38 @@
+{
+  "total_count": 3,
+  "workflow_runs": [
+    {
+      "id": 9003,
+      "name": "Infra CI",
+      "run_number": 13,
+      "run_attempt": 1,
+      "event": "push",
+      "head_branch": "main",
+      "head_sha": "1313131313131313131313131313131313131313",
+      "status": "in_progress",
+      "conclusion": null
+    },
+    {
+      "id": 9002,
+      "name": "Infra CI",
+      "run_number": 12,
+      "run_attempt": 1,
+      "event": "push",
+      "head_branch": "main",
+      "head_sha": "1212121212121212121212121212121212121212",
+      "status": "waiting",
+      "conclusion": null
+    },
+    {
+      "id": 9000,
+      "name": "Infra CI",
+      "run_number": 10,
+      "run_attempt": 1,
+      "event": "push",
+      "head_branch": "main",
+      "head_sha": "1010101010101010101010101010101010101010",
+      "status": "completed",
+      "conclusion": "success"
+    }
+  ]
+}

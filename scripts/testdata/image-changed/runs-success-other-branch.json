@@ -1,0 +1,16 @@
+{
+  "total_count": 1,
+  "workflow_runs": [
+    {
+      "id": 9002,
+      "name": "Infra CI",
+      "run_number": 12,
+      "run_attempt": 1,
+      "event": "push",
+      "head_branch": "feature",
+      "head_sha": "1212121212121212121212121212121212121212",
+      "status": "completed",
+      "conclusion": "success"
+    }
+  ]
+}

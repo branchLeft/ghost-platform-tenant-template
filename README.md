@@ -179,6 +179,17 @@ holds no `APP_HOST_DEPLOY_KEY`, and the job runs no `pulumi up`. It cannot run
 on a pull request, because a branch must not read these secrets: a pull request
 is checked by the render under mocks, and the plan is made after the merge.
 
+**A push that changes nothing skips the deploy job, and says so.** The plan job
+publishes one value, `has_changes`, and the deploy job's `if:` skips it, and so
+its approval, only when that is exactly `false`. It is `false` only when two
+checks both find no change: `scripts/plan-has-changes.py` reads the Pulumi plan,
+and `scripts/image-changed.py` compares `imageRef` with the one the last
+successful run on main shipped. The second exists because the deploy job also
+puts the image on the host over SSH, which a plan of nothing but unchanged
+resources does not show. Anything either cannot establish asks for the approval
+as before. The first line of the plan job's summary says which way it went and
+why; `scripts/image-changed.md` has the rules.
+
 Set them in this order. Until the branch policy names `main` alone, any branch
 could read the four secrets, so the secrets come last.
 

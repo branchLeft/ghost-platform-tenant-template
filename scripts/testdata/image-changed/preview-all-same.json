@@ -1,0 +1,41 @@
+{
+  "steps": [
+    {
+      "op": "same",
+      "urn": "urn:pulumi:blog::example-infra::pulumi:pulumi:Stack::example-infra-blog",
+      "oldState": {
+        "urn": "urn:pulumi:blog::example-infra::pulumi:pulumi:Stack::example-infra-blog",
+        "custom": false,
+        "type": "pulumi:pulumi:Stack",
+        "outputs": {
+          "image": "ghcr.io/example/ghost-tenant@sha256:b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2"
+        }
+      },
+      "newState": {
+        "urn": "urn:pulumi:blog::example-infra::pulumi:pulumi:Stack::example-infra-blog",
+        "custom": false,
+        "type": "pulumi:pulumi:Stack"
+      }
+    },
+    {
+      "op": "same",
+      "urn": "urn:pulumi:blog::example-infra::ghostPlatform:tenant:GhostTenant::example",
+      "oldState": {
+        "urn": "urn:pulumi:blog::example-infra::ghostPlatform:tenant:GhostTenant::example",
+        "custom": false,
+        "type": "ghostPlatform:tenant:GhostTenant",
+        "parent": "urn:pulumi:blog::example-infra::pulumi:pulumi:Stack::example-infra-blog"
+      },
+      "newState": {
+        "urn": "urn:pulumi:blog::example-infra::ghostPlatform:tenant:GhostTenant::example",
+        "custom": false,
+        "type": "ghostPlatform:tenant:GhostTenant",
+        "parent": "urn:pulumi:blog::example-infra::pulumi:pulumi:Stack::example-infra-blog"
+      }
+    }
+  ],
+  "duration": 1,
+  "changeSummary": {
+    "same": 2
+  }
+}

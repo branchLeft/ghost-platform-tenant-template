@@ -1,0 +1,30 @@
+{
+  "manifest": {
+    "version": "v0"
+  },
+  "config": {},
+  "resourcePlans": {
+    "urn:pulumi:blog::example-infra::pulumi:pulumi:Stack::example-infra-blog": {
+      "goal": {
+        "type": "pulumi:pulumi:Stack",
+        "inputDiff": {},
+        "outputDiff": {}
+      },
+      "steps": ["same"],
+      "state": {
+        "image": "ghcr.io/example/ghost-tenant@sha256:b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2"
+      }
+    },
+    "urn:pulumi:blog::example-infra::ghostPlatform:tenant:GhostTenant::example": {
+      "goal": {
+        "type": "ghostPlatform:tenant:GhostTenant",
+        "name": "example",
+        "custom": false,
+        "parent": "urn:pulumi:blog::example-infra::pulumi:pulumi:Stack::example-infra-blog",
+        "inputDiff": {},
+        "outputDiff": {}
+      },
+      "steps": ["same"]
+    }
+  }
+}
