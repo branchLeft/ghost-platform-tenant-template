@@ -362,6 +362,12 @@ class EveryUnreadableInputAsks(ImageCase):
                 outcome = self.verdict(PIN_A, PIN_A, env=env)
                 self.assertAsks(outcome, "bad-environment")
 
+    def test_an_error_before_the_verdict_function_is_reached_is_still_a_true(self) -> None:
+        # An API address urllib cannot parse raises outside evaluate(); main()'s own
+        # net must turn it into a true, not into a crash that leaves no verdict.
+        outcome = self.verdict(PIN_A, PIN_A, env={"GITHUB_API_URL": "http://["})
+        self.assertAsks(outcome, "internal-error")
+
     def test_an_argument_that_is_not_a_plain_file_name(self) -> None:
         outcome = self.run_script(PIN_A, self.serve(contents={BASELINE_SHA: (200, fixture(PIN_A))}), config_name="../Pulumi.blog.yaml")
         self.assertAsks(outcome, "bad-argument")
