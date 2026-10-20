@@ -182,7 +182,7 @@ is checked by the render under mocks, and the plan is made after the merge.
 **A push that changes nothing skips the deploy job, and says so.** The plan job
 publishes one value, `has_changes`, and the deploy job's `if:` skips it, and so
 its approval, only when that is exactly `false`. It is `false` only when two
-checks both find no change: `scripts/plan-has-changes.py` reads the Pulumi plan,
+checks both find no change: the `plan-has-changes` action reads the Pulumi plan,
 and `scripts/image-changed.py` compares `imageRef` with the one the last
 successful run on main shipped. The second exists because the deploy job also
 puts the image on the host over SSH, which a plan of nothing but unchanged
