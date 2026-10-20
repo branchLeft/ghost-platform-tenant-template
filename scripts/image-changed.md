@@ -2,7 +2,7 @@
 
 Decides whether the image this stack pins is different from the one last
 deployed. Run by the `Plan` job in `.github/workflows/infra-ci.yml` as
-`python3 -I scripts/image-changed.py`, next to `plan-has-changes.py`, so the
+`python3 -I scripts/image-changed.py`, next to the `plan-has-changes` action, so the
 `Deploy` job can be skipped, and its approval never asked for, when nothing
 would change.
 
@@ -11,20 +11,15 @@ would change.
 The deploy job does two things: the Pulumi apply, and an SSH step that puts the
 pinned image on the app host. The apply renders configuration and creates
 nothing, so a push that changes only `imageRef` can show a Pulumi plan of
-nothing but `same` and still be a real deploy. `plan-has-changes.py` reads the
+nothing but `same` and still be a real deploy. The `plan-has-changes` action reads the
 plan, so on its own it could report `false` over an image that has not shipped.
 This script reads the other half.
 
-`plan-has-changes.py` and `test_plan_has_changes.py` are byte-for-byte copies
-of the same files in `branchLeft/shared-infra` (`scripts/`, git blobs
-`cb94741cbbf3f470820fb79ce12b11718bdfde8d` and
-`abbe29a4f0b87d301839b3bec13f44a419b273c8`), and `plan-has-changes.md` is the
-copy `branchLeft/ghost-platform` carries (git blob
-`62061fb7e998569e14fad6fc1a165adfdf4f5df9`). Re-copy them deliberately, never
-edit them here. The `.md` says "apply job" where this repo's job is `Deploy`,
-and its headline says the apply is skipped: this workflow gives the script
-files of its own for the verdict and the headline and never shows its
-no-change headline, because the script knows only half of the answer.
+The plan verdict is the shared `plan-has-changes` action in
+`branchLeft/github-workflows`, pinned by commit; this repo keeps no copy of it.
+Re-pin deliberately, never edit a copy here. The workflow runs the action with
+`write-summary: 'false'` and writes the one headline itself, because the action
+knows only half of the answer.
 
 The plan job's `has_changes` is `false` only when both say no change. The step
 that combines them, `Decide whether the deploy is needed`, is the one writer of
@@ -88,7 +83,7 @@ quoted value, a block scalar, a trailing comment or a non-UTF-8 file is `true`.
   the run, not how far it got. The next success moves the baseline past it.
 - A run whose records are gone (retention) leaves no baseline, which is `true`.
 - Whether the Pulumi plan carries the image as an output change is a separate
-  question, answered by `plan-has-changes.py`; this check does not depend on it.
+  question, answered by the `plan-has-changes` action; this check does not depend on it.
 
 ## Fail closed, and what leaves the machine
 

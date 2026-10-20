@@ -217,6 +217,17 @@ jobs:
       - name: Refuse an inline credential in a runbook
         run: python3 scripts/assert-no-inline-credential.py $(git ls-files '*.md')
 
+      # The no-op deploy gate's wiring, checked from the shared action pinned by
+      # commit. It reads this workflow file only, holds no credential, and runs
+      # on every pull request, so a broken gate fails before it can merge.
+      - name: Check the no-op deploy gate's wiring
+        uses: branchLeft/github-workflows/.github/actions/check-apply-gate@2cfa57c06773bc70172022be12a85ce4ae5bcb6b # v1.0.10
+        with:
+          workflow: .github/workflows/infra-ci.yml
+          pairs: plan:deploy
+          verdict-step: noop
+          plan-file: preview-plan.json
+
   # The plan, made BEFORE the deploy job below waits for its approval, so that
   # whoever approves (the owner, or the deploy-approval App on the owner's
   # behalf) can read what the apply would do instead of approving blind. The
@@ -435,15 +446,21 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.HETZNER_S3_SECRET_ACCESS_KEY }}
         run: pulumi preview --stack __TENANT_NAME__ --save-plan preview-plan.json > /dev/null
 
-      # The Pulumi half of "would the deploy change anything". It writes its
-      # verdict and its headline to files of its own, never to the job's
-      # outputs or summary: the combining step below is the only writer of
-      # either, because this job's deploy delivers more than the plan shows.
-      # Fails closed: `has_changes=false` only for a plan that parsed and
-      # changes nothing, outputs included; plan-has-changes.md says what else
-      # counts.
+      # The Pulumi half of "would the deploy change anything", from the shared
+      # action pinned by commit. It writes its headline to a file and not to the
+      # job summary: the combining step below is the only writer of either,
+      # because this job's deploy delivers more than the plan shows. Fails
+      # closed: `has_changes` is `false` only for a plan that parsed and changes
+      # nothing, outputs included.
       - name: Decide whether the plan changes anything
-        run: python3 scripts/plan-has-changes.py preview.json preview-plan.json --github-output "$RUNNER_TEMP/plan-verdict.out" --github-summary "$RUNNER_TEMP/plan-verdict.summary"
+        id: plan
+        if: always()
+        uses: branchLeft/github-workflows/.github/actions/plan-has-changes@2cfa57c06773bc70172022be12a85ce4ae5bcb6b # v1.0.10
+        with:
+          preview-json: preview.json
+          plan-file: preview-plan.json
+          working-directory: .
+          write-summary: 'false'
 
       # The other half. The deploy job also puts the pinned image on the app
       # host over SSH, and a push that changes only the image shows a Pulumi plan
@@ -465,19 +482,21 @@ jobs:
       - name: Decide whether the deploy is needed
         id: noop
         if: always()
+        env:
+          PLAN_HAS_CHANGES: ${{ steps.plan.outputs.has_changes }}
+          PLAN_SUMMARY_FILE: ${{ steps.plan.outputs.summary_file }}
         run: |
           set -eu
-          plan_says=$(cat "$RUNNER_TEMP/plan-verdict.out" 2>/dev/null) || plan_says=
           image_says=$(sed -n 1p "$RUNNER_TEMP/image-verdict.out" 2>/dev/null) || image_says=
           image_reason=$(sed -n 2p "$RUNNER_TEMP/image-verdict.out" 2>/dev/null | grep -Ex 'reason=[a-z-]+') || image_reason='reason=unreadable'
-          if [ "$plan_says" = "has_changes=false" ] && [ "$image_says" = "image_changed=false" ]; then
+          if [ "$PLAN_HAS_CHANGES" = "false" ] && [ "$image_says" = "image_changed=false" ]; then
             has_changes=false
             headline='No changes: the deploy job is skipped and no approval is requested (a clean plan, and the pinned image is the one last deployed).'
           else
             has_changes=true
             if [ "$image_says" = "image_changed=false" ]; then
               headline='Approval required: the plan changes something, or could not be read as clean.'
-            elif [ "$plan_says" = "has_changes=false" ]; then
+            elif [ "$PLAN_HAS_CHANGES" = "false" ]; then
               headline='Approval required: the pinned image is not shown to be the one last deployed.'
             else
               headline='Approval required: the plan changes something or could not be read as clean, and the pinned image is not shown to be the one last deployed.'
@@ -487,8 +506,8 @@ jobs:
           {
             printf '%s\n' "$headline"
             printf 'Image check: %s\n' "${image_reason#reason=}"
-            if [ "$plan_says" != "has_changes=false" ] && [ -f "$RUNNER_TEMP/plan-verdict.summary" ]; then
-              cat "$RUNNER_TEMP/plan-verdict.summary"
+            if [ "$PLAN_HAS_CHANGES" != "false" ] && [ -f "$PLAN_SUMMARY_FILE" ]; then
+              cat "$PLAN_SUMMARY_FILE"
             fi
             echo
           } >> "$GITHUB_STEP_SUMMARY"

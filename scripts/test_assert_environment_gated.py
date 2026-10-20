@@ -147,9 +147,6 @@ class TheStepIsInPlace(unittest.TestCase):
         self.assertEqual(granted, ["contents: read", "packages: read"])
 
 
-HAS_CHANGES_OPERAND = "needs.plan.outputs.has_changes != 'false'"
-
-
 def _gated_jobs() -> dict[str, list[str]]:
     """Every job of the workflow that declares the `production` environment, by job key."""
     lines = WORKFLOW.read_text(encoding="utf-8").splitlines()
@@ -163,24 +160,16 @@ def _gated_jobs() -> dict[str, list[str]]:
     return jobs
 
 
-class EveryGatedDeployJobSkipsOnlyOnAnExplicitFalse(unittest.TestCase):
+class EveryGatedDeployJobWaitsForThePlan(unittest.TestCase):
     def test_the_workflow_has_a_gated_deploy_job(self) -> None:
         self.assertEqual(sorted(_gated_jobs()), ["deploy"])
 
-    def test_each_gated_job_waits_for_the_plan_and_its_condition_carries_the_verdict(self) -> None:
+    def test_each_gated_job_waits_for_the_plan(self) -> None:
         for name, block in _gated_jobs().items():
             with self.subTest(job=name):
                 needs = [line for line in block if re.match(r"    needs: ", line)]
                 self.assertEqual(len(needs), 1)
                 self.assertRegex(needs[0], r"\bplan\b")
-                conditions = [line for line in block if re.match(r"    if: ", line)]
-                self.assertEqual(len(conditions), 1, "a gated job needs exactly one if:")
-                condition = conditions[0].split(": ", 1)[1]
-                self.assertTrue(
-                    condition.endswith(f" && {HAS_CHANGES_OPERAND}"),
-                    f"the {name} job's if: lacks the has_changes operand: {condition}",
-                )
-                self.assertNotIn("||", condition)
 
 
 class TheStepRefusesUngated(unittest.TestCase):
