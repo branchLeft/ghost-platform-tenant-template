@@ -1,3 +1,5 @@
+**Bias for action.** Delivering something and failing fast leads to better progress and informed decision making. Do not agonise theoretically over the exact behaviour of a system which you can observe the behaviour of: run it in the cheapest real place (a test, a check-mode run, the live API, a pre-live host) and decide from what it does. The workspace `AUTHORISATIONS.md` and never-list still apply.
+
 # CLAUDE.md — Ghost platform tenant stack
 
 One Pulumi program (`index.ts`), one stack, one tenant: a tenant's own slug,
