@@ -63,8 +63,11 @@ Config rather than a repository variable so that changing which image a
 tenant runs is a reviewed diff on a branch, the way it was when the GCP-era
 stack passed a reference to Cloud Run. It now reaches the component as the descriptor's `image` and renders into
 `imageEnvFile`; `branchleft-deploy` still writes
-`/etc/branchleft/<slug>.image.env` on the host, and this stack still exports
-`image` for the deploy job to read.
+`/etc/branchleft/<slug>.image.env` on the host. This stack still exports
+`image` so that an operator can read it. The deploy job does not read that
+output: it reads `imageRef` from the config committed in the commit being
+deployed, because a stack output lives in the state checkpoint and can be
+rewritten by anything holding the state credential.
 
 ## `mediaEndpoint` / `mediaRegion`
 
