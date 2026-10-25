@@ -176,14 +176,13 @@ jobs:
       - name: Script unit tests, against the installed component
         run: python3 -m unittest discover -s scripts -p 'test_*.py'
 
-  # Its own job, and deliberately not one `deploy` needs. What makes a committed
-  # salt dangerous is publication: one already on `main` is already in every
-  # clone, so refusing to apply does not take it back and would take the tenant's
-  # site down instead. The gate that matters is the merge, which means this check
-  # has to be in the branch ruleset to have any teeth -- see README.md. The
-  # deploy job's own salt step reports the same condition as a warning and
-  # deploys on the committed value, so a repo in that state keeps working while
-  # it is fixed.
+  # Its own job. What makes a committed salt dangerous is publication: one
+  # already on `main` is already in every clone, so the merge is the gate that
+  # matters. This check has to be in the branch ruleset to have any teeth -- see
+  # README.md. `plan` and `deploy` both list `secret-guard` in `needs`, so a
+  # committed salt stops both before any credential is used. In a generated
+  # repo with no branch ruleset, that job graph is the only enforcement
+  # (see PR #39).
   secret-guard:
     name: Committed-secret guard
     runs-on: ubuntu-latest
@@ -340,8 +339,8 @@ jobs:
         env:
           PULUMI_CONFIG_PASSPHRASE: ${{ secrets.PULUMI_CONFIG_PASSPHRASE }}
         run: |
-          if [ -z "$PULUMI_CONFIG_PASSPHRASE" ]; then
-            echo "::error::PULUMI_CONFIG_PASSPHRASE is empty or unset on this repository's production environment. Refusing to continue: Pulumi would treat an empty value as a valid passphrase rather than failing closed."
+          if [ -z "${PULUMI_CONFIG_PASSPHRASE//[[:space:]]/}" ]; then
+            echo "::error::PULUMI_CONFIG_PASSPHRASE is empty, whitespace-only or unset on this repository's production environment. Refusing to continue: Pulumi would treat an empty value as a valid passphrase rather than failing closed."
             exit 1
           fi
 
@@ -351,8 +350,8 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.HETZNER_S3_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.HETZNER_S3_SECRET_ACCESS_KEY }}
         run: |
-          if [ -z "$PULUMI_BACKEND_URL" ]; then
-            echo "::error::the PULUMI_BACKEND_URL repository variable is unset or empty"
+          if [ -z "${PULUMI_BACKEND_URL//[[:space:]]/}" ]; then
+            echo "::error::the PULUMI_BACKEND_URL repository variable is empty, whitespace-only or unset"
             exit 1
           fi
           case "$PULUMI_BACKEND_URL" in
@@ -362,8 +361,8 @@ jobs:
               exit 1
               ;;
           esac
-          if [ -z "$AWS_ACCESS_KEY_ID" ] || [ -z "$AWS_SECRET_ACCESS_KEY" ]; then
-            echo "::error::HETZNER_S3_ACCESS_KEY_ID / HETZNER_S3_SECRET_ACCESS_KEY are empty or unset on this repository's production environment; the state backend is unreachable without them."
+          if [ -z "${AWS_ACCESS_KEY_ID//[[:space:]]/}" ] || [ -z "${AWS_SECRET_ACCESS_KEY//[[:space:]]/}" ]; then
+            echo "::error::HETZNER_S3_ACCESS_KEY_ID / HETZNER_S3_SECRET_ACCESS_KEY are empty, whitespace-only or unset on this repository's production environment; the state backend is unreachable without them."
             exit 1
           fi
           pulumi login "$PULUMI_BACKEND_URL"
@@ -388,8 +387,8 @@ jobs:
             echo "::error::scripts/assert-no-committed-pulumi-secrets.py exited $salt_status. That is neither 'no salt committed' (0) nor 'a salt is committed' (1), so whether $config carries one is unknown and this refuses to guess. The output above is the script's own."
             exit 1
           fi
-          if [ -z "$PULUMI_ENCRYPTION_SALT" ]; then
-            echo "::error::the PULUMI_ENCRYPTION_SALT environment secret is empty or unset, and $config carries no salt of its own. Set the secret to this stack's encryption salt before deploying."
+          if [ -z "${PULUMI_ENCRYPTION_SALT//[[:space:]]/}" ]; then
+            echo "::error::the PULUMI_ENCRYPTION_SALT environment secret is empty, whitespace-only or unset, and $config carries no salt of its own. Set the secret to this stack's encryption salt before deploying."
             exit 1
           fi
           case "$PULUMI_ENCRYPTION_SALT" in
@@ -627,8 +626,8 @@ jobs:
         env:
           PULUMI_CONFIG_PASSPHRASE: ${{ secrets.PULUMI_CONFIG_PASSPHRASE }}
         run: |
-          if [ -z "$PULUMI_CONFIG_PASSPHRASE" ]; then
-            echo "::error::PULUMI_CONFIG_PASSPHRASE is empty or unset on this repository's production environment. Refusing to continue: Pulumi would treat an empty value as a valid passphrase rather than failing closed."
+          if [ -z "${PULUMI_CONFIG_PASSPHRASE//[[:space:]]/}" ]; then
+            echo "::error::PULUMI_CONFIG_PASSPHRASE is empty, whitespace-only or unset on this repository's production environment. Refusing to continue: Pulumi would treat an empty value as a valid passphrase rather than failing closed."
             exit 1
           fi
 
@@ -647,8 +646,8 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.HETZNER_S3_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.HETZNER_S3_SECRET_ACCESS_KEY }}
         run: |
-          if [ -z "$PULUMI_BACKEND_URL" ]; then
-            echo "::error::the PULUMI_BACKEND_URL repository variable is unset or empty"
+          if [ -z "${PULUMI_BACKEND_URL//[[:space:]]/}" ]; then
+            echo "::error::the PULUMI_BACKEND_URL repository variable is empty, whitespace-only or unset"
             exit 1
           fi
           case "$PULUMI_BACKEND_URL" in
@@ -658,8 +657,8 @@ jobs:
               exit 1
               ;;
           esac
-          if [ -z "$AWS_ACCESS_KEY_ID" ] || [ -z "$AWS_SECRET_ACCESS_KEY" ]; then
-            echo "::error::HETZNER_S3_ACCESS_KEY_ID / HETZNER_S3_SECRET_ACCESS_KEY are empty or unset on this repository's production environment; the state backend is unreachable without them."
+          if [ -z "${AWS_ACCESS_KEY_ID//[[:space:]]/}" ] || [ -z "${AWS_SECRET_ACCESS_KEY//[[:space:]]/}" ]; then
+            echo "::error::HETZNER_S3_ACCESS_KEY_ID / HETZNER_S3_SECRET_ACCESS_KEY are empty, whitespace-only or unset on this repository's production environment; the state backend is unreachable without them."
             exit 1
           fi
           pulumi login "$PULUMI_BACKEND_URL"
@@ -716,8 +715,8 @@ jobs:
             echo "::error::scripts/assert-no-committed-pulumi-secrets.py exited $salt_status. That is neither 'no salt committed' (0) nor 'a salt is committed' (1), so whether $config carries one is unknown and this refuses to guess. The output above is the script's own."
             exit 1
           fi
-          if [ -z "$PULUMI_ENCRYPTION_SALT" ]; then
-            echo "::error::the PULUMI_ENCRYPTION_SALT environment secret is empty or unset, and $config carries no salt of its own. Set the secret to this stack's encryption salt before deploying."
+          if [ -z "${PULUMI_ENCRYPTION_SALT//[[:space:]]/}" ]; then
+            echo "::error::the PULUMI_ENCRYPTION_SALT environment secret is empty, whitespace-only or unset, and $config carries no salt of its own. Set the secret to this stack's encryption salt before deploying."
             exit 1
           fi
           case "$PULUMI_ENCRYPTION_SALT" in
@@ -838,12 +837,12 @@ jobs:
           IMAGE_REF: ${{ steps.image.outputs.ref }}
         run: |
           set -euo pipefail
-          if [ -z "$DEPLOY_KEY" ]; then
-            echo "::error::APP_HOST_DEPLOY_KEY is empty or unset on this repository's production environment. It is this tenant's own slot key, installed on the app host by an operator running provision_deploy_slot.py; see RUNBOOK-bootstrap.md."
+          if [ -z "${DEPLOY_KEY//[[:space:]]/}" ]; then
+            echo "::error::APP_HOST_DEPLOY_KEY is empty, whitespace-only or unset on this repository's production environment. It is this tenant's own slot key, installed on the app host by an operator running provision_deploy_slot.py; see RUNBOOK-bootstrap.md."
             exit 1
           fi
-          if [ -z "$APP_HOST_SSH_ADDRESS" ]; then
-            echo "::error::the APP_HOST_SSH_ADDRESS repository variable is unset or empty. It is the app host's PUBLIC address -- CI runs on GitHub-hosted runners and cannot reach the private one the stack binds its port to."
+          if [ -z "${APP_HOST_SSH_ADDRESS//[[:space:]]/}" ]; then
+            echo "::error::the APP_HOST_SSH_ADDRESS repository variable is empty, whitespace-only or unset. It is the app host's PUBLIC address -- CI runs on GitHub-hosted runners and cannot reach the private one the stack binds its port to."
             exit 1
           fi
           # A file of comments is what the template ships, so "the file exists"
