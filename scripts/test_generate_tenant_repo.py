@@ -6,6 +6,7 @@ See generate-tenant-repo.md's "Tests" section for why.
 
 from __future__ import annotations
 
+import contextlib
 import importlib.util
 import json
 import pathlib
@@ -13,6 +14,8 @@ import shutil
 import subprocess
 import tempfile
 import unittest
+from collections.abc import Iterator
+from unittest import mock
 
 SCRIPTS = pathlib.Path(__file__).resolve().parent
 REPO = SCRIPTS.parent
@@ -111,6 +114,20 @@ def copy_repo(destination: pathlib.Path) -> pathlib.Path:
         target.parent.mkdir(parents=True, exist_ok=True)
         shutil.copy2(source, target)
     return destination
+
+
+@contextlib.contextmanager
+def read_text_raising(target: pathlib.Path, error: type[OSError]) -> Iterator[None]:
+    """Make `read_text` raise `error` for `target` only; every other path reads for real."""
+    real_read_text = pathlib.Path.read_text
+
+    def read_text(self: pathlib.Path, *args: object, **kwargs: object) -> str:
+        if self == target:
+            raise error(f"simulated {error.__name__}")
+        return real_read_text(self, *args, **kwargs)
+
+    with mock.patch.object(pathlib.Path, "read_text", autospec=True, side_effect=read_text):
+        yield
 
 
 class ValidateSlug(unittest.TestCase):
@@ -317,6 +334,52 @@ class Generate(unittest.TestCase):
             with self.assertRaises(module.GenerateError) as caught:
                 module.generate(root, "acme-blog")
             self.assertIn("NOTES.md", str(caught.exception))
+
+    def test_an_undecodable_file_fails_generation_and_is_named(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = copy_repo(pathlib.Path(tmp))
+            (root / "blob.dat").write_bytes(b"\xff\xfe__TENANT_NAME__\x00")
+            with self.assertRaises(module.GenerateError) as caught:
+                module.generate(root, "acme-blog")
+            self.assertIn("blob.dat: cannot read: UnicodeDecodeError", str(caught.exception))
+            self.assertNotIn("placeholders survived", str(caught.exception))
+
+    def test_an_unreadable_file_fails_generation_and_is_named(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = copy_repo(pathlib.Path(tmp))
+            target = root / "notes.dat"
+            target.write_text("plain\n", encoding="utf-8")
+            with read_text_raising(target, PermissionError):
+                with self.assertRaises(module.GenerateError) as caught:
+                    module.generate(root, "acme-blog")
+            self.assertIn("notes.dat", str(caught.exception))
+            self.assertIn("cannot read: PermissionError", str(caught.exception))
+
+    def test_an_undecodable_file_with_a_known_binary_suffix_is_allowed(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = copy_repo(pathlib.Path(tmp))
+            (root / "logo.png").write_bytes(b"\xff\xfe__TENANT_NAME__\x00")
+            actions = module.generate(root, "acme-blog")
+            self.assertIn("no placeholder survives anywhere in the tree", actions)
+
+    def test_a_text_file_with_a_binary_suffix_is_still_swept(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = copy_repo(pathlib.Path(tmp))
+            (root / "fake.png").write_text("__TENANT_NAME__\n", encoding="utf-8")
+            with self.assertRaises(module.GenerateError) as caught:
+                module.generate(root, "acme-blog")
+            self.assertIn("fake.png", str(caught.exception))
+
+    def test_an_oserror_is_never_excused_by_a_binary_suffix(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = copy_repo(pathlib.Path(tmp))
+            target = root / "logo.png"
+            target.write_bytes(b"\x89PNG\r\n")
+            with read_text_raising(target, PermissionError):
+                with self.assertRaises(module.GenerateError) as caught:
+                    module.generate(root, "acme-blog")
+            self.assertIn("logo.png", str(caught.exception))
+            self.assertIn("cannot read: PermissionError", str(caught.exception))
 
 
 class Main(unittest.TestCase):

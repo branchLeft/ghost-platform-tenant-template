@@ -70,12 +70,36 @@ SUBSTITUTED_FILES = (
 # authored content; `scripts` holds the pattern itself as data.
 SWEEP_EXCLUDED_DIRS = ("scripts", ".git", "node_modules")
 
+# A file the sweep cannot decode cannot be shown to hold no placeholder, so it is
+# a finding. Only these lowercase suffixes excuse a file, and only once decoding
+# has failed: a text file with one of these suffixes is still swept, and an
+# OSError is never excused.
+SWEEP_BINARY_SUFFIXES = (
+    ".png",
+    ".jpg",
+    ".jpeg",
+    ".gif",
+    ".ico",
+    ".webp",
+    ".woff",
+    ".woff2",
+    ".ttf",
+    ".otf",
+    ".pdf",
+    ".zip",
+    ".gz",
+)
+
 # A `#` comment line naming a placeholder is documenting it, not carrying one.
 # **Not applied to markdown**, where `#` opens a heading: `# __TENANT_NAME__` is
 # the single most likely place for a real surviving placeholder, and treating it
 # as a comment would hide exactly that.
 COMMENT_LINE = re.compile(r"^\s*#")
 COMMENT_EXEMPT_SUFFIXES = (".md",)
+
+# Separates a file path from the reason it could not be read. A placeholder
+# finding is `path:line: TOKEN`, so an entry holding this marker is unreadable.
+UNREADABLE_MARKER = ": cannot read: "
 
 
 class GenerateError(Exception):
@@ -159,7 +183,8 @@ def apply_renames(root: pathlib.Path) -> list[str]:
 
 
 def sweep(root: pathlib.Path) -> list[str]:
-    """Return every `path:line` still carrying a placeholder token."""
+    """Return `path:line: TOKEN` for each placeholder still in the tree, and
+    `path: cannot read: ExceptionType` for each file that could not be read."""
     findings = []
     for path in sorted(root.rglob("*")):
         if not path.is_file():
@@ -169,7 +194,12 @@ def sweep(root: pathlib.Path) -> list[str]:
             continue
         try:
             text = path.read_text(encoding="utf-8")
-        except (UnicodeDecodeError, OSError):
+        except UnicodeDecodeError as error:
+            if path.suffix.lower() not in SWEEP_BINARY_SUFFIXES:
+                findings.append(f"{relative}{UNREADABLE_MARKER}{type(error).__name__}")
+            continue
+        except OSError as error:
+            findings.append(f"{relative}{UNREADABLE_MARKER}{type(error).__name__}")
             continue
         skip_comments = path.suffix not in COMMENT_EXEMPT_SUFFIXES
         for number, line in enumerate(text.splitlines(), start=1):
@@ -187,13 +217,25 @@ def generate(root: pathlib.Path, slug: str) -> list[str]:
     actions.extend(apply_substitutions(root, slug))
     actions.extend(apply_renames(root))
     findings = sweep(root)
-    if findings:
-        raise GenerateError(
+    unreadable = [finding for finding in findings if UNREADABLE_MARKER in finding]
+    placeholders = [finding for finding in findings if UNREADABLE_MARKER not in finding]
+    blocks = []
+    if placeholders:
+        blocks.append(
             "placeholders survived generation in files SUBSTITUTED_FILES does not name:\n  "
-            + "\n  ".join(findings)
+            + "\n  ".join(placeholders)
             + "\nAdd each file to SUBSTITUTED_FILES in this script and to README.md's "
             "placeholder table."
         )
+    if unreadable:
+        blocks.append(
+            "the sweep could not read these files, so it cannot show they hold no placeholder:\n  "
+            + "\n  ".join(unreadable)
+            + "\nMake each file readable UTF-8 text, or, if it is a binary, give it a suffix on "
+            "SWEEP_BINARY_SUFFIXES in this script."
+        )
+    if blocks:
+        raise GenerateError("\n".join(blocks))
     actions.append("no placeholder survives anywhere in the tree")
     return actions
 

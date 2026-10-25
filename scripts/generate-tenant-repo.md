@@ -47,6 +47,24 @@ through the installed component, rather than the length and reserved-name
 constants that `test_bounds_match_the_installed_component` alone compared, so
 a future drift in the charset itself is caught the same way.
 
+## The sweep
+
+`sweep()` is the last step, and it is what proves no placeholder survives. It
+walks every file outside `scripts`, `.git` and `node_modules`, and a placeholder
+it finds anywhere is a refusal naming the file and line.
+
+A file it cannot read is a refusal too. That covers invalid UTF-8 and any
+`OSError`, such as a permission error. A placeholder in a file the sweep cannot
+read cannot be shown to be absent, so the file is reported as
+`path: cannot read: ExceptionType`, and generation fails.
+
+The one exception is `SWEEP_BINARY_SUFFIXES`: `.png`, `.jpg`, `.jpeg`, `.gif`,
+`.ico`, `.webp`, `.woff`, `.woff2`, `.ttf`, `.otf`, `.pdf`, `.zip` and `.gz`. A
+file with one of these suffixes is excused only when decoding fails. A text file
+with a binary-looking suffix is still swept, and an `OSError` is never excused.
+Adding a binary file to the template therefore means checking that its suffix
+is on that list.
+
 ## Tests (`test_generate_tenant_repo.py`)
 
 `component_accepts_battery` executes the installed `@branchleft/ghost-platform-tenant`
