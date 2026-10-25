@@ -10,6 +10,7 @@ import contextlib
 import importlib.util
 import json
 import pathlib
+import re
 import shutil
 import subprocess
 import tempfile
@@ -270,6 +271,28 @@ class Generate(unittest.TestCase):
             module.generate(root, "acme-blog")
             for name in module.TEMPLATE_ONLY_PATHS:
                 self.assertFalse((root / name).exists(), f"{name} survived generation")
+
+    def test_no_markdown_in_a_generated_tree_names_a_stripped_path(self) -> None:
+        """A doc that ships naming a stripped script describes a file the tenant
+        does not have. Docs name files by basename as often as by full path, so
+        the match is on the basename as a whole token; a full repo-relative path
+        ends in its basename and is caught by the same match."""
+        stripped = {pathlib.PurePosixPath(name).name: name for name in module.TEMPLATE_ONLY_PATHS}
+        with tempfile.TemporaryDirectory() as tmp:
+            root = copy_repo(pathlib.Path(tmp))
+            module.generate(root, "acme-blog")
+            offenders = []
+            for doc in sorted(root.rglob("*.md")):
+                text = doc.read_text(encoding="utf-8")
+                for basename, path in stripped.items():
+                    if re.search(rf"(?<![\w.-]){re.escape(basename)}(?![\w-])", text):
+                        offenders.append(f"{doc.relative_to(root)} names {path}")
+            self.assertEqual(
+                offenders,
+                [],
+                "a generated tenant repo ships a doc naming a file it stripped:\n  "
+                + "\n  ".join(offenders),
+            )
 
     def test_the_pulumi_project_name_is_substituted(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:

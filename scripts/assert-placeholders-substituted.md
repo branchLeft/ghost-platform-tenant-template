@@ -41,7 +41,7 @@ generated without substitution would collide on the same object path.
 
 Exit status 0 if the relevant check passes, 1 if it does not.
 
-## Tests (`test_assert_placeholders_substituted.py`)
+## Tests
 
 The interesting test is not that the script finds a placeholder in a file it
 was handed -- it is `test_default_files_covers_every_placeholder_in_the_tree`,
