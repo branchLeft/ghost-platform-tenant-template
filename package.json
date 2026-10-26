@@ -13,13 +13,13 @@
   },
   "dependencies": {
     "@branchleft/ghost-platform-tenant": "7.0.0",
-    "@pulumi/pulumi": "^3.262.0"
+    "@pulumi/pulumi": "^3.272.0"
   },
   "devDependencies": {
-    "@branchleft/prettier-config": "^0.3.1",
-    "@branchleft/tsconfig": "^0.3.1",
-    "@types/node": "^26.5.1",
-    "prettier": "^3.9.6",
+    "@branchleft/prettier-config": "^0.8.3",
+    "@branchleft/tsconfig": "^0.8.3",
+    "@types/node": "^26.6.5",
+    "prettier": "^3.9.10",
     "typescript": "^5.9.0",
     "vitest": "^4.1.11"
   }
