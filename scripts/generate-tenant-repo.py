@@ -45,6 +45,8 @@ PLACEHOLDER = re.compile(r"__[A-Z][A-Z0-9_]*__")
 TEMPLATE_ONLY_PATHS = (
     "scripts/test_generate_tenant_repo.py",
     "scripts/test_assert_placeholders_substituted.py",
+    # Describes this script, which is stripped below: shipped, it names a missing file.
+    "scripts/generate-tenant-repo.md",
     # Last, and self-referential: this script is already loaded, so unlinking it
     # mid-run is safe on POSIX, but it is ordered last so that a failure leaves
     # the generator present for a re-run.
