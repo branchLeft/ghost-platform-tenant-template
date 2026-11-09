@@ -1,15 +1,16 @@
 name: Generate pnpm lockfile in CI
 
-# Makes a lockfile in CI with the workflow's own token, rather than a
-# personal one. This repo depends on private `@branchleft/*` GitHub Packages
-# packages (`ghost-platform-tenant`, `prettier-config`, `tsconfig`), and a
-# workstation with no GitHub Packages read credential cannot authenticate
-# the registry read `pnpm import`/`pnpm install` needs to produce
-# `pnpm-lock.yaml` -- there is nothing to seed a lockfile from locally. This
-# workflow follows the same trigger, isolation and guard shape as this
-# org's other CI-side npm-lockfile generator, adapted for a single root
-# package and a pnpm lockfile instead of an npm one in a package
-# subdirectory.
+# Makes or updates a lockfile in CI with the workflow's own token, rather than
+# a personal one: this repo depends on private `@branchleft/*` GitHub
+# Packages packages, and a workstation with no read credential cannot
+# authenticate the registry read that resolving them needs.
+#
+# Two modes, chosen from the target branch. `package-lock.json` present:
+# convert it to `pnpm-lock.yaml`. Absent, `pnpm-lock.yaml` present: update
+# the pnpm lockfile after a `package.json` dependency bump. Both modes
+# resolve in an isolated directory, refuse any change beyond the lockfile
+# and commit through the API. What each mode refuses is in
+# generate-pnpm-lockfile.md.
 #
 # The commit this workflow writes is made through the GitHub API
 # (`createCommitOnBranch`), not `git commit`/`git push` -- a raw push
@@ -180,17 +181,30 @@ jobs:
           ref: refs/heads/${{ needs.validate.outputs.branch }}
           persist-credentials: false
 
-      - name: Confirm this branch has package.json, .nvmrc and package-lock.json
+      # `package-lock.json` wins when both lockfiles exist, so the conversion
+      # path keeps its old behaviour on any branch it accepted before.
+      - name: Choose convert or update mode from the lockfiles on this branch
+        id: mode
         env:
           BRANCH: ${{ needs.validate.outputs.branch }}
         run: |
           set -euo pipefail
-          for f in package.json .nvmrc package-lock.json; do
+          for f in package.json .nvmrc; do
             if [ ! -f "$f" ]; then
               echo "::error::'$f' does not exist on branch '$BRANCH'"
               exit 1
             fi
           done
+          if [ -f package-lock.json ]; then
+            MODE=convert
+          elif [ -f pnpm-lock.yaml ]; then
+            MODE=update
+          else
+            echo "::error::branch '$BRANCH' has neither package-lock.json to convert nor pnpm-lock.yaml to update"
+            exit 1
+          fi
+          echo "mode=$MODE" >> "$GITHUB_OUTPUT"
+          echo "mode: $MODE"
 
       - name: Setup pnpm
         uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
@@ -226,6 +240,7 @@ jobs:
       # there is no script for it to ignore (pnpm itself refuses the flag on
       # this subcommand: `Unknown option: 'ignore-scripts'`).
       - name: Generate pnpm-lock.yaml in an isolated directory
+        if: steps.mode.outputs.mode == 'convert'
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -278,6 +293,7 @@ jobs:
       # as an externally-managed environment -- a dependency this guard
       # does not need to carry.
       - name: Refuse a version pnpm resolved that package-lock.json did not lock
+        if: steps.mode.outputs.mode == 'convert'
         run: |
           python3 - "package-lock.json" "generated-pnpm-lock.yaml" <<'PYEOF'
           import json, sys
@@ -366,6 +382,7 @@ jobs:
           PYEOF
 
       - name: Apply the generated lockfile
+        if: steps.mode.outputs.mode == 'convert'
         run: |
           set -euo pipefail
           mv generated-pnpm-lock.yaml pnpm-lock.yaml
@@ -378,6 +395,7 @@ jobs:
       # `pnpm-lock.yaml.bak` or a rename whose destination happens to
       # contain one of these paths.
       - name: Refuse any change beyond the lockfile swap
+        if: steps.mode.outputs.mode == 'convert'
         run: |
           set -euo pipefail
           CHANGED="$(git status --porcelain)"
@@ -387,6 +405,247 @@ jobs:
           if [ -n "$OTHER" ]; then
             echo "::error::the lockfile generation changed something other than the pnpm-lock.yaml/package-lock.json swap; refusing to commit any of it:"
             echo "$OTHER"
+            exit 1
+          fi
+
+      # Update mode. Only `package.json`, `pnpm-lock.yaml`, an allow-listed
+      # `pnpm-workspace.yaml` and a `.npmrc` this step writes reach the
+      # isolated directory, for the reasons given above. The workspace file
+      # carries resolution settings (the release-age exclusions a fresh
+      # `@branchleft/*` publish needs), so it is copied, but only when its
+      # top-level keys are the two this repo uses: a branch author's other
+      # key could redirect resolution. `--no-frozen-lockfile` is explicit
+      # because CI defaults pnpm to a frozen lockfile.
+      - name: Re-resolve pnpm-lock.yaml in an isolated directory (update mode)
+        if: steps.mode.outputs.mode == 'update'
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          WORKDIR="$RUNNER_TEMP/pnpm-lockfile-update"
+          mkdir -p "$WORKDIR"
+          if [ -f pnpm-workspace.yaml ]; then
+            OTHER="$(grep -E '^[^[:space:]#]' pnpm-workspace.yaml | grep -v -x -F \
+              -e 'allowBuilds:' \
+              -e 'minimumReleaseAgeExclude:' || true)"
+            if [ -n "$OTHER" ]; then
+              echo "::error::pnpm-workspace.yaml has a top-level key other than allowBuilds and minimumReleaseAgeExclude; refusing to copy settings that could change resolution:"
+              echo "$OTHER"
+              exit 1
+            fi
+            cp pnpm-workspace.yaml "$WORKDIR/pnpm-workspace.yaml"
+          fi
+          cp package.json "$WORKDIR/package.json"
+          cp pnpm-lock.yaml "$WORKDIR/pnpm-lock.yaml"
+          printf '@branchleft:registry=https://npm.pkg.github.com\n' > "$WORKDIR/.npmrc"
+          (cd "$WORKDIR" && pnpm install --lockfile-only --no-frozen-lockfile --ignore-scripts)
+
+      # The update-mode gate, inline for the reason given above the conversion
+      # gate. Everything it checks is in generate-pnpm-lockfile.md.
+      - name: Refuse a lockfile change that no bumped dependency explains
+        if: steps.mode.outputs.mode == 'update'
+        run: |
+          python3 - pnpm-lock.yaml "$RUNNER_TEMP/pnpm-lockfile-update/pnpm-lock.yaml" package.json <<'PYEOF'
+          import json
+          import sys
+
+          ROOT_SECTIONS = ("dependencies", "devDependencies", "optionalDependencies")
+          KNOWN_TOP = ("importers", "packages", "snapshots")
+          LINK_PREFIXES = ("link:", "file:", "workspace:")
+
+
+          class Refusal(Exception):
+              pass
+
+
+          def unquote(text):
+              text = text.strip()
+              if len(text) >= 2 and text[0] == "'" and text[-1] == "'":
+                  return text[1:-1].replace("''", "'")
+              return text
+
+
+          def split_entry(line):
+              # "<key>: <value>", where a quoted key may itself contain ':'.
+              text = line.strip()
+              if text.startswith("'"):
+                  end = text.find("'", 1)
+                  while end != -1 and text[end + 1 : end + 2] == "'":
+                      end = text.find("'", end + 2)
+                  if end == -1 or text[end + 1 : end + 2] != ":":
+                      raise Refusal(f"cannot parse lockfile line {line!r}")
+                  return unquote(text[: end + 1]), text[end + 2 :].strip()
+              if text.endswith(":"):
+                  return text[:-1], ""
+              key, sep, value = text.partition(": ")
+              if not sep:
+                  raise Refusal(f"cannot parse lockfile line {line!r}")
+              return key, value.strip()
+
+
+          def parse_lock(path):
+              lock = {"header": [], "importers": {}, "packages": {}, "snapshots": {}}
+              section, imp, imp_sec, name, key, snap_sec = "header", None, None, None, None, None
+              with open(path, encoding="utf-8") as f:
+                  lines = f.read().splitlines()
+              for line in lines:
+                  if not line.strip():
+                      continue
+                  indent = len(line) - len(line.lstrip(" "))
+                  if indent == 0:
+                      top = line.split(":", 1)[0]
+                      if top in KNOWN_TOP:
+                          section = top
+                          continue
+                      if section != "header":
+                          raise Refusal(f"{path}: unrecognised top-level section {line!r}")
+                  if section == "header":
+                      lock["header"].append(line)
+                  elif section == "importers":
+                      if indent == 2:
+                          imp = split_entry(line)[0]
+                          lock["importers"][imp] = {}
+                          imp_sec = None
+                      elif indent == 4:
+                          field = split_entry(line)[0]
+                          imp_sec = field if field in ROOT_SECTIONS else None
+                      elif indent == 6 and imp_sec:
+                          name = split_entry(line)[0]
+                          lock["importers"][imp][name] = {}
+                      elif indent == 8 and imp_sec:
+                          field, value = split_entry(line)
+                          if field in ("specifier", "version"):
+                              lock["importers"][imp][name][field] = unquote(value)
+                  elif section == "packages":
+                      if indent == 2:
+                          key = split_entry(line)[0]
+                          lock["packages"][key] = []
+                      elif key is not None:
+                          lock["packages"][key].append(line)
+                  else:
+                      if indent == 2:
+                          key = split_entry(line)[0]
+                          lock["snapshots"][key] = {}
+                          snap_sec = None
+                      elif indent == 4:
+                          field = split_entry(line)[0]
+                          snap_sec = field if field in ("dependencies", "optionalDependencies") else None
+                      elif indent == 6 and snap_sec and not line.lstrip().startswith("- "):
+                          dep, value = split_entry(line)
+                          lock["snapshots"][key][dep] = unquote(value)
+              return lock
+
+
+          def package_key(snapshot_key):
+              return snapshot_key.split("(", 1)[0]
+
+
+          def snapshot_target(name, value):
+              # A dependency value is a bare version, or "<real-name>@<version>" for an alias.
+              return value if "@" in value.split("(", 1)[0] else f"{name}@{value}"
+
+
+          def closure(lock, roots):
+              seen, stack = set(), []
+              for name, entry in roots:
+                  stack.append(snapshot_target(name, entry["version"]))
+              while stack:
+                  snap = stack.pop()
+                  if snap in seen:
+                      continue
+                  if snap not in lock["snapshots"]:
+                      raise Refusal(f"lockfile names {snap!r} but has no snapshot for it")
+                  seen.add(snap)
+                  for dep, value in lock["snapshots"][snap].items():
+                      if not value.startswith(LINK_PREFIXES):
+                          stack.append(snapshot_target(dep, value))
+              return {package_key(s) for s in seen}
+
+
+          def roots_of(lock, path):
+              if list(lock["importers"]) != ["."]:
+                  raise Refusal(f"{path}: update mode handles the single root importer only, found {list(lock['importers'])}")
+              roots = {}
+              for name, entry in lock["importers"]["."].items():
+                  if "specifier" not in entry or "version" not in entry:
+                      raise Refusal(f"{path}: importer entry {name!r} lacks a specifier or version")
+                  roots[name] = entry
+              return roots
+
+
+          def check(old_path, new_path, manifest_path):
+              with open(old_path, encoding="utf-8") as f:
+                  old_text = f.read()
+              with open(new_path, encoding="utf-8") as f:
+                  new_text = f.read()
+              if old_text == new_text:
+                  raise Refusal("pnpm-lock.yaml did not change; nothing to commit")
+              old, new = parse_lock(old_path), parse_lock(new_path)
+              if old["header"] != new["header"]:
+                  raise Refusal("the lockfile version or settings changed; that is not a dependency bump")
+              old_roots, new_roots = roots_of(old, old_path), roots_of(new, new_path)
+              with open(manifest_path, encoding="utf-8") as f:
+                  manifest = json.load(f)
+              declared = {}
+              for field in ROOT_SECTIONS:
+                  declared.update(manifest.get(field, {}))
+              if {n: e["specifier"] for n, e in new_roots.items()} != declared:
+                  raise Refusal("the new lockfile's importer specifiers do not match package.json")
+              old_specs = {n: e["specifier"] for n, e in old_roots.items()}
+              bumped = sorted(n for n in set(declared) | set(old_specs) if declared.get(n) != old_specs.get(n))
+              if not bumped:
+                  raise Refusal("package.json specifiers equal the old lockfile's; no dependency was bumped, so no lockfile change is explained")
+              for name in sorted(set(declared) & set(old_specs) - set(bumped)):
+                  if old_roots[name]["version"] != new_roots[name]["version"]:
+                      raise Refusal(f"{name} has an unchanged specifier but resolved {old_roots[name]['version']} -> {new_roots[name]['version']}")
+                  before = closure(old, [(name, old_roots[name])])
+                  after = closure(new, [(name, new_roots[name])])
+                  if before != after:
+                      raise Refusal(f"{name} was not bumped but its dependency tree moved: removed {sorted(before - after)} added {sorted(after - before)}")
+              bumped_old = closure(old, [(n, old_roots[n]) for n in bumped if n in old_roots])
+              bumped_new = closure(new, [(n, new_roots[n]) for n in bumped if n in new_roots])
+              removed = set(old["packages"]) - set(new["packages"])
+              added = set(new["packages"]) - set(old["packages"])
+              stray = sorted((removed - bumped_old) | (added - bumped_new))
+              if stray:
+                  raise Refusal(f"package(s) changed that no bumped dependency reaches: {stray}")
+              for key in sorted(set(old["packages"]) & set(new["packages"])):
+                  if old["packages"][key] != new["packages"][key]:
+                      raise Refusal(f"{key} kept its version but its resolution or metadata changed")
+              print(f"bumped direct dependencies: {bumped}")
+              print(f"removed {len(removed)}: {sorted(removed)}")
+              print(f"added {len(added)}: {sorted(added)}")
+              print("OK: every changed package is reached only through a bumped direct dependency")
+
+
+          def main(argv):
+              try:
+                  check(*argv)
+              except Refusal as err:
+                  print(f"::error::{err}")
+                  return 1
+              return 0
+
+
+          if __name__ == "__main__":
+              sys.exit(main(sys.argv[1:]))
+          PYEOF
+
+      - name: Apply the updated lockfile
+        if: steps.mode.outputs.mode == 'update'
+        run: |
+          set -euo pipefail
+          cp "$RUNNER_TEMP/pnpm-lockfile-update/pnpm-lock.yaml" pnpm-lock.yaml
+
+      # Exact match, as in conversion: the lockfile is the one modified file.
+      - name: Refuse any change beyond pnpm-lock.yaml
+        if: steps.mode.outputs.mode == 'update'
+        run: |
+          set -euo pipefail
+          CHANGED="$(git status --porcelain)"
+          if [ "$CHANGED" != " M pnpm-lock.yaml" ]; then
+            echo "::error::update mode must change exactly pnpm-lock.yaml; refusing to commit:"
+            echo "$CHANGED"
             exit 1
           fi
 
@@ -417,8 +676,9 @@ jobs:
       # same loop-prevention rule the old `git push` hit. An open PR on the
       # target branch still needs closing and reopening (or an ordinary
       # commit) to pick up a new CI run.
-      - name: Commit the lockfile swap via the GitHub API, if it happened
+      - name: Commit the lockfile via the GitHub API, if it changed
         env:
+          MODE: ${{ steps.mode.outputs.mode }}
           BRANCH: ${{ needs.validate.outputs.branch }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           REPO: ${{ github.repository }}
@@ -452,7 +712,12 @@ jobs:
           # to fill in, not a shell variable -- double-quoting this would
           # have the shell expand them to nothing before the query was ever
           # sent.
-          QUERY='mutation($repo: String!, $branch: String!, $headline: String!, $content: Base64String!, $oid: GitObjectID!) {
+          # Update mode writes pnpm-lock.yaml and nothing else: its query has
+          # no `deletions` at all, so no variable can add one.
+          case "$MODE" in
+            convert)
+              HEADLINE="ci: generate pnpm-lock.yaml, remove package-lock.json"
+              QUERY='mutation($repo: String!, $branch: String!, $headline: String!, $content: Base64String!, $oid: GitObjectID!) {
             createCommitOnBranch(input: {
               branch: {repositoryNameWithOwner: $repo, branchName: $branch}
               message: {headline: $headline}
@@ -465,6 +730,27 @@ jobs:
               commit { oid url }
             }
           }'
+              ;;
+            update)
+              HEADLINE="ci: update pnpm-lock.yaml for the bumped dependencies"
+              QUERY='mutation($repo: String!, $branch: String!, $headline: String!, $content: Base64String!, $oid: GitObjectID!) {
+            createCommitOnBranch(input: {
+              branch: {repositoryNameWithOwner: $repo, branchName: $branch}
+              message: {headline: $headline}
+              fileChanges: {
+                additions: [{path: "pnpm-lock.yaml", contents: $content}]
+              }
+              expectedHeadOid: $oid
+            }) {
+              commit { oid url }
+            }
+          }'
+              ;;
+            *)
+              echo "::error::unknown mode '$MODE'"
+              exit 1
+              ;;
+          esac
 
           # The whole request -- query and variables together -- is built
           # into a file and sent with `--input`, never as `-f`/`-F` fields on
@@ -479,7 +765,7 @@ jobs:
             --arg query "$QUERY" \
             --arg repo "$REPO" \
             --arg branch "$BRANCH" \
-            --arg headline "ci: generate pnpm-lock.yaml, remove package-lock.json" \
+            --arg headline "$HEADLINE" \
             --rawfile content "$RUNNER_TEMP/pnpm-lock.b64" \
             --arg oid "$HEAD_OID" \
             '{
