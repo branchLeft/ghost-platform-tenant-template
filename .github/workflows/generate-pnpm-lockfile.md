@@ -61,7 +61,14 @@ needs live in that file, so its two settings are carried over:
    conservative name and version patterns, refuses every other top-level key,
    and writes a new file holding only those values.
 
-Neither of these two programs runs with the token. `package.json`,
+Neither of these two programs runs with the token. The working directory is the
+branch's checkout, so every `python3` in the workflow runs with `-I` (isolated
+mode: no current directory on `sys.path`, no `PYTHON*` variables), and the
+prepare step unsets `RUBYOPT`, `RUBYLIB`, `PYTHONPATH`, `PYTHONSTARTUP` and
+`NODE_OPTIONS`; a branch cannot set those itself, so that is defence in depth.
+Ruby does not load from the current directory. Tests plant `json.py`, `yaml.py`,
+`re.py`, `json.rb` and `psych.rb` at the checkout root and set those variables,
+and fail if any of them runs. `package.json`,
 `pnpm-lock.yaml` and `pnpm-workspace.yaml` must not be symlinks, and the
 workspace file must be a regular file. A `package.json` with a top-level `pnpm`
 key is refused because its settings can also change what pnpm loads.

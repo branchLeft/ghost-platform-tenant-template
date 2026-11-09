@@ -36,9 +36,10 @@ APPLY_STEP = "Apply the updated lockfile"
 SWEEP_STEP = "Refuse any change beyond pnpm-lock.yaml"
 COMMIT_STEP = "Commit the lockfile via the GitHub API, if it changed"
 
+CONVERT_GUARD_STEP = "Refuse a version pnpm resolved that package-lock.json did not lock"
 CONVERT_STEPS = (
     "Generate pnpm-lock.yaml in an isolated directory",
-    "Refuse a version pnpm resolved that package-lock.json did not lock",
+    CONVERT_GUARD_STEP,
     "Apply the generated lockfile",
     "Refuse any change beyond the lockfile swap",
 )
@@ -500,6 +501,83 @@ class TheSharedRefusals(unittest.TestCase):
 
     def test_an_unprotected_branch_passes(self) -> None:
         self.assertEqual(self.ruleset("[]", 0).returncode, 0)
+
+
+class ThePlantedModules(unittest.TestCase):
+    """The working directory is the branch's checkout, so nothing in it may be importable.
+
+    Each case commits `json.py`, `yaml.py` and `re.py` (and Ruby's `json.rb` and `psych.rb`) at the
+    checkout root, each writing a marker file when loaded, and runs the real step.
+    """
+
+    def setUp(self) -> None:
+        self._tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(self._tmp.cleanup)
+        self.dir = pathlib.Path(self._tmp.name)
+        self.marker = self.dir / "marker"
+        self.repo = self.dir / "repo"
+        self.runner = self.dir / "runner"
+        self.repo.mkdir()
+        self.runner.mkdir()
+        for name in ("json.py", "yaml.py", "re.py"):
+            (self.repo / name).write_text(f'open(r"{self.marker}", "a").write("{name}\\n")\n', encoding="utf-8")
+        for name in ("json.rb", "psych.rb"):
+            (self.repo / name).write_text(f'File.open("{self.marker}", "a") {{ |f| f.puts "{name}" }}\n', encoding="utf-8")
+
+    def env(self) -> dict[str, str]:
+        hooks = self.dir / "hooks"
+        hooks.mkdir(exist_ok=True)
+        (hooks / "json.py").write_text(f'open(r"{self.marker}", "a").write("PYTHONPATH\\n")\n', encoding="utf-8")
+        (hooks / "boot.rb").write_text(f'File.open("{self.marker}", "a") {{ |f| f.puts "RUBYOPT" }}\n', encoding="utf-8")
+        return {
+            "RUNNER_TEMP": str(self.runner),
+            "PYTHONPATH": str(hooks),
+            "RUBYOPT": f"-r{hooks / 'boot.rb'}",
+            "RUBYLIB": str(self.repo),
+        }
+
+    def assert_nothing_ran(self, result: subprocess.CompletedProcess[str]) -> None:
+        planted = self.marker.read_text(encoding="utf-8") if self.marker.exists() else ""
+        self.assertEqual(planted, "", f"planted code ran: {planted}")
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
+    def test_the_prepare_step_imports_nothing_from_the_checkout(self) -> None:
+        (self.repo / "package.json").write_text("{}", encoding="utf-8")
+        (self.repo / "pnpm-lock.yaml").write_text("lock", encoding="utf-8")
+        (self.repo / "pnpm-workspace.yaml").write_text("allowBuilds:\n  protobufjs: false\n", encoding="utf-8")
+        result = _bash(_run_body("generate", PREPARE_STEP), self.repo, self.env())
+        self.assert_nothing_ran(result)
+        written = self.runner / "pnpm-lockfile-update" / "pnpm-workspace.yaml"
+        self.assertEqual(written.read_text(encoding="utf-8"), 'allowBuilds:\n  "protobufjs": false\n')
+
+    def test_the_update_gate_imports_nothing_from_the_checkout(self) -> None:
+        (self.repo / "pnpm-lock.yaml").write_text(build_lock(BASE_ROOTS, BASE_SNAPS), encoding="utf-8")
+        (self.repo / "package.json").write_text(json.dumps(MANIFEST), encoding="utf-8")
+        new = self.runner / "pnpm-lockfile-update"
+        new.mkdir()
+        (new / "pnpm-lock.yaml").write_text(build_lock(BUMPED_ROOTS, BUMPED_SNAPS), encoding="utf-8")
+        result = _bash(_run_body("generate", GUARD_STEP), self.repo, self.env())
+        self.assert_nothing_ran(result)
+        self.assertIn("OK: every changed package", result.stdout)
+
+    def test_the_conversion_gate_imports_nothing_from_the_checkout(self) -> None:
+        npm = {"packages": {"": {"name": "x"}, "node_modules/left-pad": {"version": "1.3.0"}}}
+        (self.repo / "package-lock.json").write_text(json.dumps(npm), encoding="utf-8")
+        (self.repo / "generated-pnpm-lock.yaml").write_text(build_lock(BASE_ROOTS, BASE_SNAPS), encoding="utf-8")
+        result = _bash(_run_body("generate", CONVERT_GUARD_STEP), self.repo, self.env())
+        self.assert_nothing_ran(result)
+        self.assertIn("OK:", result.stdout)
+
+    def test_every_python_runs_isolated_and_the_ruby_step_clears_its_environment(self) -> None:
+        for job in ("validate", "generate"):
+            for name in _steps(job):
+                if not any(line == "        run: |" for line in _step(job, name)):
+                    continue
+                body = _run_body(job, name)
+                for call in re.findall(r"^\s*(?:\S+=\S+\s+)*(python3?\b[^\n]*)", body, re.M):
+                    self.assertTrue(call.startswith("python3 -I "), f"{name}: {call}")
+                if re.search(r"^\s*ruby\b", body, re.M):
+                    self.assertIn("unset RUBYOPT RUBYLIB PYTHONPATH PYTHONSTARTUP NODE_OPTIONS", body, name)
 
 
 class TheUpdateSteps(unittest.TestCase):

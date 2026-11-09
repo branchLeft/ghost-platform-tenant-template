@@ -295,7 +295,7 @@ jobs:
       - name: Refuse a version pnpm resolved that package-lock.json did not lock
         if: steps.mode.outputs.mode == 'convert'
         run: |
-          python3 - "package-lock.json" "generated-pnpm-lock.yaml" <<'PYEOF'
+          python3 -I - "package-lock.json" "generated-pnpm-lock.yaml" <<'PYEOF'
           import json, sys
 
           npm_path, pnpm_path = sys.argv[1], sys.argv[2]
@@ -416,12 +416,16 @@ jobs:
       # PyYAML is not) turns it into JSON, refusing anchors, aliases, tags and
       # more than one document; Python then keeps only the two settings this
       # repo uses, validated, and writes a new file. Neither parser step
-      # holds the token. `--no-frozen-lockfile` is explicit because CI
-      # defaults pnpm to a frozen lockfile.
+      # holds the token. Every `python3` in this workflow runs with `-I`: the
+      # working directory is the branch's checkout, and without it a
+      # `json.py` committed there would run in place of the standard module.
+      # `--no-frozen-lockfile` is explicit because CI defaults pnpm to a
+      # frozen lockfile.
       - name: Prepare the isolated directory (update mode)
         if: steps.mode.outputs.mode == 'update'
         run: |
           set -euo pipefail
+          unset RUBYOPT RUBYLIB PYTHONPATH PYTHONSTARTUP NODE_OPTIONS
           for f in package.json pnpm-lock.yaml pnpm-workspace.yaml; do
             if [ -L "$f" ]; then
               echo "::error::'$f' is a symlink; refusing to copy a file whose content lives elsewhere"
@@ -471,7 +475,7 @@ jobs:
           end
           File.write(out, JSON.generate(data))
           RBEOF
-          python3 - "$PARSED" "$WORKDIR/pnpm-workspace.yaml" package.json <<'PYEOF'
+          python3 -I - "$PARSED" "$WORKDIR/pnpm-workspace.yaml" package.json <<'PYEOF'
           import json
           import re
           import sys
@@ -536,7 +540,7 @@ jobs:
       - name: Refuse a lockfile change that no bumped dependency explains
         if: steps.mode.outputs.mode == 'update'
         run: |
-          python3 - pnpm-lock.yaml "$RUNNER_TEMP/pnpm-lockfile-update/pnpm-lock.yaml" package.json <<'PYEOF'
+          python3 -I - pnpm-lock.yaml "$RUNNER_TEMP/pnpm-lockfile-update/pnpm-lock.yaml" package.json <<'PYEOF'
           import json
           import re
           import sys
