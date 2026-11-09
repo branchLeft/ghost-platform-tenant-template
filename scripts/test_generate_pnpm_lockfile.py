@@ -8,10 +8,13 @@ the runner runs it, so what is asserted is the step CI runs, not a copy.
 
 from __future__ import annotations
 
+import base64
+import hashlib
 import json
 import os
 import pathlib
 import re
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -26,6 +29,7 @@ REAL_LOCK = ROOT / "pnpm-lock.yaml"
 MODE_STEP = "Choose convert or update mode from the lockfiles on this branch"
 SHAPE_STEP = "Validate branch shape and refuse main"
 RULESET_STEP = "Refuse a branch a ruleset currently protects"
+PREPARE_STEP = "Prepare the isolated directory (update mode)"
 RESOLVE_STEP = "Re-resolve pnpm-lock.yaml in an isolated directory (update mode)"
 GUARD_STEP = "Refuse a lockfile change that no bumped dependency explains"
 APPLY_STEP = "Apply the updated lockfile"
@@ -38,7 +42,7 @@ CONVERT_STEPS = (
     "Apply the generated lockfile",
     "Refuse any change beyond the lockfile swap",
 )
-UPDATE_STEPS = (RESOLVE_STEP, GUARD_STEP, APPLY_STEP, SWEEP_STEP)
+UPDATE_STEPS = (PREPARE_STEP, RESOLVE_STEP, GUARD_STEP, APPLY_STEP, SWEEP_STEP)
 
 HEADER = "lockfileVersion: '9.0'\n\nsettings:\n  autoInstallPeers: true\n  excludeLinksFromLockfile: false\n"
 
@@ -94,6 +98,10 @@ def _bash(body: str, cwd: pathlib.Path, env: dict[str, str]) -> subprocess.Compl
     return subprocess.run(["bash", "-c", body], cwd=cwd, env=full, capture_output=True, text=True, check=False)
 
 
+def _sha(key: str) -> str:
+    return "sha512-" + base64.b64encode(hashlib.sha512(key.encode()).digest()).decode()
+
+
 def _q(key: str) -> str:
     return f"'{key}'" if key.startswith("@") else key
 
@@ -103,15 +111,20 @@ def build_lock(
     snapshots: dict[str, dict[str, str]],
     integrity: dict[str, str] | None = None,
     header: str = HEADER,
+    resolution: dict[str, str] | None = None,
 ) -> str:
-    """A v9 lockfile in pnpm's layout. `snapshots` maps a snapshot key to its dependencies."""
+    """A v9 lockfile in pnpm's layout. `snapshots` maps a snapshot key to its dependencies.
+
+    `resolution` overrides a package's whole flow-mapping body, for non-registry shapes.
+    """
     integrity = integrity or {}
+    resolution = resolution or {}
     out = [header, "importers:\n", "  .:\n    dependencies:"]
     for name, (spec, version) in roots.items():
         out.append(f"      {_q(name)}:\n        specifier: {spec}\n        version: {version}")
     out.append("\npackages:\n")
     for pkg in sorted({k.split("(")[0] for k in snapshots}):
-        out.append(f"  {_q(pkg)}:\n    resolution: {{integrity: {integrity.get(pkg, 'sha512-' + pkg)}}}\n")
+        out.append(f"  {_q(pkg)}:\n    resolution: {{{resolution.get(pkg) or 'integrity: ' + integrity.get(pkg, _sha(pkg))}}}\n")
     out.append("snapshots:\n")
     for snap, deps in snapshots.items():
         if not deps:
@@ -254,6 +267,17 @@ class TheUpdateGuardAccepts(GuardCase):
         self.assertIn("dep-a@1.0.0", result.stdout)
         self.assertIn("fresh@1.0.0", result.stdout)
 
+    def test_an_added_package_from_a_registry_this_repo_reads(self) -> None:
+        digest = _sha("fresh")
+        for body in (
+            f"integrity: {digest}, tarball: https://registry.npmjs.org/fresh/-/fresh-1.0.0.tgz",
+            f"integrity: {digest}, tarball: https://npm.pkg.github.com/download/@branchleft/fresh/1.0.0/abc123",
+        ):
+            with self.subTest(body):
+                new = build_lock(BUMPED_ROOTS, BUMPED_SNAPS, resolution={"fresh@1.0.0": body})
+                result = self.run_guard(build_lock(BASE_ROOTS, BASE_SNAPS), new, MANIFEST)
+                self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
     def test_a_lockfile_pnpm_itself_wrote(self) -> None:
         result = self.run_guard(REAL_OLD, REAL_NEW, REAL_MANIFEST)
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
@@ -311,6 +335,30 @@ class TheUpdateGuardRefuses(GuardCase):
         self.assert_refused(
             self.run_guard(build_lock(BASE_ROOTS, BASE_SNAPS), new, MANIFEST),
             "shared@1.0.0 kept its version but its resolution or metadata changed",
+        )
+
+    def test_an_added_package_that_resolves_outside_the_registries(self) -> None:
+        digest = _sha("fresh")
+        cases = {
+            f"integrity: {digest}, tarball: https://evil.example/fresh-1.0.0.tgz": "outside the registries",
+            f"integrity: {digest}, tarball: https://npm.pkg.github.com/download/@other/fresh/1.0.0/abc": "outside the registries",
+            f"integrity: {digest}, tarball: http://registry.npmjs.org/fresh.tgz": "outside the registries",
+            "tarball: https://registry.npmjs.org/fresh/-/fresh-1.0.0.tgz": "not a registry integrity",
+            "type: git, repo: https://github.com/x/fresh, commit: abc123": "not a registry integrity",
+            "directory: ../fresh, type: directory": "not a registry integrity",
+            f"integrity: {digest}, type: directory": "not a registry integrity",
+            "integrity: sha1-AAAA": "not sha512",
+        }
+        for body, fragment in cases.items():
+            with self.subTest(body):
+                new = build_lock(BUMPED_ROOTS, BUMPED_SNAPS, resolution={"fresh@1.0.0": body})
+                self.assert_refused(self.run_guard(build_lock(BASE_ROOTS, BASE_SNAPS), new, MANIFEST), fragment)
+
+    def test_an_added_package_that_depends_on_a_local_link(self) -> None:
+        snaps = {**BUMPED_SNAPS, "fresh@1.0.0": {"local": "link:../local"}}
+        self.assert_refused(
+            self.run_guard(build_lock(BASE_ROOTS, BASE_SNAPS), build_lock(BUMPED_ROOTS, snaps), MANIFEST),
+            "depends on a local link",
         )
 
     def test_a_lockfile_version_or_settings_change(self) -> None:
@@ -378,6 +426,7 @@ class TheWorkflowShape(unittest.TestCase):
 
     def test_the_update_gate_runs_before_the_lockfile_is_applied_and_committed(self) -> None:
         order = list(_steps("generate"))
+        self.assertLess(order.index(PREPARE_STEP), order.index(RESOLVE_STEP))
         self.assertLess(order.index(RESOLVE_STEP), order.index(GUARD_STEP))
         self.assertLess(order.index(GUARD_STEP), order.index(APPLY_STEP))
         self.assertLess(order.index(APPLY_STEP), order.index(SWEEP_STEP))
@@ -395,10 +444,16 @@ class TheWorkflowShape(unittest.TestCase):
         self.assertNotIn("git push", "\n".join(line for line in body.splitlines() if not line.lstrip().startswith("#")))
 
     def test_update_mode_resolves_without_scripts_in_an_isolated_directory(self) -> None:
-        body = _run_body("generate", RESOLVE_STEP)
-        self.assertIn('WORKDIR="$RUNNER_TEMP/', body)
-        self.assertIn("pnpm install --lockfile-only --no-frozen-lockfile --ignore-scripts", body)
-        self.assertNotIn("cp .npmrc", body)
+        prepare = _run_body("generate", PREPARE_STEP)
+        resolve = _run_body("generate", RESOLVE_STEP)
+        self.assertIn('WORKDIR="$RUNNER_TEMP/', prepare)
+        self.assertIn("pnpm install --lockfile-only --no-frozen-lockfile --ignore-scripts", resolve)
+        self.assertNotIn("cp .npmrc", prepare)
+        self.assertNotIn("cp pnpm-workspace.yaml", prepare)
+
+    def test_only_the_step_that_runs_pnpm_holds_the_token(self) -> None:
+        self.assertNotIn("NODE_AUTH_TOKEN", "\n".join(_step("generate", PREPARE_STEP)))
+        self.assertIn("NODE_AUTH_TOKEN", "\n".join(_step("generate", RESOLVE_STEP)))
 
 
 class TheSharedRefusals(unittest.TestCase):
@@ -433,7 +488,7 @@ class TheSharedRefusals(unittest.TestCase):
         self.assertEqual(self.shape("refs/heads/main").returncode, 1)
 
     def test_a_feature_branch_passes(self) -> None:
-        self.assertEqual(self.shape("ws1799-secrets-on-host").returncode, 0)
+        self.assertEqual(self.shape("feature-branch").returncode, 0)
 
     def test_a_branch_a_ruleset_protects_is_refused(self) -> None:
         result = self.ruleset('[{"type":"pull_request"}]', 0)
@@ -485,27 +540,56 @@ class TheUpdateSteps(unittest.TestCase):
         result, _ = self.mode((".nvmrc", "pnpm-lock.yaml"))
         self.assertEqual(result.returncode, 1)
 
-    def resolve(self, workspace: str | None) -> tuple[subprocess.CompletedProcess[str], pathlib.Path]:
+    def resolve(
+        self,
+        workspace: str | None,
+        manifest: str = "{}",
+        link: str | None = None,
+    ) -> tuple[subprocess.CompletedProcess[str], pathlib.Path]:
+        """Runs the prepare step and, only if it passed, the resolve step, as the runner does.
+
+        The stub `pnpm` records its arguments and the workspace file it was handed. `link` names a
+        file to replace with a symlink to a file outside the checkout.
+        """
         repo = self.dir / "repo"
         repo.mkdir(exist_ok=True)
         runner = self.dir / "runner"
         runner.mkdir(exist_ok=True)
-        (repo / "package.json").write_text("{}", encoding="utf-8")
+        (repo / "package.json").write_text(manifest, encoding="utf-8")
         (repo / "pnpm-lock.yaml").write_text("lock", encoding="utf-8")
         (repo / ".npmrc").write_text("@branchleft:registry=https://evil.example\n", encoding="utf-8")
         if workspace is not None:
             (repo / "pnpm-workspace.yaml").write_text(workspace, encoding="utf-8")
+        if link:
+            elsewhere = self.dir / "elsewhere"
+            elsewhere.write_text((repo / link).read_text(encoding="utf-8") if (repo / link).exists() else "x", encoding="utf-8")
+            (repo / link).unlink(missing_ok=True)
+            (repo / link).symlink_to(elsewhere)
         bin_dir = self.dir / "bin"
         bin_dir.mkdir(exist_ok=True)
         pnpm = bin_dir / "pnpm"
-        pnpm.write_text(f"#!/bin/sh\necho \"$@\" > '{self.dir}/pnpm-args'\n", encoding="utf-8")
+        pnpm.write_text(
+            f"#!/bin/sh\necho \"$@\" > '{self.dir}/pnpm-args'\ncp pnpm-workspace.yaml '{self.dir}/seen-workspace.yaml' 2>/dev/null || true\n",
+            encoding="utf-8",
+        )
         pnpm.chmod(0o755)
         env = {"RUNNER_TEMP": str(runner), "NODE_AUTH_TOKEN": "x", "PATH": f"{bin_dir}:{os.environ['PATH']}"}
-        result = _bash(_run_body("generate", RESOLVE_STEP), repo, env)
+        result = _bash(_run_body("generate", PREPARE_STEP), repo, env)
+        if result.returncode == 0:
+            result = _bash(_run_body("generate", RESOLVE_STEP), repo, env)
         return result, runner / "pnpm-lockfile-update"
 
+    def assert_workspace_refused(self, workspace: str, fragment: str | None = None) -> None:
+        result, work = self.resolve(workspace)
+        self.assertEqual(result.returncode, 1, workspace + result.stdout + result.stderr)
+        self.assertIn("::error::", result.stdout, workspace)
+        if fragment:
+            self.assertIn(fragment, result.stdout)
+        self.assertFalse((self.dir / "pnpm-args").exists(), workspace)
+        self.assertFalse((work / "pnpm-workspace.yaml").exists(), workspace)
+
     def test_the_isolated_directory_holds_only_the_allowed_inputs(self) -> None:
-        result, work = self.resolve("allowBuilds:\n  protobufjs: false\nminimumReleaseAgeExclude:\n  - 'a@1'\n")
+        result, work = self.resolve("allowBuilds:\n  protobufjs: false\nminimumReleaseAgeExclude:\n  - 'a@1.0.0'\n")
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
         self.assertEqual(
             sorted(p.name for p in work.iterdir()),
@@ -515,17 +599,104 @@ class TheUpdateSteps(unittest.TestCase):
         args = (self.dir / "pnpm-args").read_text(encoding="utf-8").strip()
         self.assertEqual(args, "install --lockfile-only --no-frozen-lockfile --ignore-scripts")
 
+    def test_pnpm_is_handed_a_workflow_written_file_with_only_the_allowed_keys(self) -> None:
+        source = (
+            "# a comment the rewrite drops\n"
+            "allowBuilds: {protobufjs: false, 'esbuild': true}\n"
+            'minimumReleaseAgeExclude: ["@branchleft/tenant@8.0.0", "@branchleft/core@0.2.0-rc.1"]\n'
+        )
+        result, _ = self.resolve(source)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        seen = (self.dir / "seen-workspace.yaml").read_text(encoding="utf-8")
+        self.assertEqual(
+            seen,
+            'allowBuilds:\n  "protobufjs": false\n  "esbuild": true\n'
+            'minimumReleaseAgeExclude:\n  - "@branchleft/tenant@8.0.0"\n  - "@branchleft/core@0.2.0-rc.1"\n',
+        )
+        self.assertNotIn("comment", seen)
+
+    def test_the_repository_workspace_file_survives_the_rewrite(self) -> None:
+        result, _ = self.resolve((ROOT / "pnpm-workspace.yaml").read_text(encoding="utf-8"))
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        seen = (self.dir / "seen-workspace.yaml").read_text(encoding="utf-8")
+        self.assertEqual(re.findall(r"^\S.*$", seen, re.M), ["allowBuilds:", "minimumReleaseAgeExclude:"])
+
     def test_a_branch_without_a_workspace_file_resolves_without_one(self) -> None:
         result, work = self.resolve(None)
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
         self.assertFalse((work / "pnpm-workspace.yaml").exists())
 
+    def test_an_empty_or_comment_only_workspace_file_resolves_without_one(self) -> None:
+        for text in ("", "# nothing here\n"):
+            result, work = self.resolve(text)
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            self.assertFalse((work / "pnpm-workspace.yaml").exists())
+
     def test_a_workspace_file_with_another_top_level_key_is_refused_before_pnpm_runs(self) -> None:
-        result, work = self.resolve("allowBuilds:\n  protobufjs: false\nregistries:\n  default: https://evil.example\n")
+        self.assert_workspace_refused(
+            "allowBuilds:\n  protobufjs: false\nregistries:\n  default: https://evil.example\n", "registries"
+        )
+
+    def test_indented_top_level_keys_cannot_pass_as_nested(self) -> None:
+        for text in (" pnpmfile: x\n", "  pnpmfile: x\n", "allowBuilds: {}\n  \n pnpmfile: x\n"):
+            self.assert_workspace_refused(text)
+
+    def test_a_tab_indented_key_is_refused(self) -> None:
+        self.assert_workspace_refused("\tpnpmfile: x\n")
+        self.assert_workspace_refused("allowBuilds:\n\tprotobufjs: false\n")
+
+    def test_a_flow_style_or_quoted_key_is_refused(self) -> None:
+        self.assert_workspace_refused("{pnpmfile: x}\n", "pnpmfile")
+        self.assert_workspace_refused('"pnpmfile": x\n', "pnpmfile")
+        self.assert_workspace_refused("'pnpmfile': x\n", "pnpmfile")
+        self.assert_workspace_refused("? pnpmfile\n: x\n", "pnpmfile")
+
+    def test_a_second_document_or_a_key_after_a_document_end_is_refused(self) -> None:
+        self.assert_workspace_refused("allowBuilds: {}\n---\npnpmfile: x\n")
+        self.assert_workspace_refused("allowBuilds: {}\n...\npnpmfile: x\n")
+        self.assert_workspace_refused("allowBuilds: {}\n...\n---\npnpmfile: x\n")
+
+    def test_anchors_aliases_and_tags_are_refused(self) -> None:
+        self.assert_workspace_refused("allowBuilds: &a {x: true}\n", "anchor")
+        self.assert_workspace_refused("allowBuilds: &a {x: true}\nminimumReleaseAgeExclude: *a\n", "YAML a")
+        self.assert_workspace_refused("allowBuilds: !!map {x: true}\n", "tag")
+        self.assert_workspace_refused("allowBuilds: !ruby/object:Object {}\n")
+
+    def test_values_outside_the_conservative_patterns_are_refused(self) -> None:
+        self.assert_workspace_refused("allowBuilds: {protobufjs: 'yes please'}\n", "allowBuilds")
+        self.assert_workspace_refused("allowBuilds: {'../../x': true}\n", "allowBuilds")
+        self.assert_workspace_refused("allowBuilds: [protobufjs]\n", "allowBuilds")
+        self.assert_workspace_refused("minimumReleaseAgeExclude: [tenant]\n", "name@version")
+        self.assert_workspace_refused("minimumReleaseAgeExclude: ['a@1.0.0 || 2.0.0']\n", "name@version")
+        self.assert_workspace_refused("minimumReleaseAgeExclude: ['a@file:../x']\n", "name@version")
+        self.assert_workspace_refused("minimumReleaseAgeExclude: {a: 1}\n", "list")
+        self.assert_workspace_refused("- allowBuilds\n", "mapping")
+        self.assert_workspace_refused("allowBuilds: {\n", "does not parse")
+
+    def test_a_workspace_file_that_is_not_a_regular_file_is_refused(self) -> None:
+        repo = self.dir / "repo"
+        (repo / "pnpm-workspace.yaml").mkdir(parents=True)
+        result, _ = self.resolve(None)
         self.assertEqual(result.returncode, 1)
-        self.assertIn("registries:", result.stdout)
+        self.assertIn("not a regular file", result.stdout)
         self.assertFalse((self.dir / "pnpm-args").exists())
-        self.assertFalse((work / "pnpm-workspace.yaml").exists())
+
+    def test_a_symlinked_input_is_refused_before_anything_is_copied(self) -> None:
+        for name in ("package.json", "pnpm-lock.yaml", "pnpm-workspace.yaml"):
+            with self.subTest(name):
+                shutil.rmtree(self.dir / "repo", ignore_errors=True)
+                (self.dir / "pnpm-args").unlink(missing_ok=True)
+                result, work = self.resolve("allowBuilds: {}\n", link=name)
+                self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+                self.assertIn(f"'{name}' is a symlink", result.stdout)
+                self.assertFalse((self.dir / "pnpm-args").exists())
+                self.assertFalse((work / "package.json").exists())
+
+    def test_a_package_json_with_a_pnpm_key_is_refused(self) -> None:
+        result, work = self.resolve(None, manifest='{"pnpm": {"overrides": {}}}')
+        self.assertEqual(result.returncode, 1)
+        self.assertIn("top-level 'pnpm' key", result.stdout)
+        self.assertFalse((self.dir / "pnpm-args").exists())
 
     def sweep(self, change: str | None) -> subprocess.CompletedProcess[str]:
         repo = self.dir / "sweep"

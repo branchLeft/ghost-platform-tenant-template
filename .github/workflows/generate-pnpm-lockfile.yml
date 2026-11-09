@@ -408,37 +408,128 @@ jobs:
             exit 1
           fi
 
-      # Update mode. Only `package.json`, `pnpm-lock.yaml`, an allow-listed
-      # `pnpm-workspace.yaml` and a `.npmrc` this step writes reach the
-      # isolated directory, for the reasons given above. The workspace file
-      # carries resolution settings (the release-age exclusions a fresh
-      # `@branchleft/*` publish needs), so it is copied, but only when its
-      # top-level keys are the two this repo uses: a branch author's other
-      # key could redirect resolution. `--no-frozen-lockfile` is explicit
-      # because CI defaults pnpm to a frozen lockfile.
+      # Update mode. Only `package.json`, `pnpm-lock.yaml`, a `.npmrc` this
+      # step writes and a workspace file this step WRITES reach the isolated
+      # directory. The branch's `pnpm-workspace.yaml` is parsed, never
+      # copied: pnpm loads code from keys such as `pnpmfile`, and `--ignore-
+      # scripts` does not stop that. Ruby's YAML parser (on the runner image;
+      # PyYAML is not) turns it into JSON, refusing anchors, aliases, tags and
+      # more than one document; Python then keeps only the two settings this
+      # repo uses, validated, and writes a new file. Neither parser step
+      # holds the token. `--no-frozen-lockfile` is explicit because CI
+      # defaults pnpm to a frozen lockfile.
+      - name: Prepare the isolated directory (update mode)
+        if: steps.mode.outputs.mode == 'update'
+        run: |
+          set -euo pipefail
+          for f in package.json pnpm-lock.yaml pnpm-workspace.yaml; do
+            if [ -L "$f" ]; then
+              echo "::error::'$f' is a symlink; refusing to copy a file whose content lives elsewhere"
+              exit 1
+            fi
+          done
+          if [ -e pnpm-workspace.yaml ] && [ ! -f pnpm-workspace.yaml ]; then
+            echo "::error::pnpm-workspace.yaml is not a regular file"
+            exit 1
+          fi
+          WORKDIR="$RUNNER_TEMP/pnpm-lockfile-update"
+          PARSED="$RUNNER_TEMP/pnpm-workspace-parsed.json"
+          mkdir -p "$WORKDIR"
+          rm -f "$PARSED"
+          ruby - pnpm-workspace.yaml "$PARSED" <<'RBEOF'
+          require 'json'
+          require 'psych'
+
+          def refuse(message)
+            puts "::error::pnpm-workspace.yaml #{message}"
+            exit 1
+          end
+
+          def walk(node)
+            refuse('uses a YAML alias') if node.is_a?(Psych::Nodes::Alias)
+            refuse('uses a YAML anchor') if node.respond_to?(:anchor) && node.anchor
+            refuse('uses a YAML tag') if node.respond_to?(:tag) && node.tag
+            (node.children || []).each { |child| walk(child) }
+          end
+
+          path, out = ARGV
+          if File.exist?(path)
+            raw = File.binread(path)
+            refuse('is larger than 64 KiB') if raw.bytesize > 65_536
+            raw.force_encoding('UTF-8')
+            refuse('is not valid UTF-8') unless raw.valid_encoding?
+            begin
+              stream = Psych.parse_stream(raw)
+              refuse('holds more than one YAML document') if stream.children.length > 1
+              walk(stream)
+              data = stream.children.empty? ? {} : Psych.safe_load(raw, permitted_classes: [], aliases: false)
+            rescue StandardError => e
+              refuse("does not parse as plain YAML: #{e.class}")
+            end
+          else
+            data = {}
+          end
+          File.write(out, JSON.generate(data))
+          RBEOF
+          python3 - "$PARSED" "$WORKDIR/pnpm-workspace.yaml" package.json <<'PYEOF'
+          import json
+          import re
+          import sys
+
+          ALLOWED = ("allowBuilds", "minimumReleaseAgeExclude")
+          NAME = re.compile(r"(@[a-z0-9][a-z0-9._~-]*/)?[a-z0-9][a-z0-9._~-]*")
+          VERSION = re.compile(r"[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?(\+[0-9A-Za-z.-]+)?")
+
+
+          def refuse(message):
+              print(f"::error::{message}")
+              sys.exit(1)
+
+
+          parsed_path, out_path, manifest_path = sys.argv[1:4]
+          with open(manifest_path, encoding="utf-8") as f:
+              manifest = json.load(f)
+          if "pnpm" in manifest:
+              refuse("package.json has a top-level 'pnpm' key; its settings can change what pnpm loads, so it is not copied")
+          with open(parsed_path, encoding="utf-8") as f:
+              data = json.load(f)
+          if not isinstance(data, dict):
+              refuse("pnpm-workspace.yaml must be a mapping at the top level")
+          extra = sorted(set(data) - set(ALLOWED))
+          if extra:
+              refuse(f"pnpm-workspace.yaml has top-level key(s) other than {list(ALLOWED)}: {extra}; refusing settings that could change what pnpm loads")
+          allow = data.get("allowBuilds", {})
+          if not isinstance(allow, dict) or not all(NAME.fullmatch(k) and isinstance(v, bool) for k, v in allow.items()):
+              refuse("allowBuilds must map a package name to true or false")
+          exclude = data.get("minimumReleaseAgeExclude", [])
+          if not isinstance(exclude, list):
+              refuse("minimumReleaseAgeExclude must be a list of name@version strings")
+          for entry in exclude:
+              name, sep, version = entry.rpartition("@") if isinstance(entry, str) else ("", "", "")
+              if not (sep and NAME.fullmatch(name) and VERSION.fullmatch(version)):
+                  refuse(f"minimumReleaseAgeExclude entry {entry!r} is not a name@version string")
+          lines = []
+          if allow:
+              lines.append("allowBuilds:")
+              lines.extend(f"  {json.dumps(k)}: {'true' if v else 'false'}" for k, v in allow.items())
+          if exclude:
+              lines.append("minimumReleaseAgeExclude:")
+              lines.extend(f"  - {json.dumps(e)}" for e in exclude)
+          if lines:
+              with open(out_path, "w", encoding="utf-8") as f:
+                  f.write("\n".join(lines) + "\n")
+          PYEOF
+          cp package.json "$WORKDIR/package.json"
+          cp pnpm-lock.yaml "$WORKDIR/pnpm-lock.yaml"
+          printf '@branchleft:registry=https://npm.pkg.github.com\n' > "$WORKDIR/.npmrc"
+
       - name: Re-resolve pnpm-lock.yaml in an isolated directory (update mode)
         if: steps.mode.outputs.mode == 'update'
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           set -euo pipefail
-          WORKDIR="$RUNNER_TEMP/pnpm-lockfile-update"
-          mkdir -p "$WORKDIR"
-          if [ -f pnpm-workspace.yaml ]; then
-            OTHER="$(grep -E '^[^[:space:]#]' pnpm-workspace.yaml | grep -v -x -F \
-              -e 'allowBuilds:' \
-              -e 'minimumReleaseAgeExclude:' || true)"
-            if [ -n "$OTHER" ]; then
-              echo "::error::pnpm-workspace.yaml has a top-level key other than allowBuilds and minimumReleaseAgeExclude; refusing to copy settings that could change resolution:"
-              echo "$OTHER"
-              exit 1
-            fi
-            cp pnpm-workspace.yaml "$WORKDIR/pnpm-workspace.yaml"
-          fi
-          cp package.json "$WORKDIR/package.json"
-          cp pnpm-lock.yaml "$WORKDIR/pnpm-lock.yaml"
-          printf '@branchleft:registry=https://npm.pkg.github.com\n' > "$WORKDIR/.npmrc"
-          (cd "$WORKDIR" && pnpm install --lockfile-only --no-frozen-lockfile --ignore-scripts)
+          (cd "$RUNNER_TEMP/pnpm-lockfile-update" && pnpm install --lockfile-only --no-frozen-lockfile --ignore-scripts)
 
       # The update-mode gate, inline for the reason given above the conversion
       # gate. Everything it checks is in generate-pnpm-lockfile.md.
@@ -447,11 +538,14 @@ jobs:
         run: |
           python3 - pnpm-lock.yaml "$RUNNER_TEMP/pnpm-lockfile-update/pnpm-lock.yaml" package.json <<'PYEOF'
           import json
+          import re
           import sys
 
           ROOT_SECTIONS = ("dependencies", "devDependencies", "optionalDependencies")
           KNOWN_TOP = ("importers", "packages", "snapshots")
           LINK_PREFIXES = ("link:", "file:", "workspace:")
+          TARBALL_PREFIXES = ("https://npm.pkg.github.com/download/@branchleft/", "https://registry.npmjs.org/")
+          INTEGRITY = re.compile(r"sha512-[A-Za-z0-9+/]+={0,2}")
 
 
           class Refusal(Exception):
@@ -573,6 +667,22 @@ jobs:
               return roots
 
 
+          def resolution_problem(block):
+              # Only a registry integrity, with at most a tarball on a registry this repo reads, is accepted.
+              found = [line.strip() for line in block if line.strip().startswith("resolution:")]
+              match = re.fullmatch(r"resolution: \{(.*)\}", found[0]) if len(found) == 1 else None
+              if not match:
+                  return "has no single flow-style resolution"
+              fields = dict(part.partition(": ")[::2] for part in match.group(1).split(", "))
+              if not set(fields) <= {"integrity", "tarball"} or "integrity" not in fields:
+                  return f"resolves by {sorted(fields)}, not a registry integrity"
+              if not INTEGRITY.fullmatch(fields["integrity"]):
+                  return "has an integrity that is not sha512"
+              if "tarball" in fields and not fields["tarball"].startswith(TARBALL_PREFIXES):
+                  return f"resolves to a tarball outside the registries this repo reads: {fields['tarball']}"
+              return None
+
+
           def check(old_path, new_path, manifest_path):
               with open(old_path, encoding="utf-8") as f:
                   old_text = f.read()
@@ -612,6 +722,16 @@ jobs:
               for key in sorted(set(old["packages"]) & set(new["packages"])):
                   if old["packages"][key] != new["packages"][key]:
                       raise Refusal(f"{key} kept its version but its resolution or metadata changed")
+              for key in sorted(added):
+                  problem = resolution_problem(new["packages"][key])
+                  if problem:
+                      raise Refusal(f"added package {key} {problem}")
+              for name in bumped:
+                  if name in new_roots and new_roots[name]["version"].startswith(LINK_PREFIXES):
+                      raise Refusal(f"{name} is bumped to a local link, {new_roots[name]['version']}")
+              for snap, deps in new["snapshots"].items():
+                  if snap not in old["snapshots"] and any(v.startswith(LINK_PREFIXES) for v in deps.values()):
+                      raise Refusal(f"added snapshot {snap} depends on a local link")
               print(f"bumped direct dependencies: {bumped}")
               print(f"removed {len(removed)}: {sorted(removed)}")
               print(f"added {len(added)}: {sorted(added)}")

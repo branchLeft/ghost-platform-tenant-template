@@ -46,13 +46,29 @@ For a branch that changed a dependency specifier in `package.json` and left
 `ERR_PNPM_OUTDATED_LOCKFILE`.
 
 The isolated directory receives `package.json`, `pnpm-lock.yaml`, a `.npmrc`
-written by the step and, if present, `pnpm-workspace.yaml`. The workspace file
-holds resolution settings, including the release-age exclusions a package
-published in the last day needs, so it is needed. It is copied only when its
-top-level keys are `allowBuilds` and `minimumReleaseAgeExclude`; any other key is
-refused before pnpm runs. Resolution is `pnpm install --lockfile-only
---no-frozen-lockfile --ignore-scripts`; the explicit flag is there because CI
-makes pnpm default to a frozen lockfile.
+written by the step and a `pnpm-workspace.yaml` the step writes itself. The
+branch's workspace file is never copied: pnpm loads code from keys such as
+`pnpmfile`, `--ignore-scripts` does not stop that, and the install step holds the
+workflow token. The release-age exclusions a package published in the last day
+needs live in that file, so its two settings are carried over:
+
+1. Ruby's YAML parser (Ruby is on the runner image; PyYAML is not) reads the
+   file and writes JSON. It refuses more than one document, any anchor, alias or
+   tag, a file over 64 KiB, and anything that does not parse, so indentation,
+   flow style, quoting and document markers cannot hide a key.
+2. Python keeps `allowBuilds` (package name to true or false) and
+   `minimumReleaseAgeExclude` (a list of `name@version` strings) under
+   conservative name and version patterns, refuses every other top-level key,
+   and writes a new file holding only those values.
+
+Neither of these two programs runs with the token. `package.json`,
+`pnpm-lock.yaml` and `pnpm-workspace.yaml` must not be symlinks, and the
+workspace file must be a regular file. A `package.json` with a top-level `pnpm`
+key is refused because its settings can also change what pnpm loads.
+
+Resolution is `pnpm install --lockfile-only --no-frozen-lockfile
+--ignore-scripts`; the explicit flag is there because CI makes pnpm default to a
+frozen lockfile.
 
 What update mode refuses:
 
@@ -68,18 +84,35 @@ What update mode refuses:
 8. A package kept its version but its `packages:` entry (resolution, integrity,
    engines) changed.
 9. Any working-tree change other than a modified `pnpm-lock.yaml`.
+10. An added package whose `resolution` is anything but a sha512 `integrity`,
+    optionally with a `tarball` under `https://registry.npmjs.org/` or
+    `https://npm.pkg.github.com/download/@branchleft/` (a git, directory or
+    other tarball resolution), and an added snapshot or bumped direct
+    dependency that points at a `link:`, `file:` or `workspace:` target.
 
-Items 2 to 8 are one Python gate, inline in the workflow so a branch that lacks
+Items 2 to 8 and 10 are one Python gate, inline in the workflow so a branch that lacks
 the script is still checked by it. The tree is walked from the `snapshots:`
 section, so a transitive package that moves is attributed to the direct
 dependency that reaches it. A bump that makes pnpm re-share a transitive package
 with an unbumped dependency is therefore refused rather than accepted; resolve
 that one by hand.
 
+## Stated limits
+
+- The pnpm that runs is the one the dispatched branch's `package.json`
+  `packageManager` field names, because `pnpm/action-setup` reads it from the
+  target branch's checkout. A branch author chooses the pnpm version that parses
+  the files above. Registry versions are immutable, but that is a trust in the
+  branch's author, not a check this workflow makes.
+- The tarball allow-list is by URL prefix; it does not prove the registry
+  served that file, only that the lockfile does not point elsewhere.
+
 ## Tests
 
 `scripts/test_generate_pnpm_lockfile.py` cuts each step out of the workflow and
 runs it: the gate against built and pnpm-written lockfile pairs, the mode
-choice, the workspace allow-list and the exact-change check under bash, and the
+choice, the workspace rewrite (indentation, tab, flow, quoted-key, multi-document,
+anchor and tag bypasses, and the file pnpm is handed), the symlink refusals and
+the exact-change check under bash, and the
 branch refusals with a stub `gh`. It runs in the credential-free job that runs
 the other `scripts/` tests.
