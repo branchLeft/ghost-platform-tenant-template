@@ -2,18 +2,16 @@
 
 Every value one tenant's stack needs, read from `Pulumi.<stack>.yaml`.
 
-Split by who writes it, because the two halves arrive at different times and
-by different routes:
+Every value is plain. They are written by the platform's provisioning workflow
+when this repo is generated, are facts about where this tenant lives, and are
+reviewable in the handover pull request's diff.
 
-- **Plain values** are written by the platform's provisioning workflow when
-  this repo is generated. They are facts about where this tenant lives, and
-  they are reviewable in the handover pull request's diff.
-- **Secret values** are set by an operator with `pulumi config set --secret`
-  in that same pull request, never by the provisioning workflow. Each one is
-  either printed once on a host (`provision_tenant_db.py`) or created in a
-  provider console (the Object Storage key pair), and a `workflow_dispatch`
-  input is plaintext in the run's API response and its form — so there is no
-  route by which provisioning could carry one without publishing it.
+**There are no secret values.** Before 8.0.0 an
+operator set six with `pulumi config set --secret` and the component wrote them
+into a Pulumi secret output, so every credential sat in the stack's config and
+its checkpoint. Now the host renders the secrets file, and this stack never
+sees a value. `scripts/assert-no-secure-stack-config.py` refuses a `secure:`
+entry, or a credential-named key, in a committed `Pulumi.<stack>.yaml`.
 
 `require`, never `get`, for anything the container cannot boot without: an
 unset value has to fail at `pulumi preview` rather than render a stack whose
@@ -37,23 +35,28 @@ only one valid value for (kind, gate, code injection, break-glass, safety,
 limits, caps, media resize and srcsets, expiry) are constants in `index.ts`, not
 keys. The database name and user, and the media bucket, are derived from the
 slug, never settable here. `hostname` is derived from `siteUrl` and
-`zones.platformZone`. New keys: `hostPortB`, `healthPort`, `ownerEmail`
-(secret since 7.0.0, below), `zones`, `backupEncryptionRecipient`, `mailDkimSelector`, `mailCeiling`,
+`zones.platformZone`. New keys: `hostPortB`, `healthPort`, `zones`,
+`backupEncryptionRecipient`, `mailDkimSelector`, `mailCeiling`,
 `mailEstateCeiling`, and optionally `databasePort` and `hostnameVerifiedAt`.
 Mail is now required. Removed: `mailFrom`, `bulkEmailBaseUrl`,
 `uploadCeilingMib`, `rssBudgetMib`.
 
-## Since 7.0.0: `ownerEmail` is secret
+## Since 8.0.0: secrets live on the host
 
-The owner's email address is a person's, so it is secret config
-(`pulumi config set --secret ownerEmail`), read with `requireSecret`, and it is
-not a descriptor field: `index.ts` passes it to the component as
-`secrets.ownerEmail`, and the component writes it only into the secrets file as
-`GHOST_OWNER_EMAIL`. A plain value would sit in this repo's committed
-`Pulumi.<stack>.yaml`. `zones.mailSpoolBaseUrl` is gone: Ghost reaches the
-host's mail spool by its service name. `pnpm test:render`
-(`test/render.test.ts`) loads this program under Pulumi's mocks and checks
-that the address appears in no plain output.
+The owner's email address, the database password, the Object Storage key pair,
+the SMTP password and the mail spool's API key are no longer config keys.
+`ownerEmail`, `databasePassword`, `mediaAccessKeyId`, `mediaSecretAccessKey`,
+`mailPassword` and `bulkEmailApiKey` are read by nothing, and a stack that still
+carries one is refused by `scripts/assert-no-secure-stack-config.py`. The
+component takes no `secrets` argument; `index.ts` exports `secretsEnvTemplate`
+(key names, empty values) and `secretKeys`, and the host fills
+`/etc/branchleft/<slug>.env` with `app/provision/render_tenant_secrets.py` from
+`branchLeft/ghost-platform`. The owner's address is a person's, and it reaches
+Ghost only as `GHOST_OWNER_EMAIL` in that file. `zones.mailSpoolBaseUrl` is
+gone since 7.0.0: Ghost reaches the host's mail spool by its service name.
+`pnpm test:render` (`test/render.test.ts`) loads this program under Pulumi's
+mocks with a sentinel under each former key and checks that it appears in no
+export, registered output or resource input, and that no output is a secret.
 
 ## `imageRef`
 
@@ -84,15 +87,13 @@ Against Ceph RGW the region is part of the SigV4 credential scope, so a
 mismatch is a signature failure surfacing as an opaque 403 that reads as a
 credential problem.
 
-## `mediaAccessKeyId` / `mediaSecretAccessKey`
+## The Object Storage key pair
 
-Both halves of the Object Storage key pair are secret config, including the
-key id.
-
-The id is not itself a secret. Holding the pair together is what makes
-rotating this credential one edit instead of two, and a rotation that updates
-one half is a tenant whose media stops working with a 403 that reads as a
-bucket-policy problem.
+Not a config key since 8.0.0: both halves, including the key id, go to the host
+together, in the secrets file. The id is not itself a secret, but holding the
+pair together is what makes rotating this credential one edit instead of two,
+and a rotation that updates one half is a tenant whose media stops working with
+a 403 that reads as a bucket-policy problem.
 
 The pair is created in the Hetzner Cloud Console — there is no API that mints
 one — and the bucket policy naming it as a principal is applied by the same

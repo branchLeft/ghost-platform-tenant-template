@@ -20,19 +20,30 @@ app host and `db1` are shared with other tenants, and this tenant's Object
 Storage bucket is its own — created by an operator before this stack first
 applied, because Hetzner mints S3 credentials only in its Cloud Console. What is
 per-tenant here is *configuration*, and this stack is the versioned,
-passphrase-wrapped record of it. `pulumi up` renders two things an operator places on the host by hand:
+passphrase-wrapped record of it. `pulumi up` renders one file an operator places
+on the host by hand, and a template the host fills:
 
 ```bash
 pulumi stack output composeFile                      # /opt/branchleft/__TENANT_NAME__/compose.yml
-pulumi stack output --show-secrets secretsEnvFile    # /etc/branchleft/__TENANT_NAME__.env, 0600
+pulumi stack output secretsEnvTemplate               # key names only, no values
 ```
 
-Both are root-owned and operator-written. A stack output lives in the
+**This stack holds no secret value.** The secrets file,
+`/etc/branchleft/__TENANT_NAME__.env`, is rendered on the host, root-owned
+`0600`, by `app/provision/render_tenant_secrets.py` in `branchLeft/ghost-platform`
+from `secretsEnvTemplate` and values given to it on stdin. Nothing here sets,
+reads or stores one: there is no `pulumi config set --secret`, and
+`scripts/assert-no-secure-stack-config.py` fails a commit, and CI's
+`Committed-secret guard` job fails a pull request, that puts a `secure:` entry
+back.
+
+The Compose file is root-owned and operator-written. A stack output lives in the
 checkpoint, which anything holding the state credential can rewrite, so apply
 immediately before reading `composeFile` and preview again after placing it:
-a changed `composeFile` means do not enable the unit. No automated path may write either:
-between them they are the runtime-isolation posture, and a stack that quietly
-loses one line of it still starts, still serves, and has dropped a boundary.
+a changed `composeFile` means do not enable the unit. No automated path may write
+it or the secrets file: between them they are the runtime-isolation posture, and
+a stack that quietly loses one line of it still starts, still serves, and has
+dropped a boundary.
 
 **The only thing CI puts on the host is an image reference.** The deploy job
 pipes `imageRef` to `branchleft-deploy` over this repo's own slot key, which
@@ -50,10 +61,9 @@ anywhere on the path.
   job's delete-guard preflight aborts any plan carrying a `delete` or `replace`
   step. Its other half does not currently fire — see the `uid` bullet below.
 - Changes are pull requests against `Pulumi.__TENANT_NAME__.yaml` and
-  `index.ts`. Secret config is encrypted with this repo's own passphrase — set
-  it with `pulumi config set --secret` from a checkout, with
-  `PULUMI_CONFIG_PASSPHRASE` exported locally, never by pasting plaintext into
-  the file.
+  `index.ts`. The stack holds no secret value, so there is no secret config to
+  set; a credential is never pasted into the file or set with
+  `pulumi config set --secret`.
 - **Changing the image** is a one-line change to `imageRef`, digest-pinned. A
   tag is refused at preview: a stack deployed by tag has no answer to "what is
   running", and a restart months later can silently change it.

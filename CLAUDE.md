@@ -10,10 +10,12 @@ has the config tables and the placeholder table; in a generated repo,
 
 **This stack creates nothing.** The component declares no cloud resources —
 every durable thing a tenant uses is shared and already exists. What it renders
-is configuration: a Compose file and a secrets file, both of which an operator
-places on the app host by hand. No automated path may write either; between them
-they are the runtime-isolation posture, and a stack that quietly loses one line
-of it still starts and still serves.
+is configuration: a Compose file an operator places on the app host by hand, and
+the key names of a secrets file the host fills. **This stack holds no secret
+value** (component 8.0.0): never add a `secure:` entry or a `requireSecret` read.
+No automated path may write either file; between them they are the
+runtime-isolation posture, and a stack that quietly loses one line of it still
+starts and still serves.
 
 **The only thing CI puts on a host is an image digest**, piped to
 `branchleft-deploy` over this repo's own slot key. That key's `authorized_keys`
