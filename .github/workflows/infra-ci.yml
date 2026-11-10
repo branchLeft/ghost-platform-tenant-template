@@ -92,7 +92,7 @@ jobs:
           persist-credentials: false
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
+        uses: pnpm/action-setup@73e46992e05b19abd31f2f3c20e0e7370d762115 # v6.1.1
 
       - name: Setup Node
         uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
@@ -220,7 +220,7 @@ jobs:
       # commit. It reads this workflow file only, holds no credential, and runs
       # on every pull request, so a broken gate fails before it can merge.
       - name: Check the no-op deploy gate's wiring
-        uses: branchLeft/github-workflows/.github/actions/check-apply-gate@ea6de91ba90ed9a3a988ae8ffa0e9d70dd42f691 # v1.0.19
+        uses: branchLeft/github-workflows/.github/actions/check-apply-gate@8435e9fb73a5ef015f19bc6803b98b1105c03540 # v1.0.23
         with:
           workflow: .github/workflows/infra-ci.yml
           pairs: plan:deploy
@@ -314,7 +314,7 @@ jobs:
           fi
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
+        uses: pnpm/action-setup@73e46992e05b19abd31f2f3c20e0e7370d762115 # v6.1.1
 
       - name: Setup Node
         uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
@@ -329,7 +329,7 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Install Pulumi CLI
-        uses: pulumi/actions@8e5e406f4007fca908480587cb9893c07090f58d # v7.0.0
+        uses: pulumi/actions@96c7761824268174e0d2a4e8c7d75671eebd24a7 # v7.1.0
 
       # The next four steps are the deploy job's own, word for word, and a test
       # holds them to it (scripts/test_plan_job.py): a plan made with a
@@ -454,7 +454,7 @@ jobs:
       - name: Decide whether the plan changes anything
         id: plan
         if: always()
-        uses: branchLeft/github-workflows/.github/actions/plan-has-changes@ea6de91ba90ed9a3a988ae8ffa0e9d70dd42f691 # v1.0.19
+        uses: branchLeft/github-workflows/.github/actions/plan-has-changes@8435e9fb73a5ef015f19bc6803b98b1105c03540 # v1.0.23
         with:
           preview-json: preview.json
           plan-file: preview-plan.json
@@ -599,7 +599,7 @@ jobs:
         run: python3 scripts/assert-placeholders-substituted.py --mangled
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
+        uses: pnpm/action-setup@73e46992e05b19abd31f2f3c20e0e7370d762115 # v6.1.1
 
       - name: Setup Node
         uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
@@ -614,7 +614,7 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Install Pulumi CLI
-        uses: pulumi/actions@8e5e406f4007fca908480587cb9893c07090f58d # v7.0.0
+        uses: pulumi/actions@96c7761824268174e0d2a4e8c7d75671eebd24a7 # v7.1.0
 
       # Pulumi's passphrase provider reads PULUMI_CONFIG_PASSPHRASE from the
       # environment via a plain lookup, which does not distinguish "unset" from
