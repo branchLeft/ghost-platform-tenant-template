@@ -1,9 +1,6 @@
 """Tests for the deploy job's environment-gate step and the script it runs.
-
-See assert-environment-gated.md. The workflow is read as text (stdlib only):
-the step is cut out of the deploy job and its `run:` body is executed under
-bash with a stub `gh`, so what is asserted is the step CI runs, not a copy.
-"""
+The step is cut out of the deploy job and its `run:` body runs under bash with a
+stub `gh`, so the asserted step is CI's own. See assert-environment-gated.md."""
 
 from __future__ import annotations
 

@@ -1,11 +1,6 @@
-"""Tests for the credential guards in the `plan` and `deploy` jobs of infra-ci.yml.
-
-Each guard must refuse a value that is empty or only whitespace, not just an
-unset one: a secret pasted with a stray newline, or a variable set to a space,
-reaches Pulumi or ssh as a value that is no use to either. The workflow is read
-as text (stdlib only), the way test_plan_job.py reads it: each step is cut out
-of its job and its `run:` body is executed under `bash -e` with stubs for
-`pulumi` and `ssh`, so what is asserted is the step CI runs, not a copy.
+"""Tests for the credential guards in infra-ci.yml's `plan` and `deploy` jobs.
+Each guard refuses an empty or whitespace-only value (a stray newline is no use to
+Pulumi or ssh), not only an unset one. Steps run as CI runs them, with stubs.
 """
 
 from __future__ import annotations
