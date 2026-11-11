@@ -227,6 +227,35 @@ jobs:
           verdict-step: noop
           plan-file: preview-plan.json
 
+  # Its own job, so it holds nothing but the two read permissions it needs and
+  # no credential: the shared action checks that every locked @branchleft
+  # package is either listed as published before attestation began or carries a
+  # signed build attestation from the repository and workflow its reviewed
+  # identity table names. The tarball download authenticates with the run's own
+  # GITHUB_TOKEN, as `pnpm install` does above. Pinned by commit, like every
+  # other action here; `scripts/test_verify_attestations_job.py` holds the pin,
+  # the comment and the permissions. It gates nothing: `plan` and `deploy` do
+  # not wait on it.
+  verify-package-attestations:
+    name: Verify @branchleft package attestations
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    permissions:
+      contents: read
+      packages: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Verify the attestation of every locked @branchleft package
+        uses: branchLeft/github-workflows/.github/actions/verify-package-attestations@2c34b90b367fd160bb01d311d29224d250460086 # v1.2.1
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
   # The plan, made BEFORE the deploy job below waits for its approval, so that
   # whoever approves (the owner, or the deploy-approval App on the owner's
   # behalf) can read what the apply would do instead of approving blind. The
