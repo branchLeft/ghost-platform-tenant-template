@@ -107,7 +107,7 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Type check
-        run: npx tsc --noEmit
+        run: pnpm exec tsc --noEmit
 
       # Runs index.ts under Pulumi's mock runtime with placeholder config, so
       # the component's validateTenantStack() and render() run on this program
@@ -121,7 +121,7 @@ jobs:
       # without it, a file a contributor forgot to run pre-commit on merges
       # unformatted and nothing here catches it.
       - name: Check formatting
-        run: npx prettier --check . --ignore-path .gitignore --ignore-path .prettierignore --ignore-path node_modules/@branchleft/prettier-config/prettierignore
+        run: pnpm exec prettier --check . --ignore-path .gitignore --ignore-path .prettierignore --ignore-path node_modules/@branchleft/prettier-config/prettierignore
 
       # Skipped in the template repo itself, where an unsubstituted placeholder
       # is the correct, permanent state of `main` -- this step exists for repos
