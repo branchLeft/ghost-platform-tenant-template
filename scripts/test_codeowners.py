@@ -150,11 +150,20 @@ OWNED: dict[str, tuple[str, ...]] = {
         "scripts/test_generate_pnpm_lockfile.py",
         "scripts/test_codeowners.py",
         "scripts/testdata/image-changed/runs-empty.json",
+        # The required 'Committed-secret guard' check: plan and deploy need it,
+        # so its exit code decides whether a deploy happens.
+        "scripts/assert-no-inline-credential.py",
+        "scripts/test_assert_no_inline_credential.py",
+        # Runs in both required checks; guards against a drifted copy failing open.
+        "scripts/test_generate_tenant_repo.py",
     ),
+    "1 the test of the test:render gate": ("test/render.test.ts",),
     "2 what runs, and what Pulumi runs, where secrets are in scope": (
         "package.json",
         "pnpm-workspace.yaml",
         ".npmrc",
+        ".pnpmfile.cjs",
+        ".pnpmfile.mjs",
         "known_hosts",
         "Pulumi.yaml",
         "Pulumi.blog.yaml",
@@ -174,9 +183,8 @@ OWNED: dict[str, tuple[str, ...]] = {
     "8 the owner's words": ("LICENSE",),
 }
 
-# Paths no one is asked to review: documents, the tests and fixtures of nothing
-# that gates a merge or a deploy, checkers no secret-bearing job runs, and
-# lockfiles and version pins (the deeper agent review takes those).
+# Paths no one is asked to review: documents, the generator that no workflow
+# runs, and lockfiles and version pins (the deeper agent review takes those).
 RELEASED: dict[str, tuple[str, ...]] = {
     "documents": (
         "README.md",
@@ -187,13 +195,7 @@ RELEASED: dict[str, tuple[str, ...]] = {
         "scripts/image-changed.md",
         "scripts/assert-no-inline-credential.md",
     ),
-    "checkers no secret-bearing job runs, and their tests": (
-        "scripts/assert-no-inline-credential.py",
-        "scripts/test_assert_no_inline_credential.py",
-        "scripts/generate-tenant-repo.py",
-        "scripts/test_generate_tenant_repo.py",
-    ),
-    "the render test": ("test/render.test.ts",),
+    "the generator, which no workflow runs": ("scripts/generate-tenant-repo.py",),
     "lockfiles and version pins": ("pnpm-lock.yaml", ".nvmrc"),
     "editor, formatter and hook settings": (
         ".editorconfig",
