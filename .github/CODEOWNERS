@@ -1,16 +1,52 @@
-* @branchLeft/branchleft-admin
-
-# The try-it-now programme's reviewer identity — branchLeft/workspace#1171.
-# CODEOWNERS takes the LAST matching pattern, so this line sets the owners for
-# the tree: the reviewer account, plus the admin team so Rob's own approval
-# path is unchanged.
+# What this file holds for the owner. There is no catch-all: a path listed here
+# is one whose change can do harm that no later check would catch, and every
+# other path merges on a signed commit, green checks and the reviewer App's
+# approval. GitHub applies the LAST matching pattern, so a line with no owner
+# releases what an earlier line took.
 #
-# The shared line above stays. SYNC-1 is `suffix` for this file: GitHub applies
-# the LAST matching pattern, so the shared escape-hatch lines below have to stay
-# the final lines here, not merely present -- a repo may add its own patterns
-# above them but never after or between them.
-* @branchLeft/branchleft-admin
+# scripts/test_codeowners.py holds a fixed table of sample paths for every class
+# below and fails when one of them changes owner.
 
+# The rules themselves, and the owner's own instructions.
+CLAUDE.md                @branchLeft/branchleft-admin
+/AUTHORISATIONS.md       @branchLeft/branchleft-admin
+/.claude/                @branchLeft/branchleft-admin
+/tools/floors.tsv        @branchLeft/branchleft-admin
+
+# The scripts the plan and deploy jobs run with secrets in scope, and the tests
+# that gate them. Documents and the two checkers named below are released.
+/scripts/                @branchLeft/branchleft-admin
+
+# What decides the program Pulumi runs, and what runs while it is installed,
+# in the jobs that hold the state credentials, the passphrase and the deploy key.
+# package.json: `main` picks the program, lifecycle hooks run on install.
+# pnpm-workspace.yaml: the list of install scripts allowed to run.
+# tsconfig.json: its ts-node block runs code inside the Pulumi process.
+# known_hosts: what the deploy job's SSH trusts.
+/package.json            @branchLeft/branchleft-admin
+/pnpm-workspace.yaml     @branchLeft/branchleft-admin
+/.npmrc                  @branchLeft/branchleft-admin
+/known_hosts             @branchLeft/branchleft-admin
+/Pulumi.yaml             @branchLeft/branchleft-admin
+/Pulumi.*.yaml           @branchLeft/branchleft-admin
+/index.ts                @branchLeft/branchleft-admin
+/config.ts               @branchLeft/branchleft-admin
+/tsconfig.json           @branchLeft/branchleft-admin
+
+# The owner's words: licence text.
+/LICENSE                 @branchLeft/branchleft-admin
+
+# Released from /scripts/ above. Read-and-report checkers that no job holding a
+# secret runs, and their tests, and the documents beside the scripts.
+/scripts/*.md
+/scripts/assert-no-inline-credential.py
+/scripts/test_assert_no_inline_credential.py
+/scripts/generate-tenant-repo.py
+/scripts/test_generate_tenant_repo.py
+
+# SYNC-1 suffix: shared with every repo, and these must stay the final lines
+# (GitHub applies the LAST matching pattern, so anything after or between them
+# can silently take ownership). A repo adds its own patterns above, never here.
 /.standardsignore        @branchLeft/branchleft-admin
 /.standards.mode         @branchLeft/branchleft-admin
 /.docs-lint*             @branchLeft/branchleft-admin
