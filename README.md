@@ -24,9 +24,7 @@ account-level service. What is genuinely per-tenant is *configuration* — a
 Compose stack carrying a runtime-isolation posture, a secrets file, a UID, two
 volumes and a set of Ghost environment variables — and that is what this
 renders. The stack is the versioned, reviewed, passphrase-wrapped record of it,
-and its checkpoint is what the delete guard is meant to protect — see the
-caveat under **Delete-guard preflight** for the half of that which does not
-currently work.
+and its checkpoint is what the delete guard is meant to protect.
 
 So `pulumi up` here is not a deploy. Its useful products are two outputs an
 operator places on the host by hand:
@@ -275,7 +273,7 @@ back.
 
 The guard is `node_modules/@branchleft/ghost-platform-tenant/scripts/assert-no-tenant-deletes.py`,
 shipped inside the component. CI runs it against a real `pulumi preview --json`
-plan. It has two halves, and only one of them currently works.
+plan. It has two halves.
 
 **What it does refuse:** any `delete` or `replace` step in the plan. That
 catches a slug change, which Pulumi renders as a delete and a create, and with
@@ -324,5 +322,4 @@ scripts — is source-available under the [PolyForm Shield License
 named in `TEMPLATE_ONLY_PATHS` or `SUBSTITUTED_FILES`, so `gh repo create
 --template` — which is what provisions a tenant repo, not this repo's own
 generator script — copies both, unchanged, into every repo generated from this
-template. Until the platform owner decides otherwise, a generated tenant repo
-therefore inherits the Shield licence via both files, byte for byte.
+template. A generated tenant repo therefore inherits the Shield licence via both files, byte for byte.
