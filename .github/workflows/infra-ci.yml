@@ -853,6 +853,16 @@ jobs:
           fi
           umask 077
           printf '%s\n' "$DEPLOY_KEY" > deploy_key
+          # The fingerprint of the key's public half, never the key itself, so
+          # the run log and job summary can be compared with the fingerprint the
+          # app host authorises for this slot. The comment field is dropped: it
+          # is free text inside the secret and this repo's logs are public.
+          if ! fingerprint=$(ssh-keygen -l -f deploy_key </dev/null | awk '{print $2, $NF}'); then
+            echo "::error::ssh-keygen could not read APP_HOST_DEPLOY_KEY as an SSH key, so the deploy is refused before ssh is tried. Set the secret to the whole slot private key, as operator-installed; see RUNBOOK-bootstrap.md."
+            exit 1
+          fi
+          echo "Deploy key fingerprint: ${fingerprint}"
+          echo "Deploy key fingerprint: \`${fingerprint}\`" >> "$GITHUB_STEP_SUMMARY"
           printf '%s\n' "$IMAGE_REF" \
             | ssh -T -i deploy_key \
                 -o IdentitiesOnly=yes \

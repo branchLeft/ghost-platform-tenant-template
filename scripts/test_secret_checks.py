@@ -34,6 +34,35 @@ SLUG = "blog"
 SALT_CONFIG_BODY = "config: {}\n"
 KNOWN_HOSTS_BODY = "host.example ssh-ed25519 AAAAstub\n"
 
+# A real key, made by ssh-keygen, so the deploy step's fingerprint line can be
+# checked against the fingerprint ssh-keygen itself reports for the public half.
+# The comment is a marker: it must never reach the log or the job summary.
+KEY_COMMENT = "comment-marker-never-logged"
+
+
+def _make_deploy_key() -> tuple[str, str]:
+    """Return (private key text, the fingerprint ssh-keygen reports for its public half, as the step prints it)."""
+    with tempfile.TemporaryDirectory() as tmp:
+        path = Path(tmp) / "key"
+        subprocess.run(
+            ["ssh-keygen", "-q", "-t", "ed25519", "-N", "", "-C", KEY_COMMENT, "-f", str(path)],
+            check=True,
+            capture_output=True,
+        )
+        private = path.read_text(encoding="utf-8")
+        report = subprocess.run(
+            ["ssh-keygen", "-l", "-f", f"{path}.pub"], check=True, capture_output=True, text=True
+        ).stdout.split()
+    return private, f"{report[1]} {report[-1]}"
+
+
+DEPLOY_KEY_BODY, DEPLOY_KEY_FINGERPRINT = _make_deploy_key()
+DEPLOY_BASELINE = {
+    "DEPLOY_KEY": DEPLOY_KEY_BODY,
+    "APP_HOST_SSH_ADDRESS": "host.example",
+    "IMAGE_REF": "registry.example/app@sha256:stub",
+}
+
 # Stands in for `pulumi`: records its arguments and succeeds.
 STUB_PULUMI = """#!/bin/bash
 echo "$*" >> "$STUB_PULUMI_LOG"
@@ -70,6 +99,7 @@ class RunResult:
     ssh_calls: list[str]
     config_before: str
     config_after: str
+    summary: str
 
 
 @dataclass(frozen=True)
@@ -140,11 +170,7 @@ SPECS = (
     StepSpec(
         jobs=("deploy",),
         step=DEPLOY_STEP,
-        baseline={
-            "DEPLOY_KEY": "stub-deploy-key",
-            "APP_HOST_SSH_ADDRESS": "host.example",
-            "IMAGE_REF": "registry.example/app@sha256:stub",
-        },
+        baseline=DEPLOY_BASELINE,
         guards=(
             Guard("DEPLOY_KEY", ("APP_HOST_DEPLOY_KEY",), "known_hosts carries no host key line"),
             Guard(
@@ -185,6 +211,8 @@ def _run_step(job: str, step: str, environment: dict[str, str]) -> RunResult:
         ssh_log = root / "ssh.log"
         pulumi_log.write_text("", encoding="utf-8")
         ssh_log.write_text("", encoding="utf-8")
+        summary = root / "step-summary.md"
+        summary.write_text("", encoding="utf-8")
         os.symlink(SCRIPTS, work / "scripts")
         (work / "known_hosts").write_text(KNOWN_HOSTS_BODY, encoding="utf-8")
         config = work / _config_name(text)
@@ -199,6 +227,7 @@ def _run_step(job: str, step: str, environment: dict[str, str]) -> RunResult:
                 "PATH": f"{stubs}{os.pathsep}{os.environ['PATH']}",
                 "STUB_PULUMI_LOG": str(pulumi_log),
                 "STUB_SSH_LOG": str(ssh_log),
+                "GITHUB_STEP_SUMMARY": str(summary),
                 **environment,
             },
         )
@@ -209,7 +238,32 @@ def _run_step(job: str, step: str, environment: dict[str, str]) -> RunResult:
             ssh_calls=ssh_log.read_text(encoding="utf-8").splitlines(),
             config_before=SALT_CONFIG_BODY,
             config_after=config.read_text(encoding="utf-8"),
+            summary=summary.read_text(encoding="utf-8"),
         )
+
+
+class TheDeployKeyFingerprintIsLoggedBeforeSsh(unittest.TestCase):
+    def test_the_fingerprint_is_logged_and_summarised_and_the_key_never_is(self) -> None:
+        result = _run_step("deploy", DEPLOY_STEP, dict(DEPLOY_BASELINE))
+        self.assertEqual(result.code, 0, result.output)
+        printed = result.output + result.summary
+        self.assertIn(f"Deploy key fingerprint: {DEPLOY_KEY_FINGERPRINT}", result.output.splitlines())
+        self.assertIn(f"Deploy key fingerprint: `{DEPLOY_KEY_FINGERPRINT}`", result.summary.splitlines())
+        self.assertNotIn(KEY_COMMENT, printed)
+        self.assertNotIn(DEPLOY_KEY_BODY.strip(), printed)
+        for body_line in DEPLOY_KEY_BODY.splitlines()[1:-1]:
+            self.assertNotIn(body_line, printed)
+        self.assertEqual(len(result.ssh_calls), 1)
+
+    def test_a_value_ssh_keygen_cannot_read_is_refused_before_ssh(self) -> None:
+        for value_label, value in (("plain text", "stub-deploy-key\n"), ("truncated key", DEPLOY_KEY_BODY[:60])):
+            label = f"deploy / {DEPLOY_STEP} / {value_label}"
+            with self.subTest(label):
+                result = _run_step("deploy", DEPLOY_STEP, {**DEPLOY_BASELINE, "DEPLOY_KEY": value})
+                self.assertEqual(result.code, 1, f"{label}\n{result.output}")
+                self.assertIn("::error::ssh-keygen could not read APP_HOST_DEPLOY_KEY", result.output, label)
+                self.assertEqual(result.ssh_calls, [], label)
+                self.assertNotIn("Deploy key fingerprint", result.summary, label)
 
 
 class TheCredentialGuardsRefuseBlankValues(unittest.TestCase):
