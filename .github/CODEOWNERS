@@ -16,8 +16,8 @@ CLAUDE.md                @branchLeft/branchleft-admin
 # The scripts the plan and deploy jobs run with secrets in scope, and the tests
 # that gate them. That includes the committed-secret guard and its test (a
 # required check that plan and deploy need) and test_generate_tenant_repo.py
-# (it runs in both required checks). Only documents and the generator are
-# released, below.
+# (it runs in both required checks), and the generator (see below). Only the
+# documents beside them are released, below.
 /scripts/                @branchLeft/branchleft-admin
 
 # The test of the test:render gate, which runs in the required Type check.
@@ -46,10 +46,13 @@ CLAUDE.md                @branchLeft/branchleft-admin
 # The owner's words: licence text.
 /LICENSE                 @branchLeft/branchleft-admin
 
-# Released from /scripts/ above: the documents beside the scripts, and the
-# generator, which no workflow runs.
+# The generator stays owned: the platform's provision-tenant workflow runs it in
+# a job that holds the tenant state keys and the provisioning App key, and it
+# writes the secret-bearing CI workflow into every new tenant repository.
+/scripts/generate-tenant-repo.py @branchLeft/branchleft-admin
+
+# Released from /scripts/ above: the documents beside the scripts.
 /scripts/*.md
-/scripts/generate-tenant-repo.py
 
 # SYNC-1 suffix: shared with every repo, and these must stay the final lines
 # (GitHub applies the LAST matching pattern, so anything after or between them
