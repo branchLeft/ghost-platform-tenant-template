@@ -60,9 +60,8 @@ that the address appears in no plain output.
 The image this tenant runs, always digest-pinned.
 
 Config rather than a repository variable so that changing which image a
-tenant runs is a reviewed diff on a branch, the way it was when the GCP-era
-stack passed a reference to Cloud Run. It now reaches the component as the descriptor's `image` and renders into
-`imageEnvFile`; `branchleft-deploy` still writes
+tenant runs is a reviewed diff on a branch. It reaches the component as the
+descriptor's `image` and renders into `imageEnvFile`; `branchleft-deploy` still writes
 `/etc/branchleft/<slug>.image.env` on the host. This stack still exports
 `image` so that an operator can read it. The deploy job does not read that
 output: it reads `imageRef` from the config committed in the commit being
