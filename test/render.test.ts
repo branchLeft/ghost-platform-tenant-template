@@ -15,6 +15,24 @@ const SLUG = 'example';
 const SENTINEL_LOCAL = 'owner-sentinel-4f7c1a93';
 const SENTINEL = `${SENTINEL_LOCAL}@sentinel-owner.example.test`;
 const DIGEST = 'c'.repeat(64);
+const PIN = `ghcr.io/example/ghost-tenant@sha256:${DIGEST}`;
+
+/** What `image-pin.txt` holds for the test that loads the program. The file is
+ * not committed in the template (a tenant's own pin is written into its repo),
+ * so `config.ts`'s read of it is answered here and nothing else is touched. */
+const pinFile = vi.hoisted(() => ({ content: '' }));
+
+vi.mock('fs', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('fs')>();
+  const readFileSync = ((target: unknown, ...rest: unknown[]) =>
+    String(target).endsWith('image-pin.txt')
+      ? pinFile.content
+      : (actual.readFileSync as (...args: unknown[]) => unknown)(
+          target,
+          ...rest
+        )) as typeof actual.readFileSync;
+  return { ...actual, readFileSync };
+});
 
 /** Placeholder config in reserved `.example.test` names, one value per key
  * `config.ts` reads. Secrets are placeholders too. */
@@ -28,7 +46,6 @@ function fixtureConfig(): Record<string, unknown> {
     hostPortB: 8112,
     healthPort: 8113,
     ownerEmail: SENTINEL,
-    imageRef: `ghcr.io/example/ghost-tenant@sha256:${DIGEST}`,
     databaseHost: '10.20.1.20',
     databasePassword: 'PLACEHOLDER_DB_PASSWORD',
     mediaEndpoint: 'https://objects.example.test',
@@ -73,6 +90,7 @@ let recorded: { component: string; outputs: Record<string, unknown> | undefined 
 
 beforeEach(() => {
   vi.resetModules();
+  pinFile.content = `${PIN}\n`;
   created = [];
   recorded = [];
 });
@@ -216,6 +234,19 @@ describe('the stack program under mocks', () => {
     const config = (await import('../config.js')) as { ownerEmail: pulumi.Output<string> };
     expect(pulumi.Output.isInstance(config.ownerEmail)).toBe(true);
     expect(await pulumi.isSecret(config.ownerEmail)).toBe(true);
+  });
+
+  it('takes the image from the pin file, not from Pulumi config', async () => {
+    const exported = await loadProgram({
+      ...fixtureConfig(),
+      imageRef: 'ghcr.io/example/ignored@sha256:' + 'd'.repeat(64),
+    });
+    expect(exported['image']).toBe(PIN);
+  });
+
+  it('refuses a pin file that is not digest-pinned', async () => {
+    pinFile.content = 'ghcr.io/example/ghost-tenant:latest\n';
+    await expect(loadProgram(fixtureConfig())).rejects.toThrow(/imageRef must be digest-pinned/);
   });
 
   it('refuses a config with no mail transport, naming the missing key', async () => {

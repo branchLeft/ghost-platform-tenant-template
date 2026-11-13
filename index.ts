@@ -193,7 +193,7 @@ export const mediaBucket = tenant.mediaBucket;
 export const mediaPublicBaseUrl = tenant.mediaPublicBaseUrl;
 
 /** The image this stack pins, for an operator to read. The deploy job does not
- * read this output: it reads `imageRef` from this commit's config, because a
+ * read this output: it reads `image-pin.txt` from this commit, because a
  * stack output lives in the checkpoint and can be rewritten by anything holding
  * the state credential. */
 export const image = imageRef;

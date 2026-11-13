@@ -27,11 +27,10 @@ LOOPBACK_HOSTS = frozenset({"127.0.0.1", "localhost"})
 NAME_PATTERN = re.compile(r"[A-Za-z0-9][A-Za-z0-9._-]*\Z")
 SHA_PATTERN = re.compile(r"[0-9a-f]{40}\Z")
 REPOSITORY_PATTERN = re.compile(r"[A-Za-z0-9][A-Za-z0-9._-]*/[A-Za-z0-9][A-Za-z0-9._-]*\Z")
-# The only shape of pin that is compared: a plain scalar ending in a sha256
-# digest. Anything else (quoted, a block scalar, a comment tail) is not read.
+# The only shape of pin that is compared: one line, a reference ending in a
+# sha256 digest. Anything else (quoted, a comment, a key, a second line) is not read.
 PIN_VALUE = r"[A-Za-z0-9][A-Za-z0-9._/:-]*@sha256:[0-9a-f]{64}"
-PIN_LINE = re.compile(rf"[ \t]*[A-Za-z0-9_.-]+:imageRef:[ \t]+({PIN_VALUE})[ \t]*\Z")
-PIN_KEY = "imageRef"
+PIN_LINE = re.compile(rf"({PIN_VALUE})\Z")
 
 Fetch = Callable[[str, str], bytes]
 
@@ -65,13 +64,13 @@ def _positive_int(text: str | None, reason: str) -> int:
 
 
 def pin_of(text: str) -> str:
-    """The one `imageRef` value in a stack config file, or Unclear.
+    """The one image reference in a pin file, or Unclear.
 
-    Every non-comment line naming the key must be that one line, in the one
-    shape this reads, so a second, quoted or malformed line is never skipped."""
-    named = [line for line in text.splitlines() if PIN_KEY in line and not line.lstrip().startswith("#")]
-    _require(len(named) == 1, "pin-line-count")
-    match = PIN_LINE.match(named[0])
+    The file is exactly one line, the reference, with at most the one newline
+    that ends it: a comment, a key, a blank or second line is never skipped."""
+    line = text[:-1] if text.endswith("\n") else text
+    _require(line != "" and "\n" not in line, "pin-line-count")
+    match = PIN_LINE.match(line)
     _require(match is not None, "pin-line-shape")
     return str(match.group(1))  # type: ignore[union-attr]
 
@@ -129,7 +128,7 @@ def _consistent(runs: list[Run]) -> None:
 
 
 def evaluate(config_path: str, workflow: str, environ: dict[str, str], fetch: Fetch) -> Verdict:
-    """The verdict for this checkout's stack config against the last deployed one.
+    """The verdict for this checkout's pin file against the last deployed one.
 
     Fails closed: anything not understood, or any error, is a `true` with a reason code."""
     try:
@@ -250,7 +249,7 @@ def make_fetch(api: str, token: str) -> Fetch:
 def main(argv: list[str]) -> int:
     parser = argparse.ArgumentParser(prog="image-changed.py", description=__doc__.split("\n")[0])
     parser.add_argument("--workflow", required=True, help="the workflow file name, e.g. infra-ci.yml")
-    parser.add_argument("--config", required=True, help="the stack config file at the repository root")
+    parser.add_argument("--config", required=True, help="the pin file at the repository root")
     parser.add_argument("--github-output", required=True, help="append image_changed=<bool> and reason=<code> here")
     args = parser.parse_args(argv[1:])
 

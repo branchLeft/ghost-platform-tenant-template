@@ -314,9 +314,16 @@ def _env_block(code: str) -> str:
     return match.group(1)
 
 
+def _stack_name() -> str:
+    """The stack the plan job selects, as the workflow spells it: the stack config file its
+    salt step appends to is named for it (the template carries the placeholder)."""
+    match = re.search(r"config=Pulumi\.(\S+)\.yaml", "\n".join(_job("plan")))
+    assert match is not None
+    return match.group(1).replace("__TENANT_NAME__", "blog")
+
+
 def _config_name() -> str:
-    """The stack config file the image step is told to read, as the workflow spells it
-    (a generated repo carries its own name where the template carries the placeholder)."""
+    """The pin file the image step is told to read, as the workflow spells it."""
     match = re.search(r"--config (\S+)", _run_text(_step_named(_job("plan"), IMAGE_STEP)))
     assert match is not None
     return match.group(1).replace("__TENANT_NAME__", "blog")
@@ -388,8 +395,8 @@ class TheStepsAsTheWorkflowRunsThem(unittest.TestCase):
     `continue-on-error` is the runner's, not bash's: a failing save step is run on regardless,
     as the runner would."""
 
-    PIN_A = "stack-config-pin-a.yaml"
-    PIN_B = "stack-config-pin-b.yaml"
+    PIN_A = "pin-a.txt"
+    PIN_B = "pin-b.txt"
     CLEAN_PREVIEW = "preview-all-same.json"
     CLEAN_PLAN = "plan-all-same.json"
     ALL_STEPS = (SAVE_PLAN_STEP, IMAGE_STEP, NOOP_STEP)
@@ -466,7 +473,7 @@ class TheStepsAsTheWorkflowRunsThem(unittest.TestCase):
         self.run_steps(
             preview=self.CLEAN_PREVIEW, plan=self.CLEAN_PLAN, current=self.PIN_A, baseline=self.PIN_A, steps=(SAVE_PLAN_STEP,)
         )
-        stack = _config_name().removeprefix("Pulumi.").removesuffix(".yaml")  # `blog` here, the slug in a generated repo
+        stack = _stack_name()  # `blog` here, the slug in a generated repo
         self.assertEqual(self.stub_calls, [f"preview --stack {stack} --save-plan preview-plan.json"])
         self.assertEqual(self.stdouts[SAVE_PLAN_STEP], "")
 
@@ -510,8 +517,8 @@ class TheStepsAsTheWorkflowRunsThem(unittest.TestCase):
             ("no earlier success", {"success": ok("runs-empty.json"), "recent": ok("runs-recent-only-current.json")}, good),
             ("api error", {"success": (500, b"{}")}, good),
             ("not json", {"recent": (200, b"<html>")}, good),
-            ("missing line", {}, {BASELINE_SHA: (200, fixture("stack-config-no-pin.yaml"))}),
-            ("duplicate line", {}, {BASELINE_SHA: (200, fixture("stack-config-two-pins.yaml"))}),
+            ("missing line", {}, {BASELINE_SHA: (200, fixture("pin-none.txt"))}),
+            ("duplicate line", {}, {BASELINE_SHA: (200, fixture("pin-two.txt"))}),
             ("pending earlier run", {"success": ok("runs-success-only-10.json"), "recent": ok("runs-recent-pending.json")}, {OLDER_SHA: (200, fixture(self.PIN_A))}),
             ("unreadable baseline file", {}, {}),
         )
@@ -534,6 +541,62 @@ class TheStepsAsTheWorkflowRunsThem(unittest.TestCase):
                 )
                 self.assertAsks(result)
                 self.assertEqual(result[1], ["has_changes=true"])
+
+
+READ_PIN_STEP = "Read the image this stack pins"
+
+
+class TheDeployReadsTheImageFromThePinFile(unittest.TestCase):
+    """The deploy job's read of the pin runs under bash against a pin file, and takes
+    only the one shape image-changed.py takes: what it accepts reaches the ssh stdin."""
+
+    GOOD = "ghcr.io/example/ghost-tenant@sha256:" + "a1" * 32
+
+    def read(self, content: bytes | None) -> tuple[int, str, str]:
+        step = _step_named(_job("deploy"), READ_PIN_STEP)
+        with tempfile.TemporaryDirectory() as tmp:
+            work = Path(tmp)
+            if content is not None:
+                (work / "image-pin.txt").write_bytes(content)
+            out = work / "github-output"
+            done = subprocess.run(
+                ["bash", "-e", "-c", _run_text(step)],
+                cwd=work,
+                capture_output=True,
+                text=True,
+                env={"PATH": os.environ["PATH"], "GITHUB_OUTPUT": str(out)},
+                check=False,
+            )
+            return done.returncode, out.read_text(encoding="utf-8") if out.exists() else "", done.stderr + done.stdout
+
+    def test_the_step_holds_no_pulumi_credential_and_does_not_ask_pulumi(self) -> None:
+        text = "\n".join(_step_named(_job("deploy"), READ_PIN_STEP))
+        for needle in ("PULUMI", "AWS_", "pulumi ", "secrets."):
+            self.assertNotIn(needle, text)
+        self.assertIn("image-pin.txt", _run_text(_step_named(_job("deploy"), READ_PIN_STEP)))
+
+    def test_a_pin_file_with_one_reference_is_read(self) -> None:
+        for name, content in (("with newline", self.GOOD + "\n"), ("without newline", self.GOOD)):
+            with self.subTest(case=name):
+                code, output, noise = self.read(content.encode())
+                self.assertEqual((code, output), (0, f"ref={self.GOOD}\n"), noise)
+
+    def test_anything_else_is_refused_and_writes_no_output(self) -> None:
+        for name, content in (
+            ("missing", None),
+            ("empty", b""),
+            ("tag only", b"ghcr.io/example/ghost-tenant:latest\n"),
+            ("short digest", b"ghcr.io/example/ghost-tenant@sha256:abc\n"),
+            ("quoted", f"'{self.GOOD}'\n".encode()),
+            ("comment", f"# pin\n{self.GOOD}\n".encode()),
+            ("key and value", f"imageRef: {self.GOOD}\n".encode()),
+            ("two lines", f"{self.GOOD}\n{self.GOOD}\n".encode()),
+            ("trailing space", f"{self.GOOD} \n".encode()),
+        ):
+            with self.subTest(case=name):
+                code, output, _ = self.read(content)
+                self.assertNotEqual(code, 0)
+                self.assertEqual(output, "")
 
 
 def _run_guard(env, policies):
