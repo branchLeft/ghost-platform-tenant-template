@@ -26,7 +26,7 @@ SCRIPT = SCRIPTS / "image-changed.py"
 DATA = SCRIPTS / "testdata" / "image-changed"
 
 REPOSITORY = "example/tenant"
-CONFIG = "Pulumi.blog.yaml"
+CONFIG = "image-pin.txt"
 WORKFLOW = "infra-ci.yml"
 TOKEN = "stub-token-never-real"
 RUN_ID = "9003"
@@ -36,8 +36,8 @@ OLDER_SHA = "1010101010101010101010101010101010101010"
 RUNS_PATH = f"/repos/{REPOSITORY}/actions/workflows/{WORKFLOW}/runs"
 CONTENTS_PATH = f"/repos/{REPOSITORY}/contents/{CONFIG}"
 
-PIN_A = "stack-config-pin-a.yaml"
-PIN_B = "stack-config-pin-b.yaml"
+PIN_A = "pin-a.txt"
+PIN_B = "pin-b.txt"
 
 # The quiet history: the last run to succeed is run 12, nothing earlier is pending.
 SUCCESS = "runs-success-12-10.json"
@@ -87,7 +87,7 @@ class FakeApi:
 
     `success` and `recent` are the two workflow-run listings (the one filtered to
     `status=success` and the unfiltered one), `contents` maps a commit sha to the
-    answer for the stack config at that commit, and `redirect_contents` answers
+    answer for the pin file at that commit, and `redirect_contents` answers
     the contents read with a redirect."""
 
     def __init__(self, success, recent, contents, redirect_contents=False, config_name=CONFIG, pending=None):
@@ -166,7 +166,7 @@ class Outcome:
 
 class ImageCase(unittest.TestCase):
     def run_script(self, current, api, env=None, config_name=CONFIG, output_is_dir=False) -> Outcome:
-        """Run the script as the plan job does, in a directory holding the current stack config."""
+        """Run the script as the plan job does, in a directory holding the current pin file."""
         with tempfile.TemporaryDirectory() as tmp:
             work = pathlib.Path(tmp)
             if current is not None:
@@ -221,7 +221,6 @@ class ThePinComparison(ImageCase):
         for name, current, baseline in (
             ("a and a", PIN_A, PIN_A),
             ("b and b", PIN_B, PIN_B),
-            ("a with every other line changed", "stack-config-pin-a-other-lines-changed.yaml", PIN_A),
         ):
             with self.subTest(case=name):
                 self.assertEqualPins(self.verdict(current, baseline))
@@ -233,8 +232,10 @@ class ThePinComparison(ImageCase):
             with self.subTest(case=name):
                 self.assertAsks(self.verdict(current, baseline), "pin-differs")
 
-    def test_a_commented_out_pin_is_not_a_second_pin(self) -> None:
-        self.assertEqualPins(self.verdict("stack-config-pin-a-other-lines-changed.yaml", "stack-config-pin-a-other-lines-changed.yaml"))
+    def test_a_trailing_newline_is_not_part_of_the_pin(self) -> None:
+        bare = fixture(PIN_A).rstrip(b"\n")
+        self.assertEqualPins(self.verdict(bare, PIN_A))
+        self.assertEqualPins(self.verdict(PIN_A, bare))
 
     def test_the_stdout_names_the_baseline_run_and_no_pin(self) -> None:
         outcome = self.verdict(PIN_B, PIN_A)
@@ -328,8 +329,9 @@ class AFailedRunBetweenTwoSuccessesIsNotSkippedOver(ImageCase):
     def test_a_stopped_run_whose_config_cannot_be_read_asks(self) -> None:
         for name, failed, reason in (
             ("404", (404, b'{"message":"Not Found"}'), "api-error"),
-            ("two pins", (200, fixture("stack-config-two-pins.yaml")), "pin-line-count"),
-            ("no pin", (200, fixture("stack-config-no-pin.yaml")), "pin-line-count"),
+            ("two pins", (200, fixture("pin-two.txt")), "pin-line-count"),
+            ("comment only", (200, fixture("pin-none.txt")), "pin-line-shape"),
+            ("empty", (200, b""), "pin-line-count"),
             ("not utf-8", (200, b"\xff\xfe\x00"), "intervening-run-unreadable"),
         ):
             with self.subTest(case=name):
@@ -474,9 +476,9 @@ class EveryUnreadableInputAsks(ImageCase):
 
     def test_a_missing_or_repeated_pin_line_at_the_baseline(self) -> None:
         for name, baseline in (
-            ("missing", "stack-config-no-pin.yaml"),
-            ("repeated", "stack-config-two-pins.yaml"),
-            ("quoted", "stack-config-quoted-pin.yaml"),
+            ("missing", "pin-none.txt"),
+            ("repeated", "pin-two.txt"),
+            ("quoted", "pin-quoted.txt"),
             ("not utf-8", b"\xff\xfe\x00"),
             ("empty", b""),
         ):
@@ -486,9 +488,9 @@ class EveryUnreadableInputAsks(ImageCase):
 
     def test_a_missing_or_repeated_pin_line_in_the_current_config(self) -> None:
         for name, current in (
-            ("missing", "stack-config-no-pin.yaml"),
-            ("repeated", "stack-config-two-pins.yaml"),
-            ("quoted", "stack-config-quoted-pin.yaml"),
+            ("missing", "pin-none.txt"),
+            ("repeated", "pin-two.txt"),
+            ("quoted", "pin-quoted.txt"),
         ):
             with self.subTest(case=name):
                 outcome = self.verdict(current, PIN_A)
@@ -518,7 +520,7 @@ class EveryUnreadableInputAsks(ImageCase):
         self.assertAsks(outcome, "internal-error")
 
     def test_an_argument_that_is_not_a_plain_file_name(self) -> None:
-        outcome = self.run_script(PIN_A, self.serve(contents={BASELINE_SHA: (200, fixture(PIN_A))}), config_name="../Pulumi.blog.yaml")
+        outcome = self.run_script(PIN_A, self.serve(contents={BASELINE_SHA: (200, fixture(PIN_A))}), config_name="../image-pin.txt")
         self.assertAsks(outcome, "bad-argument")
 
     def test_an_unwritable_output_fails_the_step_and_writes_no_verdict(self) -> None:
@@ -570,17 +572,24 @@ class AnyExceptionAsks(unittest.TestCase):
 
     def test_the_pin_reader_takes_only_one_shape(self) -> None:
         digest = "a1" * 32
-        good = f"x:imageRef: ghcr.io/example/t@sha256:{digest}\n"
-        self.assertEqual(self.module.pin_of(good), f"ghcr.io/example/t@sha256:{digest}")
+        ref = f"ghcr.io/example/t@sha256:{digest}"
+        self.assertEqual(self.module.pin_of(ref + "\n"), ref)
+        self.assertEqual(self.module.pin_of(ref), ref)
         for bad in (
             "",
-            "x:imageRef: ghcr.io/example/t@sha256:abc\n",
-            "x:imageRef: ghcr.io/example/t:latest\n",
-            f"x:imageRef: 'ghcr.io/example/t@sha256:{digest}'\n",
-            f"x:imageRef: ghcr.io/example/t@sha256:{digest} # comment\n",
-            f"x:imageRef: |\n  ghcr.io/example/t@sha256:{digest}\n",
-            good + good,
-            f"imageRef: ghcr.io/example/t@sha256:{digest}\n",
+            "\n",
+            "ghcr.io/example/t@sha256:abc\n",
+            "ghcr.io/example/t:latest\n",
+            f"'{ref}'\n",
+            f"{ref} # comment\n",
+            f"# {ref}\n",
+            f"imageRef: {ref}\n",
+            f"x:imageRef: {ref}\n",
+            f"{ref}\n{ref}\n",
+            f"{ref}\n\n",
+            f"{ref}\r\n",
+            f"{ref} \n",
+            f"# the pin\n{ref}\n",
         ):
             with self.subTest(text=bad):
                 with self.assertRaises(self.module.Unclear):
@@ -588,7 +597,7 @@ class AnyExceptionAsks(unittest.TestCase):
 
     def test_the_fixture_digests_are_real_digests(self) -> None:
         for name in (PIN_A, PIN_B):
-            self.assertIsNotNone(self.module.PIN_LINE.search(next(line for line in fixture(name).decode().splitlines() if "imageRef" in line)), name)
+            self.assertIsNotNone(self.module.pin_of(fixture(name).decode()), name)
 
 
 class TheFixturesAreJson(unittest.TestCase):

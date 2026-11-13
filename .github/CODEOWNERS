@@ -37,6 +37,8 @@ CLAUDE.md                @branchLeft/branchleft-admin
 /.pnpmfile.cjs           @branchLeft/branchleft-admin
 /.pnpmfile.mjs           @branchLeft/branchleft-admin
 /known_hosts             @branchLeft/branchleft-admin
+# The image pin is not here: `image-pin.txt` holds it alone, with no ciphertext,
+# and has no line below, so a digest bump needs no code-owner review.
 /Pulumi.yaml             @branchLeft/branchleft-admin
 /Pulumi.*.yaml           @branchLeft/branchleft-admin
 /index.ts                @branchLeft/branchleft-admin

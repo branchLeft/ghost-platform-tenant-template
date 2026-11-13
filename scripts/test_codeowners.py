@@ -199,6 +199,7 @@ RELEASED: dict[str, tuple[str, ...]] = {
         "scripts/assert-no-inline-credential.md",
     ),
     "lockfiles and version pins": ("pnpm-lock.yaml", ".nvmrc"),
+    "the image pin, which holds no ciphertext": ("image-pin.txt",),
     "editor, formatter and hook settings": (
         ".editorconfig",
         ".prettierignore",

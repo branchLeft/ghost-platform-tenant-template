@@ -150,7 +150,7 @@ could read those secrets, so the secrets are the last step.
 Merging is itself the test. A healthy first run:
 
 - applies the stack, reporting the component and its outputs;
-- reads `imageRef` from this commit's stack config, not from a stack output;
+- reads the image from this commit's `image-pin.txt`, not from a stack output;
 - pipes it over the slot key, and `branchleft-deploy` pins the digest and
   restarts `branchleft-compose@<slug>`.
 

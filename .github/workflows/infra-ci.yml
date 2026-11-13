@@ -500,7 +500,7 @@ jobs:
       - name: Check the pinned image against the last deployed one
         env:
           GITHUB_TOKEN: ${{ github.token }}
-        run: python3 -I scripts/image-changed.py --workflow infra-ci.yml --config Pulumi.__TENANT_NAME__.yaml --github-output "$RUNNER_TEMP/image-verdict.out"
+        run: python3 -I scripts/image-changed.py --workflow infra-ci.yml --config image-pin.txt --github-output "$RUNNER_TEMP/image-verdict.out"
 
       # The only step that writes `has_changes`, and the only one that writes
       # this job's summary. Both halves must say "no change" for it to be
@@ -821,28 +821,28 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.HETZNER_S3_SECRET_ACCESS_KEY }}
         run: pulumi up --stack __TENANT_NAME__ --yes
 
-      # Read from this commit's own stack config, never from a stack output.
-      # The apply above fails the job on a value the program rejects (the
+      # Read from this commit's own pin file, never from a stack output. The
+      # apply above fails the job on a value the program rejects (the
       # digest-pin check in index.ts throws), so a value that reaches this step
       # is one that apply accepted. A stack output lives in the checkpoint, and
       # the state credential every tenant repository holds can rewrite it
       # between the apply and this read; what is read here becomes the image
       # pin on the host, so its source must be a file reviewed in this repo.
+      # The file holds no ciphertext, which is why it is a file of its own and
+      # not a line of the stack config.
       - name: Read the image this stack pins
         id: image
-        env:
-          PULUMI_CONFIG_PASSPHRASE: ${{ secrets.PULUMI_CONFIG_PASSPHRASE }}
-          PULUMI_BACKEND_URL: ${{ vars.PULUMI_BACKEND_URL }}
-          AWS_ACCESS_KEY_ID: ${{ secrets.HETZNER_S3_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.HETZNER_S3_SECRET_ACCESS_KEY }}
         run: |
           set -euo pipefail
-          image=$(pulumi config get imageRef --stack __TENANT_NAME__)
           # A failing command substitution inside a here-doc or an `echo` does
           # not trip errexit, so the value is captured and checked before it can
-          # flow into an ssh invocation as an empty string.
-          if [ -z "$image" ]; then
-            echo "::error::the stack config value 'imageRef' is empty; refusing to deploy"
+          # flow into an ssh invocation as an empty string. The shape is the
+          # one scripts/image-changed.py reads: a single line, a reference
+          # ending in a sha256 digest, and nothing else.
+          image=$(cat image-pin.txt)
+          pattern='^[A-Za-z0-9][A-Za-z0-9._/:-]*@sha256:[0-9a-f]{64}$'
+          if ! [[ "$image" =~ $pattern ]]; then
+            echo "::error::image-pin.txt is not exactly one digest-pinned image reference; refusing to deploy"
             exit 1
           fi
           echo "ref=$image" >> "$GITHUB_OUTPUT"
