@@ -93,7 +93,7 @@ jobs:
           persist-credentials: false
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
+        uses: pnpm/action-setup@73e46992e05b19abd31f2f3c20e0e7370d762115 # v6.1.1
 
       - name: Setup Node
         uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
@@ -108,7 +108,7 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Type check
-        run: npx tsc --noEmit
+        run: pnpm exec tsc --noEmit
 
       # Runs index.ts under Pulumi's mock runtime with placeholder config, so
       # the component's validateTenantStack() and render() run on this program
@@ -122,7 +122,7 @@ jobs:
       # without it, a file a contributor forgot to run pre-commit on merges
       # unformatted and nothing here catches it.
       - name: Check formatting
-        run: npx prettier --check . --ignore-path .gitignore --ignore-path .prettierignore --ignore-path node_modules/@branchleft/prettier-config/prettierignore
+        run: pnpm exec prettier --check . --ignore-path .gitignore --ignore-path .prettierignore --ignore-path node_modules/@branchleft/prettier-config/prettierignore
 
       # Skipped in the template repo itself, where an unsubstituted placeholder
       # is the correct, permanent state of `main` -- this step exists for repos
@@ -230,12 +230,41 @@ jobs:
       # commit. It reads this workflow file only, holds no credential, and runs
       # on every pull request, so a broken gate fails before it can merge.
       - name: Check the no-op deploy gate's wiring
-        uses: branchLeft/github-workflows/.github/actions/check-apply-gate@ea6de91ba90ed9a3a988ae8ffa0e9d70dd42f691 # v1.0.19
+        uses: branchLeft/github-workflows/.github/actions/check-apply-gate@8435e9fb73a5ef015f19bc6803b98b1105c03540 # v1.0.23
         with:
           workflow: .github/workflows/infra-ci.yml
           pairs: plan:deploy
           verdict-step: noop
           plan-file: preview-plan.json
+
+  # Its own job, so it holds nothing but the two read permissions it needs and
+  # no credential: the shared action checks that every locked @branchleft
+  # package is either listed as published before attestation began or carries a
+  # signed build attestation from the repository and workflow its reviewed
+  # identity table names. The tarball download authenticates with the run's own
+  # GITHUB_TOKEN, as `pnpm install` does above. Pinned by commit, like every
+  # other action here; `scripts/test_verify_attestations_job.py` holds the pin,
+  # the comment and the permissions. It gates nothing: `plan` and `deploy` do
+  # not wait on it.
+  verify-package-attestations:
+    name: Verify @branchleft package attestations
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    permissions:
+      contents: read
+      packages: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Verify the attestation of every locked @branchleft package
+        uses: branchLeft/github-workflows/.github/actions/verify-package-attestations@231e592397f4c94668c64646c14160d9d497bdde # v1.2.2
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
 
   # The plan, made BEFORE the deploy job below waits for its approval, so that
   # whoever approves (the owner, or the deploy-approval App on the owner's
@@ -324,7 +353,7 @@ jobs:
           fi
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
+        uses: pnpm/action-setup@73e46992e05b19abd31f2f3c20e0e7370d762115 # v6.1.1
 
       - name: Setup Node
         uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
@@ -339,7 +368,7 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Install Pulumi CLI
-        uses: pulumi/actions@8e5e406f4007fca908480587cb9893c07090f58d # v7.0.0
+        uses: pulumi/actions@96c7761824268174e0d2a4e8c7d75671eebd24a7 # v7.1.0
 
       # The next four steps are the deploy job's own, word for word, and a test
       # holds them to it (scripts/test_plan_job.py): a plan made with a
@@ -464,7 +493,7 @@ jobs:
       - name: Decide whether the plan changes anything
         id: plan
         if: always()
-        uses: branchLeft/github-workflows/.github/actions/plan-has-changes@ea6de91ba90ed9a3a988ae8ffa0e9d70dd42f691 # v1.0.19
+        uses: branchLeft/github-workflows/.github/actions/plan-has-changes@8435e9fb73a5ef015f19bc6803b98b1105c03540 # v1.0.23
         with:
           preview-json: preview.json
           plan-file: preview-plan.json
@@ -481,7 +510,7 @@ jobs:
       - name: Check the pinned image against the last deployed one
         env:
           GITHUB_TOKEN: ${{ github.token }}
-        run: python3 -I scripts/image-changed.py --workflow infra-ci.yml --config Pulumi.__TENANT_NAME__.yaml --github-output "$RUNNER_TEMP/image-verdict.out"
+        run: python3 -I scripts/image-changed.py --workflow infra-ci.yml --config image-pin.txt --github-output "$RUNNER_TEMP/image-verdict.out"
 
       # The only step that writes `has_changes`, and the only one that writes
       # this job's summary. Both halves must say "no change" for it to be
@@ -609,7 +638,7 @@ jobs:
         run: python3 scripts/assert-placeholders-substituted.py --mangled
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
+        uses: pnpm/action-setup@73e46992e05b19abd31f2f3c20e0e7370d762115 # v6.1.1
 
       - name: Setup Node
         uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
@@ -624,7 +653,7 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Install Pulumi CLI
-        uses: pulumi/actions@8e5e406f4007fca908480587cb9893c07090f58d # v7.0.0
+        uses: pulumi/actions@96c7761824268174e0d2a4e8c7d75671eebd24a7 # v7.1.0
 
       # Pulumi's passphrase provider reads PULUMI_CONFIG_PASSPHRASE from the
       # environment via a plain lookup, which does not distinguish "unset" from
@@ -803,28 +832,28 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.HETZNER_S3_SECRET_ACCESS_KEY }}
         run: pulumi up --stack __TENANT_NAME__ --yes
 
-      # Read from this commit's own stack config, never from a stack output.
-      # The apply above fails the job on a value the program rejects (the
+      # Read from this commit's own pin file, never from a stack output. The
+      # apply above fails the job on a value the program rejects (the
       # digest-pin check in index.ts throws), so a value that reaches this step
       # is one that apply accepted. A stack output lives in the checkpoint, and
       # the state credential every tenant repository holds can rewrite it
       # between the apply and this read; what is read here becomes the image
       # pin on the host, so its source must be a file reviewed in this repo.
+      # The file holds no ciphertext, which is why it is a file of its own and
+      # not a line of the stack config.
       - name: Read the image this stack pins
         id: image
-        env:
-          PULUMI_CONFIG_PASSPHRASE: ${{ secrets.PULUMI_CONFIG_PASSPHRASE }}
-          PULUMI_BACKEND_URL: ${{ vars.PULUMI_BACKEND_URL }}
-          AWS_ACCESS_KEY_ID: ${{ secrets.HETZNER_S3_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.HETZNER_S3_SECRET_ACCESS_KEY }}
         run: |
           set -euo pipefail
-          image=$(pulumi config get imageRef --stack __TENANT_NAME__)
           # A failing command substitution inside a here-doc or an `echo` does
           # not trip errexit, so the value is captured and checked before it can
-          # flow into an ssh invocation as an empty string.
-          if [ -z "$image" ]; then
-            echo "::error::the stack config value 'imageRef' is empty; refusing to deploy"
+          # flow into an ssh invocation as an empty string. The shape is the
+          # one scripts/image-changed.py reads: a single line, a reference
+          # ending in a sha256 digest, and nothing else.
+          image=$(cat image-pin.txt)
+          pattern='^[A-Za-z0-9][A-Za-z0-9._/:-]*@sha256:[0-9a-f]{64}$'
+          if ! [[ "$image" =~ $pattern ]]; then
+            echo "::error::image-pin.txt is not exactly one digest-pinned image reference; refusing to deploy"
             exit 1
           fi
           echo "ref=$image" >> "$GITHUB_OUTPUT"
@@ -864,6 +893,16 @@ jobs:
           fi
           umask 077
           printf '%s\n' "$DEPLOY_KEY" > deploy_key
+          # The fingerprint of the key's public half, never the key itself, so
+          # the run log and job summary can be compared with the fingerprint the
+          # app host authorises for this slot. The comment field is dropped: it
+          # is free text inside the secret and this repo's logs are public.
+          if ! fingerprint=$(ssh-keygen -l -f deploy_key </dev/null | awk '{print $2, $NF}'); then
+            echo "::error::ssh-keygen could not read APP_HOST_DEPLOY_KEY as an SSH key, so the deploy is refused before ssh is tried. Set the secret to the whole slot private key, as operator-installed; see RUNBOOK-bootstrap.md."
+            exit 1
+          fi
+          echo "Deploy key fingerprint: ${fingerprint}"
+          echo "Deploy key fingerprint: \`${fingerprint}\`" >> "$GITHUB_STEP_SUMMARY"
           printf '%s\n' "$IMAGE_REF" \
             | ssh -T -i deploy_key \
                 -o IdentitiesOnly=yes \

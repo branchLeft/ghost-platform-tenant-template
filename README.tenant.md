@@ -46,7 +46,7 @@ a stack that quietly loses one line of it still starts, still serves, and has
 dropped a boundary.
 
 **The only thing CI puts on the host is an image reference.** The deploy job
-pipes `imageRef` to `branchleft-deploy` over this repo's own slot key, which
+pipes the image reference in `image-pin.txt` to `branchleft-deploy` over this repo's own slot key, which
 writes `/etc/branchleft/__TENANT_NAME__.image.env` and restarts
 `branchleft-compose@__TENANT_NAME__`. That key's `authorized_keys` entry carries
 a forced command naming this stack, written by root — so it cannot address any
@@ -59,12 +59,13 @@ anywhere on the path.
   `main` applies the `__TENANT_NAME__` stack and then deploys its pinned image.
   Both jobs refuse to run while a template placeholder survives, and the deploy
   job's delete-guard preflight aborts any plan carrying a `delete` or `replace`
-  step. Its other half does not currently fire — see the `uid` bullet below.
+  step.
 - Changes are pull requests against `Pulumi.__TENANT_NAME__.yaml` and
   `index.ts`. The stack holds no secret value, so there is no secret config to
   set; a credential is never pasted into the file or set with
   `pulumi config set --secret`.
-- **Changing the image** is a one-line change to `imageRef`, digest-pinned. A
+- **Changing the image** is a one-line change to `image-pin.txt`, digest-pinned.
+  That file holds no credential, so it is not owned in `.github/CODEOWNERS`. A
   tag is refused at preview: a stack deployed by tag has no answer to "what is
   running", and a restart months later can silently change it.
 - **Changing `uid` or `appHostPrivateIp` is refused at preview**, and both

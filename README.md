@@ -24,9 +24,7 @@ account-level service. What is genuinely per-tenant is *configuration* — a
 Compose stack carrying a runtime-isolation posture, a secrets file, a UID, two
 volumes and a set of Ghost environment variables — and that is what this
 renders. The stack is the versioned, reviewed, passphrase-wrapped record of it,
-and its checkpoint is what the delete guard is meant to protect — see the
-caveat under **Delete-guard preflight** for the half of that which does not
-currently work.
+and its checkpoint is what the delete guard is meant to protect.
 
 So `pulumi up` here is not a deploy. Its useful products are outputs an
 operator places on the host by hand, and a template the host fills:
@@ -113,7 +111,7 @@ pull request's diff:
 | `zones` | The render core's `ZoneConfig` as an object: `demoZone`, `platformZone`, `ownedDomains`, `demoMailDomain`. Platform-wide, identical across tenants. 7.0.0 dropped `mailSpoolBaseUrl`; a stale one is ignored. |
 | `hostnameVerifiedAt` | Only when `siteUrl` is outside `zones.platformZone` (a custom domain): the ISO instant it was verified. |
 | `backupEncryptionRecipient` | This tenant's own single backup encryption recipient. |
-| `imageRef` | The image this tenant runs, digest-pinned. Refused at preview if it carries no `@sha256:`. |
+| `image-pin.txt` (not config) | The image this tenant runs, digest-pinned: one line, the reference, in a file at the repository root that holds no ciphertext (read by `config.ts` as `imageRef`). Refused at preview if it carries no `@sha256:`. |
 | `databaseHost` | `db1`'s private address. |
 | `databaseMaxUserConnections` | Optional. The cap applied on `db1`, recorded so it is visible here. |
 | `mediaEndpoint`, `mediaRegion` | Object Storage addressing, platform-wide. The endpoint host and the region must name the same location, or the failure is a 403 that reads as a credential problem. **There is no `mediaBucket` and no `mediaPublicBaseUrl`**: this tenant's bucket is `branchleft-media-<slug>`, derived from the slug inside the component. The bucket is the only boundary between this tenant's media and another tenant's, so it is deliberately not something a stack can set. |
@@ -210,7 +208,7 @@ is checked by the render under mocks, and the plan is made after the merge.
 publishes one value, `has_changes`, and the deploy job's `if:` skips it, and so
 its approval, only when that is exactly `false`. It is `false` only when two
 checks both find no change: the `plan-has-changes` action reads the Pulumi plan,
-and `scripts/image-changed.py` compares `imageRef` with the one the last
+and `scripts/image-changed.py` compares `image-pin.txt` with the one the last
 successful run on main shipped. The second exists because the deploy job also
 puts the image on the host over SSH, which a plan of nothing but unchanged
 resources does not show. Anything either cannot establish asks for the approval
@@ -302,7 +300,7 @@ back.
 
 The guard is `node_modules/@branchleft/ghost-platform-tenant/scripts/assert-no-tenant-deletes.py`,
 shipped inside the component. CI runs it against a real `pulumi preview --json`
-plan. It has two halves, and only one of them currently works.
+plan. It has two halves.
 
 **What it does refuse:** any `delete` or `replace` step in the plan. That
 catches a slug change, which Pulumi renders as a delete and a create, and with
@@ -351,5 +349,4 @@ scripts — is source-available under the [PolyForm Shield License
 named in `TEMPLATE_ONLY_PATHS` or `SUBSTITUTED_FILES`, so `gh repo create
 --template` — which is what provisions a tenant repo, not this repo's own
 generator script — copies both, unchanged, into every repo generated from this
-template. Until the platform owner decides otherwise, a generated tenant repo
-therefore inherits the Shield licence via both files, byte for byte.
+template. A generated tenant repo therefore inherits the Shield licence via both files, byte for byte.

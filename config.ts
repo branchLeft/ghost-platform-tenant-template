@@ -1,3 +1,5 @@
+import * as fs from 'fs';
+import * as path from 'path';
 import * as pulumi from '@pulumi/pulumi';
 import type { ZoneConfig } from '@branchleft/ghost-platform-tenant';
 
@@ -37,9 +39,11 @@ export const hostPortB = config.requireNumber('hostPortB');
 /** The sidecar port the edge probes (`ports.health`); not Ghost's own port. */
 export const healthPort = config.requireNumber('healthPort');
 
-/** The image this tenant runs, always digest-pinned — config rather than a
- * repository variable, so which image runs is a reviewed diff. See config.md. */
-export const imageRef = config.require('imageRef');
+/** The image this tenant runs, always digest-pinned: the one line of
+ * `image-pin.txt`, so a digest bump is a reviewed one-line diff outside the
+ * stack config. See config.md. Read here, as a file next to this one, and not
+ * from Pulumi config. */
+export const imageRef = fs.readFileSync(path.join(__dirname, 'image-pin.txt'), 'utf8').trim();
 
 /** `db1`'s private address. */
 export const databaseHost = config.require('databaseHost');

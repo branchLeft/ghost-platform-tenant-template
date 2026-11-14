@@ -10,7 +10,7 @@ would change.
 
 The deploy job does two things: the Pulumi apply, and an SSH step that puts the
 pinned image on the app host. The apply renders configuration and creates
-nothing, so a push that changes only `imageRef` can show a Pulumi plan of
+nothing, so a push that changes only the pin can show a Pulumi plan of
 nothing but `same` and still be a real deploy. The `plan-has-changes` action reads the
 plan, so on its own it could report `false` over an image that has not shipped.
 This script reads the other half.
@@ -56,8 +56,9 @@ holds no host key and no write scope (it has `actions: read` and
 5. The baseline is the earlier run with the highest `run_number` among the
    successes. None at all: `true`. Failed, cancelled and stopped runs are never
    the baseline, because only a success proves the host got its image.
-6. Read the stack config at the baseline's sha through the contents API and
-   compare the `imageRef` value with the checkout's. Different: `true`.
+6. Read the pin file at the baseline's sha through the contents API and
+   compare its reference with the checkout's. A baseline that predates the pin
+   file has none to read (a 404 is `api-error`): `true`, once. Different: `true`.
 7. A deploy that failed or was stopped after the baseline can leave the host
    between a pin write and its restart, so it may hold that run's pin and not
    the baseline's. Every finished run after the baseline, and before this one,
@@ -67,10 +68,11 @@ holds no host key and no write scope (it has `actions: read` and
    complete the unfiltered window must reach back to the baseline; if it does
    not, `true`. Only then, all equal: `false`.
 
-The `imageRef` line is read in one shape only: a non-comment line
-`<project>:imageRef: <ref>` whose value is a plain scalar ending in a
-`@sha256:` digest. Exactly one non-comment line may name the key. Zero, two, a
-quoted value, a block scalar, a trailing comment or a non-UTF-8 file is `true`.
+The pin file (`image-pin.txt`, holding no ciphertext) is read in one shape only:
+one line, the reference, ending in a `@sha256:` digest, with at most the one
+newline that ends it. An empty file or a second or blank line is
+`pin-line-count`; a comment, a key, a quoted value, trailing space or any other
+text is `pin-line-shape`; a non-UTF-8 file is `true`.
 
 ## What it does not catch
 
@@ -95,7 +97,7 @@ code and the baseline run id: no pin, no config content, no token.
 
 ## Usage
 
-    image-changed.py --workflow infra-ci.yml --config <stack config file> --github-output <file>
+    image-changed.py --workflow infra-ci.yml --config <pin file> --github-output <file>
 
 Reads `GITHUB_TOKEN`, `GITHUB_REPOSITORY`, `GITHUB_RUN_ID`,
 `GITHUB_RUN_NUMBER` and `GITHUB_API_URL` (default `https://api.github.com`).
@@ -119,7 +121,7 @@ equal pins in a quiet history; each unreadable input (no earlier success, an API
 error on each listing and the contents read, a redirect, a reply that is not
 JSON, a run order that cannot be established, a pending earlier run (including
 one outside a full 30-entry window, for each of the three statuses), a pending
-listing cut short, a later success, a missing, repeated or quoted pin line) gives
+listing cut short, a later success, a missing, repeated, commented or quoted pin line) gives
 `true` on its own. A failed, cancelled, timed-out or action-required run between
 two successes gives `true` when its pin differs (both directions), `false` only
 when every such run holds the current pin, and `true` when one's config cannot be
