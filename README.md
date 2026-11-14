@@ -26,13 +26,13 @@ volumes and a set of Ghost environment variables — and that is what this
 renders. The stack is the versioned, reviewed, passphrase-wrapped record of it,
 and its checkpoint is what the delete guard is meant to protect.
 
-So `pulumi up` here is not a deploy. Its useful products are two outputs an
-operator places on the host by hand:
+So `pulumi up` here is not a deploy. Its useful products are outputs an
+operator places on the host by hand, and a template the host fills:
 
 | Output | Goes to |
 |---|---|
 | `composeFile` | `/opt/branchleft/<slug>/compose.yml`, root-owned |
-| `secretsEnvFile` (a Pulumi secret) | `/etc/branchleft/<slug>.env`, root-owned `0600` |
+| `secretsEnvTemplate`, `secretKeys` (key names only, plain) | filled on the host into `/etc/branchleft/<slug>.env`, root-owned `0600`; see **Secrets live on the host** |
 | `provisionScript` | run as root on the app host, before the unit is enabled (was `hostProvisioningCommand` before 6.0.0) |
 | `imageEnvFile`, `edgeSiteBlock`, `ghostSettings` | new in 6.0.0: the image env file, the tenant's edge site block (JSON) and its Ghost settings (JSON) |
 | `edgeRequestBodyMaxSize` | this tenant's site block in the edge's site registry, in `branchLeft/shared-infra` |
@@ -116,15 +116,9 @@ pull request's diff:
 | `databaseMaxUserConnections` | Optional. The cap applied on `db1`, recorded so it is visible here. |
 | `mediaEndpoint`, `mediaRegion` | Object Storage addressing, platform-wide. The endpoint host and the region must name the same location, or the failure is a 403 that reads as a credential problem. **There is no `mediaBucket` and no `mediaPublicBaseUrl`**: this tenant's bucket is `branchleft-media-<slug>`, derived from the slug inside the component. The bucket is the only boundary between this tenant's media and another tenant's, so it is deliberately not something a stack can set. |
 
-**Set by an operator** with `pulumi config set --secret`, in that same pull
-request — never by the provisioning flow, because a `workflow_dispatch` input is
-plaintext in the run's API response and its form:
-
-| Key | Where the value comes from |
-|---|---|
-| `databasePassword` | Printed **once** by `db/provision/provision_tenant_db.py` on `db1`. Printed by nothing afterwards; a re-run leaves an existing password alone and says nothing about it. |
-| `ownerEmail` | The address Ghost creates the owner account with. A person's address, so secret config, never plain: since tenant 7.0.0 it reaches the host only as `GHOST_OWNER_EMAIL` in the secrets file, where `provision-owner.mjs --email` takes it from. |
-| `mediaAccessKeyId`, `mediaSecretAccessKey` | This tenant's Object Storage key pair, created in the Hetzner Cloud Console — no API mints one — and allowlisted by bucket policy to this tenant's bucket alone. Both are secret config, including the id: holding the pair together is what makes a rotation one edit rather than two. |
+**No secret is set here.** Since component 8.0.0 the stack holds no secret
+value, so there is no `pulumi config set --secret` step and no `secure:` entry
+in `Pulumi.<slug>.yaml`. See **Secrets live on the host**, below.
 
 `uid` deserves its own note. It is host state: `provision_tenant_volume.py
 --list-claims` on the app host reports which UIDs are already handed out, the
@@ -147,11 +141,44 @@ upload limits and caps are the render core's defaults.
 | `mailHost` | SMTP submission host. |
 | `mailPort` | Optional, defaults to `587`. |
 | `mailUser` | SMTP user. |
-| `mailPassword` | Secret. |
 | `bulkEmailDomain` | The tenant's own sending domain, outside every domain the platform owns. |
 | `mailDkimSelector` | DKIM selector for that domain. |
-| `bulkEmailApiKey` | Secret. The mail spool's API key. |
 | `mailCeiling`, `mailEstateCeiling` | Per-tenant and estate-wide send ceilings; the first must not exceed the second. |
+
+## Secrets live on the host
+
+**The stack holds no secret value.** From component 8.0.0 the program reads no
+`requireSecret`, passes no `secrets` argument and exports no secret output, so
+no credential reaches `Pulumi.<slug>.yaml`, the stack's checkpoint or a stack
+output, and a credential that can read this repo's config or state cannot
+recover one. What it exports instead is `secretsEnvTemplate`: the key names the
+secrets file needs, with empty values, and `secretKeys`, the names alone.
+
+The host fills the file. `app/provision/render_tenant_secrets.py` in
+`branchLeft/ghost-platform` takes that template and a JSON object of KEY to value
+on its stdin, and writes `/etc/branchleft/<slug>.env`, root-owned `0600`. The
+values it takes are the tenant's database password (printed once by
+`provision_tenant_db.py`), its Object Storage key pair, its SMTP and bulk-mail
+credentials and the owner's address. The onboarding runbook in
+`branchLeft/ghost-platform` (`RUNBOOK-tenant-onboarding.md`) has the exact
+step. Nothing in this repo reads or holds them.
+
+Two checks keep it so:
+
+- `test/render.test.ts` (`pnpm test:render`) loads the program under Pulumi's
+  mocks with a sentinel under each former secret key and searches every export,
+  registered output and resource input. It fails on a Pulumi secret, an export
+  off its reviewed list, or a sentinel anywhere, and carries leaking stand-ins as
+  control cases so a silent all-clear is not possible.
+- `scripts/assert-no-secure-stack-config.py` refuses a `secure:` entry, or a key
+  named like a credential, in a committed `Pulumi.<stack>.yaml`. It runs as a
+  pre-commit hook and as CI's `Committed-secret guard` job; its `--state` mode
+  does the same for an exported checkpoint.
+
+```bash
+python3 scripts/assert-no-secure-stack-config.py --self-test
+python3 scripts/assert-no-secure-stack-config.py --scan-tree .
+```
 
 ## Repo variables and environment secrets
 

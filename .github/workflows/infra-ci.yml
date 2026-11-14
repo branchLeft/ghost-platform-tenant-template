@@ -13,12 +13,13 @@ name: Infra CI
 # `db1`, the Object Storage bucket -- so what is per-tenant is *configuration*,
 # and this stack is the versioned, reviewed, passphrase-wrapped record of it.
 # `pulumi up` therefore renders rather than creates: its useful products are the
-# `composeFile` and `secretsEnvFile` outputs an operator places on the host.
+# `composeFile` output an operator places on the host and the `secretsEnvTemplate`
+# the host fills with its secrets. This stack holds no secret value.
 #
 # WHAT DEPLOYS. Only the image. `branchleft-deploy` on the app host writes
 # /etc/branchleft/<slug>.image.env and restarts branchleft-compose@<slug>; it
 # never writes the secrets file and never rewrites the Compose file, both of
-# which are root-owned and operator-written. So a compromised copy of this
+# which are root-owned and written on the host. So a compromised copy of this
 # repo's credentials can change which image this tenant runs and nothing else on
 # that host -- see the reach table in the platform's migration programme doc.
 #
@@ -207,6 +208,15 @@ jobs:
         run: |
           python3 scripts/assert-no-committed-pulumi-secrets.py --self-test
           python3 scripts/assert-no-committed-pulumi-secrets.py --scan-tree .
+
+      # The stack holds no secret value since component 8.0.0: the host renders
+      # the secrets file. Refuses any `secure:` entry, or a key named like a
+      # credential, in a committed stack config. `--scan-tree` for the same
+      # reason as the salt check above.
+      - name: Refuse a secret held in the stack config
+        run: |
+          python3 scripts/assert-no-secure-stack-config.py --self-test
+          python3 scripts/assert-no-secure-stack-config.py --scan-tree .
 
       # Every tracked markdown file, not a fixed list -- a runbook added
       # later is covered without this workflow needing an edit. Catches an
@@ -450,8 +460,8 @@ jobs:
           python3 "$GUARD" preview.json
 
       # What the approver reads. Resource type and name per step, never a
-      # property value: this stack's outputs include a Pulumi secret, and on a
-      # public tenant repo a log is public. The script refuses a delete or a
+      # property value: this stack holds no secret since 8.0.0, but on a public
+      # tenant repo a log is public. The script refuses a delete or a
       # replace again for itself and fails closed on a plan it cannot read.
       - name: Print the plan
         run: |
@@ -781,10 +791,11 @@ jobs:
       # that would have deleted a tenant's content volume.
       #
       # The full plan is NOT printed on failure, unlike the GCP-era version of
-      # this step. This stack's outputs include `secretsEnvFile`, a Pulumi
-      # secret: Pulumi renders it as `[secret]` in `--json`, and the difference
-      # between relying on that and not printing the plan at all is one upstream
-      # change. `pulumi preview --diff` from a checkout is the debugging path.
+      # this step. This stack exported `secretsEnvFile`, a Pulumi secret, before
+      # 8.0.0 and holds none now, but a plan is still not printed on failure: the
+      # difference between relying on `[secret]` in `--json` and not printing it
+      # is one upstream change. `pulumi preview --diff` from a checkout is the
+      # debugging path.
       # Both halves of this guard are live from component 3.0.0. The identity
       # half compares `uid`, `stackName`, `contentVolume`, `adaptersVolume`,
       # `databaseName` and `appHostPrivateIp` against the plan's own steps, so
@@ -905,8 +916,8 @@ jobs:
         run: rm -f deploy_key
 
       # Deliberately does not publish the preview plan, unlike the GCP-era
-      # version of this workflow: this stack carries a secret output, and a job
-      # summary on a public tenant repo is visible to anyone.
+      # version of this workflow: a job summary on a public tenant repo is
+      # visible to anyone.
       - name: Write outcome to job summary
         if: always()
         # Bound rather than interpolated. Neither value is attacker-shaped, but a

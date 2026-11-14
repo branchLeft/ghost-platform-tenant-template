@@ -59,3 +59,12 @@ repos:
         entry: python3 scripts/assert-no-committed-pulumi-secrets.py
         language: system
         files: ^(.*/)?Pulumi\.[^/]+\.yaml$
+
+      # The stack holds no secret value since component 8.0.0: the host renders
+      # the secrets file. A `pulumi config set --secret` writes a `secure:`
+      # entry whose diff looks like exactly what the command was asked to do.
+      - id: no-secure-stack-config
+        name: no secret held in a committed stack config
+        entry: python3 scripts/assert-no-secure-stack-config.py
+        language: system
+        files: ^(.*/)?Pulumi\.[^/]+\.yaml$

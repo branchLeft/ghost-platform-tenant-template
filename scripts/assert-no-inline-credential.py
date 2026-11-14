@@ -69,8 +69,7 @@ def find_offenses(path: pathlib.Path) -> list[str]:
                 offenses.append(
                     f"{path}:{lineno}: `export {name}=...` assigns a "
                     f"placeholder inline ({value!r}). Read it instead: "
-                    f'`read -rs {name}` on its own line, then `export {name}` '
-                    "-- see RUNBOOK-bootstrap.md for the shape."
+                    f'`read -rs {name}` on its own line, then `export {name}`.'
                 )
             continue
 

@@ -27,8 +27,8 @@ approver requires, so no other output of the plan job may carry the marker word
 ## What it never prints
 
 A step's resource type and name only. Not the property values, not the stack
-or project from the URN. This stack's outputs include a Pulumi secret, and on a
-public tenant repo a job log is public. Anything outside `[A-Za-z0-9_.:$/@+-]`
+or project from the URN. The stack holds no secret since component 8.0.0, but
+on a public tenant repo a job log is public. Anything outside `[A-Za-z0-9_.:$/@+-]`
 in a type, a name or an operation becomes `?`, so a hostile name cannot start a
 line with `::` (a runner command) or forge the summary line.
 

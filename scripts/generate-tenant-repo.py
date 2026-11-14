@@ -36,7 +36,7 @@ MAX_SLUG_LENGTH = 26
 # unit. Kept in step with `RESERVED_STACK_NAMES` in the component by
 # `test_generate_tenant_repo.py`, which reads the installed package rather than
 # trusting this copy.
-RESERVED_SLUGS = ("website", "edge", "db", "monitoring", "nextcloud1")
+RESERVED_SLUGS = ("website", "edge", "db", "monitoring", "nextcloud1", "mail-spool")
 
 PLACEHOLDER = re.compile(r"__[A-Z][A-Z0-9_]*__")
 

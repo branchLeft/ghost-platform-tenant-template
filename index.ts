@@ -9,11 +9,9 @@ import {
 import {
   appHostPrivateIp,
   backupEncryptionRecipient,
-  bulkEmailApiKey,
   bulkEmailDomain,
   databaseHost,
   databaseMaxUserConnections,
-  databasePassword,
   databasePort,
   healthPort,
   hostPort,
@@ -24,14 +22,10 @@ import {
   mailDkimSelector,
   mailEstateCeiling,
   mailHost,
-  mailPassword,
   mailPort,
   mailUser,
-  mediaAccessKeyId,
   mediaEndpoint,
   mediaRegion,
-  mediaSecretAccessKey,
-  ownerEmail,
   siteUrl,
   slug,
   uid,
@@ -74,8 +68,8 @@ function hostnameOf(url: string): TenantStackDescriptor['hostname'] {
 // only one a `tenant` kind may carry or the platform default, so none is a
 // config key. `as unknown as` because the render core brands its string and
 // number fields; `validateTenantStack()` inside the component is what proves
-// them. No `ownerEmail`: it is a person's address, so it travels as a secret
-// beside the descriptor, never in it.
+// them. No `ownerEmail` and no credential: the stack holds no secret value, and
+// the host renders the secrets file.
 const descriptor = {
   version: 1,
   kind: 'tenant',
@@ -124,30 +118,22 @@ const descriptor = {
 const tenant = new GhostTenant(slug, {
   descriptor,
   zones,
-  secrets: {
-    databasePassword,
-    s3AccessKeyId: mediaAccessKeyId,
-    s3SecretAccessKey: mediaSecretAccessKey,
-    mailPassword,
-    bulkEmailApiKey,
-    ownerEmail,
-  },
   ...(databaseMaxUserConnections === undefined
     ? {}
     : { maxUserConnections: databaseMaxUserConnections }),
 });
 
 /**
- * The exact content of `/etc/branchleft/<slug>.env`, root-owned `0600` on the
- * app host. A Pulumi secret: it carries this tenant's database password, its
- * SMTP and bulk-mail credentials, and the owner's email address
- * (`GHOST_OWNER_EMAIL`), which is how that address reaches the host.
- *
- * Read with `pulumi stack output --show-secrets secretsEnvFile`. Written to the
- * host by an operator alone — no automated path may write this file, which is
- * why nothing in this repo's CI reads this output.
+ * The key names `/etc/branchleft/<slug>.env` needs, as the render core's
+ * template: `KEY=` lines with empty values, never a value. Not a secret. The
+ * host fills it, root-owned `0600`, with `app/provision/render_tenant_secrets.py`
+ * from `branchLeft/ghost-platform`; this stack never holds the values. See
+ * config.md.
  */
-export const secretsEnvFile = tenant.secretsEnvFile;
+export const secretsEnvTemplate = tenant.secretsEnvTemplate;
+
+/** The names in `secretsEnvTemplate`, in its order. */
+export const secretKeys = tenant.secretKeys;
 
 /** The exact content of `/opt/branchleft/<slug>/compose.yml`. Placed on the
  * host by an operator, for the same reason: every line of it is a

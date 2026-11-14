@@ -5,8 +5,10 @@ import type { ZoneConfig } from '@branchleft/ghost-platform-tenant';
 
 const config = new pulumi.Config();
 
-/** Every value one tenant's stack needs, read from `Pulumi.<stack>.yaml`. See
- * config.md for the plain/secret split and why fields below use `require`. */
+/** Every value one tenant's stack needs, read from `Pulumi.<stack>.yaml`. The
+ * stack holds no secret value since 8.0.0: nothing here is read with
+ * `requireSecret`. See config.md for why, and for why fields below use
+ * `require`. */
 
 /**
  * This tenant's slug: the Compose project, the systemd instance, the directory
@@ -37,16 +39,10 @@ export const hostPortB = config.requireNumber('hostPortB');
 /** The sidecar port the edge probes (`ports.health`); not Ghost's own port. */
 export const healthPort = config.requireNumber('healthPort');
 
-/** The address Ghost creates the owner account with. A person's address, so
- * secret config (`pulumi config set --secret ownerEmail`), never plain: since
- * 7.0.0 the component takes it as `secrets.ownerEmail` and writes it only into
- * the secrets file. See config.md. */
-export const ownerEmail = config.requireSecret('ownerEmail');
-
 /** The image this tenant runs, always digest-pinned: the one line of
- * `image-pin.txt`, a file that holds no ciphertext, so a digest bump is a
- * reviewed diff that does not touch the encrypted stack config. See config.md.
- * Read here, as a file next to this one, and not from Pulumi config. */
+ * `image-pin.txt`, so a digest bump is a reviewed one-line diff outside the
+ * stack config. See config.md. Read here, as a file next to this one, and not
+ * from Pulumi config. */
 export const imageRef = fs.readFileSync(path.join(__dirname, 'image-pin.txt'), 'utf8').trim();
 
 /** `db1`'s private address. */
@@ -54,11 +50,6 @@ export const databaseHost = config.require('databaseHost');
 
 /** `db1`'s MySQL port. */
 export const databasePort = config.getNumber('databasePort') ?? 3306;
-
-/** Printed once by `db/provision/provision_tenant_db.py`; a re-run leaves an
- * existing password alone. Lose this value and the recovery is a password
- * reset on `db1`, not a lookup. */
-export const databasePassword = config.requireSecret('databasePassword');
 
 /** Applied on `db1` by the provisioning script; recorded here so the cap this
  * tenant is subject to is visible in its own repo. */
@@ -70,12 +61,6 @@ export const databaseMaxUserConnections = config.getNumber('databaseMaxUserConne
  * config.md. */
 export const mediaEndpoint = config.require('mediaEndpoint');
 export const mediaRegion = config.require('mediaRegion');
-
-/** Both halves of the Object Storage key pair, including the id, which is not
- * itself secret — held together so rotation is one edit, not two. See
- * config.md. */
-export const mediaAccessKeyId = config.requireSecret('mediaAccessKeyId');
-export const mediaSecretAccessKey = config.requireSecret('mediaSecretAccessKey');
 
 /**
  * The zones every hostname and sending domain is checked against: `demoZone`,
@@ -100,15 +85,11 @@ export const backupEncryptionRecipient = config.require('backupEncryptionRecipie
 export const mailHost = config.require('mailHost');
 export const mailPort = config.getNumber('mailPort') ?? 587;
 export const mailUser = config.require('mailUser');
-export const mailPassword = config.requireSecret('mailPassword');
 
 /** The tenant's own sending identity: the domain it signs and the DKIM
  * selector. The domain must sit outside every domain the platform owns. */
 export const bulkEmailDomain = config.require('bulkEmailDomain');
 export const mailDkimSelector = config.require('mailDkimSelector');
-
-/** The mail spool's Mailgun-shaped API key. */
-export const bulkEmailApiKey = config.requireSecret('bulkEmailApiKey');
 
 /** Per-tenant and estate-wide send ceilings. */
 export const mailCeiling = config.requireNumber('mailCeiling');

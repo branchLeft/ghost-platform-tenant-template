@@ -17,90 +17,13 @@ every app host is exactly the thing the deploy design exists not to have.
 ## What an operator finishes in the handover pull request
 
 The pull request arrives carrying `Pulumi.<slug>.yaml` with the plain config
-values only. Three things have to be added to it before it can merge, from a
-local checkout of the `provisioning/handover` branch.
+values only, and it needs one more thing before it can merge. **There is no
+secret to set.** Since component 8.0.0 this stack holds no secret value: no
+`pulumi config set --secret`, no stack passphrase or salt needed at this step,
+and no `secure:` entry in the file. The `Committed-secret guard` job fails the
+pull request if one is added.
 
-**Set the environment up first, in this order.** The salt step is the one that
-matters: `Pulumi.<slug>.yaml` is handed over without an `encryptionsalt`, and a
-`pulumi config set --secret` against a file that has none mints a _new_ salt
-into it — after which the stack's checkpoint and its own config disagree about
-which key its secrets are under, and nothing says so until a deploy fails to
-decrypt them.
-
-Run each `read` below on its own — paste that one line, then type or paste
-the value at the prompt it shows. Never `export VAR='value'` with the value
-written in: that line is what your shell just wrote, verbatim, to its own
-history file.
-
-```bash
-printf 'PULUMI_CONFIG_PASSPHRASE (the escrowed value, decrypted): '; read -rs PULUMI_CONFIG_PASSPHRASE; echo; export PULUMI_CONFIG_PASSPHRASE
-```
-
-```bash
-printf 'AWS_ACCESS_KEY_ID (Hetzner S3 access key id): '; read -rs AWS_ACCESS_KEY_ID; echo; export AWS_ACCESS_KEY_ID
-```
-
-```bash
-printf 'AWS_SECRET_ACCESS_KEY (Hetzner S3 secret access key): '; read -rs AWS_SECRET_ACCESS_KEY; echo; export AWS_SECRET_ACCESS_KEY
-```
-
-```bash
-pulumi login "$(gh variable get PULUMI_BACKEND_URL --repo branchLeft/<generated-repo>)"
-```
-
-The salt is in this repo's `PULUMI_ENCRYPTION_SALT` environment secret, which is
-write-only. If you no longer hold a copy, read it back out of the checkpoint:
-
-```bash
-pulumi stack export --stack <slug> \
-  | python3 -c 'import json,sys; print(json.load(sys.stdin)["deployment"]["secrets_providers"]["state"]["salt"])'
-```
-
-Read it into a variable rather than typing it straight into the `printf` below —
-the `read` line has to be pasted alone, same as the credentials above:
-
-```bash
-printf "this stack's salt: "; read -rs STACK_SALT; echo
-```
-
-Then append it, and drop the variable once it is written:
-
-```bash
-printf '\nencryptionsalt: %s\n' "$STACK_SALT" >> Pulumi.<slug>.yaml && unset STACK_SALT
-```
-
-Then:
-
-1. **The database password**, printed once by `provision_tenant_db.py` on `db1`
-   and printed by nothing afterwards:
-
-   ```bash
-   pulumi config set --secret databasePassword --stack <slug>
-   ```
-
-2. **This tenant's Object Storage key pair**, both halves secret:
-
-   ```bash
-   pulumi config set --secret mediaAccessKeyId --stack <slug>
-   pulumi config set --secret mediaSecretAccessKey --stack <slug>
-   ```
-
-   **The owner's email address**, secret because it is a person's: a plain
-   value would be committed to this repo in `Pulumi.<slug>.yaml`.
-
-   ```bash
-   pulumi config set --secret ownerEmail --stack <slug>
-   ```
-
-   This tenant's media bucket, `branchleft-media-<slug>`, and the bucket policy
-   that fences this key to it must already exist —
-   `branchLeft/ghost-platform`'s `RUNBOOK-tenant-onboarding.md` §6 creates and
-   verifies both. Nothing in this stack creates them, and nothing fails if they
-   are missing until the first upload: the deploy succeeds and the tenant's
-   media 404s. Confirm the bucket name after the first apply with
-   `pulumi stack output mediaBucket --stack <slug>`.
-
-3. **`known_hosts`**, filled in with the app host's SSH host key. Take it from
+1. **`known_hosts`**, filled in with the app host's SSH host key. Take it from
    the host itself over your own root session — never `ssh-keyscan`, which is
    trust-on-first-use and records whatever answered:
 
@@ -111,24 +34,26 @@ Then:
 
    Write one line: `<app-host-public-ipv4> ` followed by that whole output.
 
-**Then take the salt back out before committing.** It must not reach the commit
-(`branchLeft/standards` PUL-12), and the `Committed-secret guard` job fails
-while it is there:
+2. **Check the stack carries no secret**, before committing:
 
-```bash
-python3 - <<'EOF'
-import pathlib, re
-p = next(pathlib.Path('.').glob('Pulumi.*.yaml'))
-p.write_text(re.sub(r'(?m)^encryptionsalt:.*\n', '', p.read_text()))
-EOF
-python3 scripts/assert-no-committed-pulumi-secrets.py --scan-tree .
-```
+   ```bash
+   python3 scripts/assert-no-secure-stack-config.py --scan-tree .
+   ```
 
-Each of the three values above is one a `workflow_dispatch` input could not have carried:
-inputs are plaintext in the run's API response and in its form. That the
-passphrase has to be used here, on day one, is deliberate — it is what proves
-the escrow works while the tenant is still new, rather than the first time
-anyone needs it being an incident.
+   It prints nothing and exits 0 when the file is clean. That is the same check
+   CI runs.
+
+**The secrets file is written on the host, not here.** The tenant's database
+password (printed once by `provision_tenant_db.py` on `db1`), its Object Storage
+key pair, its SMTP and bulk-mail credentials and the owner's address reach
+`/etc/branchleft/<slug>.env` only through `render_tenant_secrets.py` on the app
+host, as root, from the stack's `secretsEnvTemplate` output. The exact step is in
+`branchLeft/ghost-platform`'s `RUNBOOK-tenant-onboarding.md`. This tenant's media
+bucket, `branchleft-media-<slug>`, and the bucket policy that fences the key to
+it must already exist, from the same runbook. Nothing in this stack creates
+them, and nothing fails if they are missing until the first upload: the deploy
+succeeds and the tenant's media 404s. Confirm the bucket name after the first
+apply with `pulumi stack output mediaBucket --stack <slug>`.
 
 **Do not merge until the four host-side steps have run** and this repo's
 `APP_HOST_DEPLOY_KEY` environment secret is set. Merging runs the deploy job,
