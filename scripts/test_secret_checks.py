@@ -31,6 +31,13 @@ DEPLOY_STEP = "Deploy the pinned image to this tenant's slot"
 # repo has already replaced.
 SLUG = "blog"
 
+# A backend URL as provisioning writes it: the bucket and the tenant's own
+# prefix, served through the storage gateway's public name.
+GATEWAY_BACKEND_URL = (
+    "s3://example-bucket/example-prefix"
+    "?endpoint=https://state.branchleft.co.uk&s3ForcePathStyle=true&region=example-region"
+)
+
 SALT_CONFIG_BODY = "config: {}\n"
 KNOWN_HOSTS_BODY = "host.example ssh-ed25519 AAAAstub\n"
 
@@ -116,7 +123,7 @@ def _check_passphrase_valid(case: unittest.TestCase, result: RunResult) -> None:
 
 
 def _check_backend_valid(case: unittest.TestCase, result: RunResult) -> None:
-    case.assertEqual(result.pulumi_calls, ["login s3://example-bucket"])
+    case.assertEqual(result.pulumi_calls, [f"login {GATEWAY_BACKEND_URL}"])
 
 
 def _check_salt_valid(case: unittest.TestCase, result: RunResult) -> None:
@@ -141,7 +148,7 @@ SPECS = (
         jobs=("plan", "deploy"),
         step=BACKEND_STEP,
         baseline={
-            "PULUMI_BACKEND_URL": "s3://example-bucket",
+            "PULUMI_BACKEND_URL": GATEWAY_BACKEND_URL,
             "AWS_ACCESS_KEY_ID": "stub-access-key",
             "AWS_SECRET_ACCESS_KEY": "stub-secret-key",
         },
@@ -149,12 +156,12 @@ SPECS = (
             Guard("PULUMI_BACKEND_URL", ("PULUMI_BACKEND_URL",), "must be an s3://"),
             Guard(
                 "AWS_ACCESS_KEY_ID",
-                ("HETZNER_S3_ACCESS_KEY_ID", "HETZNER_S3_SECRET_ACCESS_KEY"),
+                ("STATE_GATEWAY_ACCESS_KEY_ID", "STATE_GATEWAY_SECRET_ACCESS_KEY"),
                 None,
             ),
             Guard(
                 "AWS_SECRET_ACCESS_KEY",
-                ("HETZNER_S3_ACCESS_KEY_ID", "HETZNER_S3_SECRET_ACCESS_KEY"),
+                ("STATE_GATEWAY_ACCESS_KEY_ID", "STATE_GATEWAY_SECRET_ACCESS_KEY"),
                 None,
             ),
         ),
@@ -264,6 +271,74 @@ class TheDeployKeyFingerprintIsLoggedBeforeSsh(unittest.TestCase):
                 self.assertIn("::error::ssh-keygen could not read APP_HOST_DEPLOY_KEY", result.output, label)
                 self.assertEqual(result.ssh_calls, [], label)
                 self.assertNotIn("Deploy key fingerprint", result.summary, label)
+
+
+# Backends that reach the object store, or something else, without going through
+# the gateway. Every one must be refused before `pulumi login` is called.
+NON_GATEWAY_BACKENDS = (
+    ("straight at the object store", "s3://example-bucket/p?endpoint=https://fsn1.your-objectstorage.com&s3ForcePathStyle=true&region=fsn1"),
+    ("no endpoint parameter", "s3://example-bucket/p?s3ForcePathStyle=true&region=fsn1"),
+    ("no query at all", "s3://example-bucket/p"),
+    ("empty endpoint", "s3://example-bucket/p?endpoint=&s3ForcePathStyle=true"),
+    ("plain http", "s3://example-bucket/p?endpoint=http://state.branchleft.co.uk&s3ForcePathStyle=true"),
+    ("a suffixed host", "s3://example-bucket/p?endpoint=https://state.branchleft.co.uk.example.net&s3ForcePathStyle=true"),
+    ("a userinfo lookalike", "s3://example-bucket/p?endpoint=https://state.branchleft.co.uk@example.net&s3ForcePathStyle=true"),
+    ("a different gateway host", "s3://example-bucket/p?endpoint=https://media.branchleft.co.uk&s3ForcePathStyle=true"),
+    ("a gs:// backend", "gs://example-bucket"),
+)
+
+
+class TheSharedStateCredentialIsGone(unittest.TestCase):
+    def test_no_file_that_ships_names_the_shared_pair(self) -> None:
+        root = SCRIPTS.parent
+        shipped = [root / ".github" / "workflows" / "infra-ci.yml", root / "README.md", root / "README.tenant.md"]
+        shipped += [p for p in SCRIPTS.glob("*") if p.is_file() and p.name != Path(__file__).name]
+        for path in shipped:
+            # A generated tenant repo has no README.tenant.md (it became README.md).
+            if not path.is_file():
+                continue
+            text = path.read_text(encoding="utf-8", errors="ignore")
+            with self.subTest(path.name):
+                self.assertNotIn("HETZNER_S3_", text)
+                self.assertNotIn("TENANT_STATE_S3_", text)
+
+    def test_both_jobs_read_the_tenants_own_pair(self) -> None:
+        for job in ("plan", "deploy"):
+            text = "\n".join(_step_named(_job(job), BACKEND_STEP))
+            with self.subTest(job):
+                self.assertIn("secrets.STATE_GATEWAY_ACCESS_KEY_ID", text)
+                self.assertIn("secrets.STATE_GATEWAY_SECRET_ACCESS_KEY", text)
+
+
+class TheBackendMustGoThroughTheGateway(unittest.TestCase):
+    def test_a_backend_that_skips_the_gateway_is_refused_before_login(self) -> None:
+        for job in ("plan", "deploy"):
+            for label, url in NON_GATEWAY_BACKENDS:
+                with self.subTest(f"{job} / {label}"):
+                    result = _run_step(
+                        job,
+                        BACKEND_STEP,
+                        {
+                            "PULUMI_BACKEND_URL": url,
+                            "AWS_ACCESS_KEY_ID": "stub-access-key",
+                            "AWS_SECRET_ACCESS_KEY": "stub-secret-key",
+                        },
+                    )
+                    self.assertEqual(result.code, 1, f"{job} / {label}\n{result.output}")
+                    self.assertIn("::error::PULUMI_BACKEND_URL must", result.output, label)
+                    self.assertEqual(result.pulumi_calls, [], label)
+
+    def test_the_gateway_endpoint_is_accepted_wherever_it_sits_in_the_query(self) -> None:
+        for job in ("plan", "deploy"):
+            url = "s3://example-bucket/p?region=r&s3ForcePathStyle=true&endpoint=https://state.branchleft.co.uk"
+            with self.subTest(job):
+                result = _run_step(
+                    job,
+                    BACKEND_STEP,
+                    {"PULUMI_BACKEND_URL": url, "AWS_ACCESS_KEY_ID": "k", "AWS_SECRET_ACCESS_KEY": "s"},
+                )
+                self.assertEqual(result.code, 0, result.output)
+                self.assertEqual(result.pulumi_calls, [f"login {url}"])
 
 
 class TheCredentialGuardsRefuseBlankValues(unittest.TestCase):
