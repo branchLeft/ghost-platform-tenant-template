@@ -13,8 +13,10 @@ import pathlib
 import re
 import shutil
 import subprocess
+import os
 import tempfile
 import unittest
+import urllib.request
 from collections.abc import Iterator
 from unittest import mock
 
@@ -100,10 +102,28 @@ CHARSET_BATTERY: list[tuple[str, bool]] = [
     ("blog_one", False),
     ("blog one", False),
     ("a", True),
-    ("blog", True),
+    # Not "blog": the component accepts tenant zero's own slug, while this script refuses
+    # every registered name, so a registered name is not a charset-only comparison.
+    ("shop", True),
     ("blog--co", True),
     ("acme-blog", True),
 ]
+
+
+# The register's published version: the file on the default branch of the
+# repository that owns it. Public, so reading it needs no credential.
+REGISTER_URL = (
+    "https://raw.githubusercontent.com/branchLeft/ghost-platform/main/registers/tenant-names.json"
+)
+
+
+def published_register() -> dict | None:
+    """The register as published, or None when it cannot be reached."""
+    try:
+        with urllib.request.urlopen(REGISTER_URL, timeout=20) as response:  # noqa: S310
+            return json.loads(response.read().decode("utf-8"))
+    except (OSError, ValueError):
+        return None
 
 
 def copy_repo(destination: pathlib.Path) -> pathlib.Path:
@@ -160,13 +180,63 @@ class ValidateSlug(unittest.TestCase):
         with self.assertRaises(module.GenerateError):
             module.validate_slug(("a" * (module.MAX_SLUG_LENGTH - 1)) + "-")
 
-    def test_refuses_every_reserved_stack_name(self) -> None:
-        # A tenant taking one of these overwrites a platform stack's directory,
-        # secrets file and systemd unit on the app host.
-        for reserved in module.RESERVED_SLUGS:
-            with self.subTest(reserved=reserved):
+    def test_refuses_every_registered_name_of_either_kind(self) -> None:
+        # A tenant taking a registered name overwrites a platform stack's
+        # directory, secrets file and systemd unit, or collides with an existing
+        # tenant. Read from the register copy, so a name added there is covered
+        # without editing this test.
+        register = json.loads(module.REGISTER_FILE.read_text(encoding="utf-8"))
+        kinds = {entry["kind"] for entry in register["names"]}
+        self.assertEqual(kinds, {"infrastructure", "tenant"}, "the battery must cover both kinds")
+        for entry in register["names"]:
+            with self.subTest(name=entry["name"]):
                 with self.assertRaises(module.GenerateError):
-                    module.validate_slug(reserved)
+                    module.validate_slug(entry["name"])
+
+    def test_accepts_a_name_that_is_not_registered(self) -> None:
+        taken = module.taken_names()
+        for free in ("acme-blog", "shop", "a"):
+            self.assertNotIn(free, taken)
+            self.assertEqual(module.validate_slug(free), free)
+
+    def test_the_script_keeps_no_list_of_taken_names_of_its_own(self) -> None:
+        self.assertFalse(hasattr(module, "RESERVED_SLUGS"))
+
+    def test_a_missing_or_malformed_register_refuses_every_name(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            for label, text in (
+                ("missing", None),
+                ("not json", "{"),
+                ("no names", '{"version": 1}'),
+                ("empty names", '{"version": 1, "names": []}'),
+                ("bad kind", '{"version": 1, "names": [{"name": "x", "kind": "other"}]}'),
+                ("bad entry", '{"version": 1, "names": ["x"]}'),
+            ):
+                path = pathlib.Path(tmp) / f"{label.replace(' ', '-')}.json"
+                if text is not None:
+                    path.write_text(text, encoding="utf-8")
+                with self.subTest(label=label):
+                    with mock.patch.object(module, "REGISTER_FILE", path):
+                        with self.assertRaises(module.GenerateError):
+                            module.validate_slug("acme-blog")
+
+    def test_the_register_copy_matches_the_published_register(self) -> None:
+        # The drift check: this repo's copy must equal the register in
+        # branchLeft/ghost-platform. In CI an unreachable register is a failure,
+        # because a check that skips there is a copy that can lag unnoticed;
+        # elsewhere it skips, so an offline run is not blocked.
+        published = published_register()
+        if published is None:
+            if os.environ.get("CI"):
+                self.fail(f"could not read the published register at {REGISTER_URL}")
+            self.skipTest("the published register is unreachable")
+        copy = json.loads(module.REGISTER_FILE.read_text(encoding="utf-8"))
+        self.assertEqual(
+            copy,
+            published,
+            "scripts/tenant-names.json lags the register in branchLeft/ghost-platform; "
+            "replace it with a verbatim copy of registers/tenant-names.json",
+        )
 
     def test_bounds_match_the_installed_component(self) -> None:
         # The component is the authority; this script's copies exist so
@@ -181,10 +251,13 @@ class ValidateSlug(unittest.TestCase):
         constants = component_constants()
         if constants is None:
             self.skipTest("component not installed or node unavailable; run pnpm install --frozen-lockfile")
+        # The component's list is the register's infrastructure names as of its
+        # release, so it may lag the register but never hold a name the register
+        # copy does not: every name the component refuses, this script refuses.
         self.assertEqual(
-            sorted(constants["reserved"]),
-            sorted(module.RESERVED_SLUGS),
-            "RESERVED_SLUGS has drifted from the component's RESERVED_STACK_NAMES",
+            sorted(set(constants["reserved"]) - set(module.taken_names())),
+            [],
+            "the component refuses a name the register copy does not hold",
         )
         self.assertEqual(
             constants["maxSlugLength"],
