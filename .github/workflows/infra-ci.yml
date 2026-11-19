@@ -49,11 +49,14 @@ name: Infra CI
 #                         unwraps (branchLeft/standards PUL-12). A salt in a tree
 #                         anyone can clone is an offline verifier for the
 #                         passphrase above.
-#   HETZNER_S3_ACCESS_KEY_ID / HETZNER_S3_SECRET_ACCESS_KEY
-#                         reach the Pulumi state backend. Not scoped per stack:
-#                         they reach every tenant stack in that bucket, which is
-#                         why that bucket holds tenant stacks alone and never the
-#                         estate's own.
+#   STATE_GATEWAY_ACCESS_KEY_ID / STATE_GATEWAY_SECRET_ACCESS_KEY
+#                         this tenant's own credential for the Pulumi state
+#                         backend, minted by the storage gateway and confined by
+#                         it to this tenant's own prefix. It reaches no other
+#                         tenant's state. The backend URL must name the gateway
+#                         (endpoint=https://state.branchleft.co.uk); the login
+#                         step refuses any other endpoint, so a repo pointed
+#                         straight at the object store fails here.
 #
 # No GCP identity, no Workload Identity Federation, no service account. The
 # provider-enforced repository pin those gave is not replaced like for like; the
@@ -386,8 +389,8 @@ jobs:
       - name: Log in to the Pulumi state backend
         env:
           PULUMI_BACKEND_URL: ${{ vars.PULUMI_BACKEND_URL }}
-          AWS_ACCESS_KEY_ID: ${{ secrets.HETZNER_S3_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.HETZNER_S3_SECRET_ACCESS_KEY }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.STATE_GATEWAY_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.STATE_GATEWAY_SECRET_ACCESS_KEY }}
         run: |
           if [ -z "${PULUMI_BACKEND_URL//[[:space:]]/}" ]; then
             echo "::error::the PULUMI_BACKEND_URL repository variable is empty, whitespace-only or unset"
@@ -400,8 +403,23 @@ jobs:
               exit 1
               ;;
           esac
+          endpoint=""
+          case "$PULUMI_BACKEND_URL" in
+            *\?*)
+              IFS='&' read -ra params <<< "${PULUMI_BACKEND_URL#*\?}"
+              for param in "${params[@]}"; do
+                case "$param" in
+                  endpoint=*) endpoint="${param#endpoint=}" ;;
+                esac
+              done
+              ;;
+          esac
+          if [ "$endpoint" != "https://state.branchleft.co.uk" ]; then
+            echo "::error::PULUMI_BACKEND_URL must name the storage gateway as its endpoint (endpoint=https://state.branchleft.co.uk). A backend that points straight at the object store would bypass the gateway that confines this tenant's credential to its own state."
+            exit 1
+          fi
           if [ -z "${AWS_ACCESS_KEY_ID//[[:space:]]/}" ] || [ -z "${AWS_SECRET_ACCESS_KEY//[[:space:]]/}" ]; then
-            echo "::error::HETZNER_S3_ACCESS_KEY_ID / HETZNER_S3_SECRET_ACCESS_KEY are empty, whitespace-only or unset on this repository's production environment; the state backend is unreachable without them."
+            echo "::error::STATE_GATEWAY_ACCESS_KEY_ID / STATE_GATEWAY_SECRET_ACCESS_KEY are empty, whitespace-only or unset on this repository's production environment; the state backend is unreachable without them."
             exit 1
           fi
           pulumi login "$PULUMI_BACKEND_URL"
@@ -444,8 +462,8 @@ jobs:
         env:
           PULUMI_CONFIG_PASSPHRASE: ${{ secrets.PULUMI_CONFIG_PASSPHRASE }}
           PULUMI_BACKEND_URL: ${{ vars.PULUMI_BACKEND_URL }}
-          AWS_ACCESS_KEY_ID: ${{ secrets.HETZNER_S3_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.HETZNER_S3_SECRET_ACCESS_KEY }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.STATE_GATEWAY_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.STATE_GATEWAY_SECRET_ACCESS_KEY }}
         run: pulumi preview --stack __TENANT_NAME__ --json --show-sames > preview.json
 
       # The component's own guard, as on the deploy job. A plan that fails it
@@ -480,8 +498,8 @@ jobs:
         env:
           PULUMI_CONFIG_PASSPHRASE: ${{ secrets.PULUMI_CONFIG_PASSPHRASE }}
           PULUMI_BACKEND_URL: ${{ vars.PULUMI_BACKEND_URL }}
-          AWS_ACCESS_KEY_ID: ${{ secrets.HETZNER_S3_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.HETZNER_S3_SECRET_ACCESS_KEY }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.STATE_GATEWAY_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.STATE_GATEWAY_SECRET_ACCESS_KEY }}
         run: pulumi preview --stack __TENANT_NAME__ --save-plan preview-plan.json > /dev/null
 
       # The Pulumi half of "would the deploy change anything", from the shared
@@ -682,8 +700,8 @@ jobs:
       - name: Log in to the Pulumi state backend
         env:
           PULUMI_BACKEND_URL: ${{ vars.PULUMI_BACKEND_URL }}
-          AWS_ACCESS_KEY_ID: ${{ secrets.HETZNER_S3_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.HETZNER_S3_SECRET_ACCESS_KEY }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.STATE_GATEWAY_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.STATE_GATEWAY_SECRET_ACCESS_KEY }}
         run: |
           if [ -z "${PULUMI_BACKEND_URL//[[:space:]]/}" ]; then
             echo "::error::the PULUMI_BACKEND_URL repository variable is empty, whitespace-only or unset"
@@ -696,8 +714,23 @@ jobs:
               exit 1
               ;;
           esac
+          endpoint=""
+          case "$PULUMI_BACKEND_URL" in
+            *\?*)
+              IFS='&' read -ra params <<< "${PULUMI_BACKEND_URL#*\?}"
+              for param in "${params[@]}"; do
+                case "$param" in
+                  endpoint=*) endpoint="${param#endpoint=}" ;;
+                esac
+              done
+              ;;
+          esac
+          if [ "$endpoint" != "https://state.branchleft.co.uk" ]; then
+            echo "::error::PULUMI_BACKEND_URL must name the storage gateway as its endpoint (endpoint=https://state.branchleft.co.uk). A backend that points straight at the object store would bypass the gateway that confines this tenant's credential to its own state."
+            exit 1
+          fi
           if [ -z "${AWS_ACCESS_KEY_ID//[[:space:]]/}" ] || [ -z "${AWS_SECRET_ACCESS_KEY//[[:space:]]/}" ]; then
-            echo "::error::HETZNER_S3_ACCESS_KEY_ID / HETZNER_S3_SECRET_ACCESS_KEY are empty, whitespace-only or unset on this repository's production environment; the state backend is unreachable without them."
+            echo "::error::STATE_GATEWAY_ACCESS_KEY_ID / STATE_GATEWAY_SECRET_ACCESS_KEY are empty, whitespace-only or unset on this repository's production environment; the state backend is unreachable without them."
             exit 1
           fi
           pulumi login "$PULUMI_BACKEND_URL"
@@ -771,8 +804,8 @@ jobs:
         env:
           PULUMI_CONFIG_PASSPHRASE: ${{ secrets.PULUMI_CONFIG_PASSPHRASE }}
           PULUMI_BACKEND_URL: ${{ vars.PULUMI_BACKEND_URL }}
-          AWS_ACCESS_KEY_ID: ${{ secrets.HETZNER_S3_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.HETZNER_S3_SECRET_ACCESS_KEY }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.STATE_GATEWAY_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.STATE_GATEWAY_SECRET_ACCESS_KEY }}
         # `--show-sames` is required by the guard, not a debugging aid. Pulumi
         # omits an unchanged ComponentResource from `steps` entirely without
         # it, which is indistinguishable from a `GhostTenant` that has stopped
@@ -828,8 +861,8 @@ jobs:
         env:
           PULUMI_CONFIG_PASSPHRASE: ${{ secrets.PULUMI_CONFIG_PASSPHRASE }}
           PULUMI_BACKEND_URL: ${{ vars.PULUMI_BACKEND_URL }}
-          AWS_ACCESS_KEY_ID: ${{ secrets.HETZNER_S3_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.HETZNER_S3_SECRET_ACCESS_KEY }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.STATE_GATEWAY_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.STATE_GATEWAY_SECRET_ACCESS_KEY }}
         run: pulumi up --stack __TENANT_NAME__ --yes
 
       # Read from this commit's own pin file, never from a stack output. The
