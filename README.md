@@ -70,9 +70,11 @@ The script refuses if any placeholder survives anywhere in the tree, and
 `scripts/test_generate_tenant_repo.py` runs the whole generation against a copy
 of this repo's own tracked files on every push — so a placeholder added to an
 unlisted file fails here rather than shipping into a tenant repo as a literal
-token. It also refuses a reserved slug (`website`, `edge`, `db`, `monitoring`,
-cross-checked against the installed component) and one too long for MySQL's
-account-name limit, before a repository exists to clean up.
+token. It also refuses a slug the tenant name register already holds (read from
+`scripts/tenant-names.json`, a copy of `registers/tenant-names.json` in
+branchLeft/ghost-platform, which the unit tests compare with the published
+register) and one too long for MySQL's account-name limit, before the script
+changes anything.
 
 CI additionally refuses to type-check or deploy while either token remains
 unsubstituted (`scripts/assert-placeholders-substituted.py`).

@@ -10,6 +10,7 @@ here rather than in the provisioning workflow.
 from __future__ import annotations
 
 import argparse
+import json
 import pathlib
 import re
 import shutil
@@ -31,12 +32,17 @@ SLUG = re.compile(r"\A[a-z]([a-z0-9-]*[a-z0-9])?\Z")
 # would be created for a slug whose stack then refuses at preview.
 MAX_SLUG_LENGTH = 26
 
-# An app host already runs a Compose stack under each of these names. A tenant
-# taking one would overwrite that stack's directory, secrets file and systemd
-# unit. Kept in step with `RESERVED_STACK_NAMES` in the component by
-# `test_generate_tenant_repo.py`, which reads the installed package rather than
-# trusting this copy.
-RESERVED_SLUGS = ("website", "edge", "db", "monitoring", "nextcloud1", "mail-spool")
+# Every name that is already taken -- an app host's own stacks and each
+# existing tenant -- is in the tenant name register, `registers/tenant-names.json`
+# in branchLeft/ghost-platform, the one home for that list. This script keeps no
+# list of its own: it reads `tenant-names.json` beside it, a verbatim copy of the
+# register, and `test_generate_tenant_repo.py` fails when the copy lags the
+# register's published version. A tenant taking a taken name would overwrite
+# that stack's directory, secrets file and systemd unit (or collide with an
+# existing tenant's repository), so a registered name is refused whatever its
+# kind -- tenant zero's included, which is not provisioned through here.
+REGISTER_FILE = pathlib.Path(__file__).resolve().parent / "tenant-names.json"
+REGISTER_KINDS = ("infrastructure", "tenant")
 
 PLACEHOLDER = re.compile(r"__[A-Z][A-Z0-9_]*__")
 
@@ -45,6 +51,8 @@ PLACEHOLDER = re.compile(r"__[A-Z][A-Z0-9_]*__")
 TEMPLATE_ONLY_PATHS = (
     "scripts/test_generate_tenant_repo.py",
     "scripts/test_assert_placeholders_substituted.py",
+    # The generator's copy of the tenant name register: read only by the script below.
+    "scripts/tenant-names.json",
     # Describes this script, which is stripped below: shipped, it names a missing file.
     "scripts/generate-tenant-repo.md",
     # Last, and self-referential: this script is already loaded, so unlinking it
@@ -108,6 +116,40 @@ class GenerateError(Exception):
     """Raised for anything a caller could have avoided, or that the tree refused."""
 
 
+def taken_names(register: pathlib.Path | None = None) -> dict[str, str]:
+    """The register's names, each mapped to its kind.
+
+    Refuses a missing, unreadable or malformed register rather than reading it
+    as empty: an empty list would accept every name, which is the failure this
+    exists to prevent.
+    """
+    path = REGISTER_FILE if register is None else register
+    try:
+        document = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, ValueError) as exc:
+        raise GenerateError(
+            f"the tenant name register copy {path.name} cannot be read ({type(exc).__name__}); "
+            "refusing every name rather than none"
+        ) from exc
+    entries = document.get("names") if isinstance(document, dict) else None
+    if not isinstance(entries, list) or not entries:
+        raise GenerateError(
+            f"the tenant name register copy {path.name} has no `names` list; refusing every name "
+            "rather than none"
+        )
+    names: dict[str, str] = {}
+    for entry in entries:
+        name = entry.get("name") if isinstance(entry, dict) else None
+        kind = entry.get("kind") if isinstance(entry, dict) else None
+        if not isinstance(name, str) or kind not in REGISTER_KINDS:
+            raise GenerateError(
+                f"the tenant name register copy {path.name} holds an entry that is not a name "
+                f"with a kind of {' or '.join(REGISTER_KINDS)}: {entry!r}"
+            )
+        names[name] = kind
+    return names
+
+
 def validate_slug(slug: str) -> str:
     if not SLUG.match(slug):
         raise GenerateError(
@@ -119,11 +161,12 @@ def validate_slug(slug: str) -> str:
             f"slug {slug!r} is {len(slug)} characters; the maximum is {MAX_SLUG_LENGTH} so that "
             "'ghost_' plus the slug fits MySQL's 32-character account-name limit"
         )
-    if slug in RESERVED_SLUGS:
+    taken = taken_names()
+    if slug in taken:
         raise GenerateError(
-            f"slug {slug!r} is reserved -- an app host already runs a Compose stack of that name, "
-            f"and a tenant using it would overwrite that stack's directory, secrets file and "
-            f"systemd unit. Reserved: {', '.join(RESERVED_SLUGS)}"
+            f"slug {slug!r} is already registered as a {taken[slug]} name -- a host or tenant "
+            "already uses it, and taking it would overwrite that stack's directory, secrets file "
+            "and systemd unit. See the tenant name register in branchLeft/ghost-platform."
         )
     return slug
 
