@@ -888,7 +888,7 @@ jobs:
           # A file of comments is what the template ships, so "the file exists"
           # proves nothing. What matters is that it carries a key.
           if ! grep -qE '^[^#[:space:]]' known_hosts; then
-            echo "::error::known_hosts carries no host key line. Fill it in from the host itself over an operator root session -- never with ssh-keyscan, which is trust-on-first-use and would defeat the pinning. The file's own header carries the command."
+            echo "::error::known_hosts carries no host key line. It is filled from the host-key register by the provisioning run; the app host's key is recorded once, from the host, into infra/provisioning/host-key-register.txt by pull request. Never ssh-keyscan."
             exit 1
           fi
           umask 077
