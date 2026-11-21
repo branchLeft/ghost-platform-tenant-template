@@ -23,16 +23,11 @@ secret to set.** Since component 8.0.0 this stack holds no secret value: no
 and no `secure:` entry in the file. The `Committed-secret guard` job fails the
 pull request if one is added.
 
-1. **`known_hosts`**, filled in with the app host's SSH host key. Take it from
-   the host itself over your own root session — never `ssh-keyscan`, which is
-   trust-on-first-use and records whatever answered:
-
-   ```bash
-   ssh -i ~/.ssh/id_ed25519_hetzner root@<app-host-public-ipv4> \
-     'cat /etc/ssh/ssh_host_ed25519_key.pub'
-   ```
-
-   Write one line: `<app-host-public-ipv4> ` followed by that whole output.
+1. **`known_hosts`** is filled from the host-key register by the provisioning
+   run; you do not write it by hand. The app host's key is recorded once, from
+   the host itself, by a person through the register's `record` command, and
+   landed to `infra/provisioning/host-key-register.txt` by pull request. Never
+   `ssh-keyscan`, which is trust-on-first-use and records whatever answered.
 
 2. **Check the stack carries no secret**, before committing:
 

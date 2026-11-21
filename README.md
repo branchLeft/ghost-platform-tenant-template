@@ -234,8 +234,10 @@ tier limit rather than a misconfiguration — the scoping is then the whole of
 what the environment buys, and it is still the property that matters.
 
 `known_hosts` is committed, not a secret: it holds the app host's SSH **host**
-public key, and publishing it is what pinning means. The deploy job refuses
-while it carries no key line.
+public key, and publishing it is what pinning means. It is filled from the
+host-key register by the provisioning run, never by hand; a key is recorded once
+from the host itself, never with `ssh-keyscan`. The deploy job refuses while it
+carries no key line.
 
 `pnpm install --frozen-lockfile` installs `@branchleft/ghost-platform-tenant`
 using the workflow run's own `GITHUB_TOKEN`. The package is public on GitHub
