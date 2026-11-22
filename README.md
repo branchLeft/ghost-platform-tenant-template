@@ -184,18 +184,18 @@ python3 scripts/assert-no-secure-stack-config.py --scan-tree .
 
 | Name | Kind | What it is | Written by |
 |---|---|---|---|
-| `PULUMI_BACKEND_URL` | variable | The full `s3://…?endpoint=…&s3ForcePathStyle=true&region=…` state backend URL, not a bucket name. | provisioning |
+| `PULUMI_BACKEND_URL` | variable | The full `s3://<bucket>/<this tenant's prefix>?endpoint=https://state.branchleft.co.uk&s3ForcePathStyle=true&region=…` state backend URL, not a bucket name. The endpoint must be the storage gateway. | provisioning |
 | `APP_HOST_SSH_ADDRESS` | variable | The app host's **public** address. CI runs on GitHub-hosted runners and cannot reach the private one `appHostPrivateIp` names. | provisioning |
 | `PULUMI_CONFIG_PASSPHRASE` | `production` env secret | This stack's own secrets passphrase, minted fresh at onboarding, never shared with another tenant or with the platform repo that created it. | provisioning |
 | `PULUMI_ENCRYPTION_SALT` | `production` env secret | This stack's `encryptionsalt`, the `v1:`-prefixed value alone. | provisioning |
-| `HETZNER_S3_ACCESS_KEY_ID` / `HETZNER_S3_SECRET_ACCESS_KEY` | `production` env secrets | Reach the state backend. Not scoped per stack — they reach every tenant stack in that bucket, which is why that bucket holds tenant stacks alone and never the estate's own. | provisioning |
+| `STATE_GATEWAY_ACCESS_KEY_ID` / `STATE_GATEWAY_SECRET_ACCESS_KEY` | `production` env secrets | This tenant's own credential for the state backend, minted by the storage gateway and confined by it to this tenant's own prefix. It reaches no other tenant's state. The login step refuses a backend whose endpoint is not `https://state.branchleft.co.uk`. | provisioning |
 | `APP_HOST_DEPLOY_KEY` | `production` env secret | This tenant's own ed25519 slot key. **Written by an operator, never by provisioning** — minting a host credential and writing it to a repository in one unattended run is a credential-creating credential, which the deploy design exists to not have. | operator |
 
 **A second environment, `production-plan`, for the plan job.** The `plan` job
 previews the stack on main before the deploy job waits for its approval, so
 whoever approves can read what the apply would do. A preview needs the same four
 secrets as the apply (`PULUMI_CONFIG_PASSPHRASE`, `PULUMI_ENCRYPTION_SALT` and
-the two `HETZNER_S3_*` keys), and no job outside the gated one may read them
+the two `STATE_GATEWAY_*` keys), and no job outside the gated one may read them
 from `production`. So the same four secret names are also set, with the same
 values, on `production-plan`. That environment carries no reviewer (it would stop
 the job before the plan exists) and **must** have a deployment branch policy

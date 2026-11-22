@@ -115,10 +115,12 @@ the fix a privileged operation, never widening the credential to silence it.
   is a bucket holding tenant stacks alone. It deliberately is not the bucket the
   estate's checkpoint — and the production hcloud token inside it — lives in.
 
-The one reach worth stating plainly rather than burying: the Object Storage
-credential that reaches this stack's state reaches **every tenant stack in that
-bucket**, because an S3 credential is not scoped per stack. That is a known,
-recorded property of the state backend, not something this repo can narrow.
+The one reach worth stating plainly rather than burying: this stack's state
+credential (`STATE_GATEWAY_ACCESS_KEY_ID` / `STATE_GATEWAY_SECRET_ACCESS_KEY`)
+is minted by the storage gateway for this tenant alone and reaches only this
+tenant's own prefix in the state bucket. The login step refuses any backend
+whose endpoint is not the gateway's, so a repo cannot be pointed straight at the
+object store.
 
 ---
 
