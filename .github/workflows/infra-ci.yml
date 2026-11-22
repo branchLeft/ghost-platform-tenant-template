@@ -172,9 +172,9 @@ jobs:
 
       # Run here as well as in the credential-free `secret-guard` job, and the
       # duplication is the point: one assertion in
-      # `test_generate_tenant_repo.py` compares this repo's copy of the reserved
-      # stack names against the installed component's, and skips itself when the
-      # package is absent. `secret-guard` deliberately installs nothing, so
+      # `test_generate_tenant_repo.py` compares this repo's copy of the tenant
+      # name register against the component's reserved stack names, and skips
+      # itself when the package is absent. `secret-guard` deliberately installs nothing, so
       # without this step that assertion would be permanently skipped and a
       # drifted copy would fail open.
       - name: Script unit tests, against the installed component

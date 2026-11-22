@@ -47,6 +47,25 @@ through the installed component, rather than the length and reserved-name
 constants that `test_bounds_match_the_installed_component` alone compared, so
 a future drift in the charset itself is caught the same way.
 
+## `tenant-names.json`
+
+The names that are already taken -- an app host's own stacks and every existing
+tenant -- are not listed in this script. `scripts/tenant-names.json` is a
+verbatim copy of `registers/tenant-names.json` in branchLeft/ghost-platform, the
+one home for that list, and `validate_slug` refuses any name in it, whatever its
+kind, as its first act: nothing is removed, substituted or renamed for a refused
+slug. A copy that is missing, unreadable or malformed refuses every name rather
+than none, because an empty list would accept all of them. The copy is removed
+from a generated repo with the script.
+
+The register is public, so `test_the_register_copy_matches_the_published_register`
+reads the published file and fails when the copy lags it. To refresh the copy,
+replace it with the register verbatim. In CI an unreachable register is a
+failure, since a check that skips there would let the copy lag unnoticed; run
+elsewhere it skips. `test_bounds_match_the_installed_component` still checks
+that every name the installed component refuses is in the copy, as the
+component's list is the register's infrastructure names as of its release.
+
 ## The sweep
 
 `sweep()` is the last step, and it is what proves no placeholder survives. It
