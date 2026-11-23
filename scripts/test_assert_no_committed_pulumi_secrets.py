@@ -6,24 +6,14 @@ Every test targets a false pass. See assert-no-committed-pulumi-secrets.md's
 """
 
 import contextlib
-import importlib.util
 import io
 import pathlib
 import tempfile
 import unittest
 
+from _testsupport import load_script
 
-def _load_module():
-    """Import the script by path: its filename has hyphens, so it is not a
-    legal module name for a plain import."""
-    path = pathlib.Path(__file__).resolve().parent / "assert-no-committed-pulumi-secrets.py"
-    spec = importlib.util.spec_from_file_location("assert_no_committed_pulumi_secrets", path)
-    module = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(module)
-    return module
-
-
-guard = _load_module()
+guard = load_script("assert-no-committed-pulumi-secrets.py", "assert_no_committed_pulumi_secrets")
 
 
 def lines_flagged(text: str) -> list[int]:

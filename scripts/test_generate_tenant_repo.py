@@ -7,7 +7,6 @@ See generate-tenant-repo.md's "Tests" section for why.
 from __future__ import annotations
 
 import contextlib
-import importlib.util
 import json
 import pathlib
 import re
@@ -20,22 +19,9 @@ import urllib.request
 from collections.abc import Iterator
 from unittest import mock
 
-SCRIPTS = pathlib.Path(__file__).resolve().parent
-REPO = SCRIPTS.parent
+from _testsupport import REPO, load_script, tracked_files
 
-_spec = importlib.util.spec_from_file_location(
-    "generate_tenant_repo", SCRIPTS / "generate-tenant-repo.py"
-)
-assert _spec and _spec.loader
-module = importlib.util.module_from_spec(_spec)
-_spec.loader.exec_module(module)
-
-
-def tracked_files() -> list[str]:
-    listing = subprocess.run(
-        ["git", "ls-files"], cwd=REPO, capture_output=True, check=True, text=True
-    )
-    return [name for name in listing.stdout.splitlines() if name]
+module = load_script("generate-tenant-repo.py", "generate_tenant_repo")
 
 
 def _component_installed() -> bool:

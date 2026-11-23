@@ -5,19 +5,13 @@ See assert-no-inline-credential.md's "Tests" section for what each covers.
 
 from __future__ import annotations
 
-import importlib.util
 import pathlib
 import tempfile
 import unittest
 
-SCRIPTS = pathlib.Path(__file__).resolve().parent
+from _testsupport import load_script
 
-_spec = importlib.util.spec_from_file_location(
-    "assert_no_inline_credential", SCRIPTS / "assert-no-inline-credential.py"
-)
-assert _spec and _spec.loader
-module = importlib.util.module_from_spec(_spec)
-_spec.loader.exec_module(module)
+module = load_script("assert-no-inline-credential.py", "assert_no_inline_credential")
 
 
 def _write(tmp: str, text: str) -> pathlib.Path:
