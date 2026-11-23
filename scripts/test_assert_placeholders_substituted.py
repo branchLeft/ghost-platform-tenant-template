@@ -6,25 +6,16 @@ one: `test_default_files_covers_every_placeholder_in_the_tree`.
 
 from __future__ import annotations
 
-import importlib.util
 import os
 import pathlib
 import re
-import subprocess
 import tempfile
 import unittest
 
 import placeholder_table
+from _testsupport import REPO, load_script, tracked_files
 
-SCRIPTS = pathlib.Path(__file__).resolve().parent
-REPO = SCRIPTS.parent
-
-_spec = importlib.util.spec_from_file_location(
-    "assert_placeholders_substituted", SCRIPTS / "assert-placeholders-substituted.py"
-)
-assert _spec and _spec.loader
-module = importlib.util.module_from_spec(_spec)
-_spec.loader.exec_module(module)
+module = load_script("assert-placeholders-substituted.py", "assert_placeholders_substituted")
 
 # Prose names placeholders in order to document them, and this test file and
 # the script itself both carry the pattern as data. Substitution happens in
@@ -201,17 +192,9 @@ class DefaultFiles(unittest.TestCase):
             )
 
     def test_default_files_covers_every_placeholder_in_the_tree(self) -> None:
-        listing = subprocess.run(
-            ["git", "ls-files", "-z"],
-            cwd=REPO,
-            capture_output=True,
-            check=True,
-        )
         covered = set(module.DEFAULT_FILES)
         uncovered: list[str] = []
-        for name in listing.stdout.decode().split("\0"):
-            if not name:
-                continue
+        for name in tracked_files():
             path = pathlib.Path(name)
             if path.suffix in EXCLUDED_SUFFIXES or path.parts[0] in EXCLUDED_DIRS:
                 continue

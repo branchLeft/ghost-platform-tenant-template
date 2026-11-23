@@ -10,7 +10,6 @@ See image-changed.md."""
 from __future__ import annotations
 
 import http.server
-import importlib.util
 import json
 import os
 import pathlib
@@ -20,6 +19,8 @@ import tempfile
 import threading
 import unittest
 import urllib.parse
+
+from _testsupport import load_script
 
 SCRIPTS = pathlib.Path(__file__).resolve().parent
 SCRIPT = SCRIPTS / "image-changed.py"
@@ -45,10 +46,7 @@ RECENT = "runs-recent-quiet.json"
 
 
 def load_module():
-    spec = importlib.util.spec_from_file_location("image_changed", SCRIPT)
-    module = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(module)
-    return module
+    return load_script("image-changed.py", "image_changed")
 
 
 def fixture(name: str) -> bytes:
