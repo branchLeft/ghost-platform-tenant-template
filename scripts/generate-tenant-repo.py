@@ -16,6 +16,10 @@ import re
 import shutil
 import sys
 
+# Placeholder names, the files that carry them, and the values they become.
+# Imported, not copied: a placeholder is added in placeholder_table.py only.
+from placeholder_table import PLACEHOLDER_PATTERN, SUBSTITUTED_FILES, substitutions
+
 # Mirrors `validateTenantSlug` in @branchleft/ghost-platform-tenant: the slug
 # becomes a Compose project, systemd instance, directory, MySQL identifier and
 # two volume names, so a value valid in one and not another is a tenant that
@@ -44,8 +48,6 @@ MAX_SLUG_LENGTH = 26
 REGISTER_FILE = pathlib.Path(__file__).resolve().parent / "tenant-names.json"
 REGISTER_KINDS = ("infrastructure", "tenant")
 
-PLACEHOLDER = re.compile(r"__[A-Z][A-Z0-9_]*__")
-
 # Removed from the generated repo. Each one either asserts something only true
 # of the template, or describes the template rather than the tenant.
 TEMPLATE_ONLY_PATHS = (
@@ -65,16 +67,6 @@ TEMPLATE_ONLY_PATHS = (
 # substituted in place: a generated repo's landing page should describe that
 # tenant's stack, not call itself a template. Applied last -- see the docstring.
 RENAMES = (("README.tenant.md", "README.md"),)
-
-# Every file carrying a placeholder. Named by their **pre-rename** paths, so
-# that substitution can run before the rename. Adding a placeholder to a file
-# that is not in this list is the defect this script and its test exist to make
-# impossible.
-SUBSTITUTED_FILES = (
-    "Pulumi.yaml",
-    ".github/workflows/infra-ci.yml",
-    "README.tenant.md",
-)
 
 # Directories the final sweep does not walk. `.git` and `node_modules` are not
 # authored content; `scripts` holds the pattern itself as data.
@@ -171,15 +163,6 @@ def validate_slug(slug: str) -> str:
     return slug
 
 
-def substitutions(slug: str) -> dict[str, str]:
-    return {
-        # The Pulumi project name. Every tenant stack shares one state bucket
-        # and the object path derives from this, so it must be unique.
-        "__TENANT_PULUMI_PROJECT__": f"{slug}-infra",
-        "__TENANT_NAME__": slug,
-    }
-
-
 def remove_template_only(root: pathlib.Path) -> list[str]:
     """Delete what belongs to the template. Idempotent: a missing path is fine."""
     actions = []
@@ -201,7 +184,7 @@ def apply_substitutions(root: pathlib.Path, slug: str) -> list[str]:
         path = root / name
         if not path.is_file():
             raise GenerateError(
-                f"{name} is named in SUBSTITUTED_FILES but is missing from this tree. Refusing "
+                f"{name} is named in placeholder_table.py but is missing from this tree. Refusing "
                 "rather than skipping: a file that has moved is a file whose placeholders stop "
                 "being substituted, silently."
             )
@@ -250,7 +233,7 @@ def sweep(root: pathlib.Path) -> list[str]:
         for number, line in enumerate(text.splitlines(), start=1):
             if skip_comments and COMMENT_LINE.match(line):
                 continue
-            found = PLACEHOLDER.findall(line)
+            found = PLACEHOLDER_PATTERN.findall(line)
             if found:
                 findings.append(f"{relative}:{number}: {', '.join(sorted(set(found)))}")
     return findings
@@ -267,9 +250,9 @@ def generate(root: pathlib.Path, slug: str) -> list[str]:
     blocks = []
     if placeholders:
         blocks.append(
-            "placeholders survived generation in files SUBSTITUTED_FILES does not name:\n  "
+            "placeholders survived generation in files placeholder_table.py does not name:\n  "
             + "\n  ".join(placeholders)
-            + "\nAdd each file to SUBSTITUTED_FILES in this script and to README.md's "
+            + "\nAdd each file to the table in scripts/placeholder_table.py and to README.md's "
             "placeholder table."
         )
     if unreadable:

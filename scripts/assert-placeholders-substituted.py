@@ -11,25 +11,9 @@ import pathlib
 import re
 import sys
 
-PLACEHOLDER_PATTERN = re.compile(r"__[A-Z][A-Z0-9_]*__")
-
-# Kept in step with README.md's placeholder table by hand. A file dropped from
-# here is a file the check stops covering, silently -- which is why the table
-# and this list are both named in the pull-request checklist for any change
-# that adds a placeholder.
-DEFAULT_FILES = [
-    "Pulumi.yaml",
-    ".github/workflows/infra-ci.yml",
-]
-
-# Every placeholder name the table carries, and the file(s) each must appear
-# in, intact, while this repo is still the template. Absent from
-# DEFAULT_FILES above because generation renames it to README.md before
-# substituting it -- it does not exist, under this name, in a generated repo.
-TEMPLATE_PLACEHOLDER_FILES: dict[str, list[str]] = {
-    "TENANT_PULUMI_PROJECT": ["Pulumi.yaml"],
-    "TENANT_NAME": [".github/workflows/infra-ci.yml", "README.tenant.md"],
-}
+# The placeholder names, the files each one must appear in, and the pattern.
+# Derived from scripts/placeholder_table.py, not kept by hand here.
+from placeholder_table import DEFAULT_FILES, PLACEHOLDER_PATTERN, TEMPLATE_PLACEHOLDER_FILES
 
 # Prettier's markdown formatter treats `__word__` as bold-emphasis syntax and
 # rewrites it to `**word**` wherever it is not inside a code span -- so a

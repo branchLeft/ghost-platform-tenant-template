@@ -140,6 +140,7 @@ OWNED: dict[str, tuple[str, ...]] = {
         "scripts/image-changed.py",
         "scripts/summarise-plan.py",
         "scripts/assert-placeholders-substituted.py",
+        "scripts/placeholder_table.py",
         "scripts/assert-plan-environment-main-only.py",
         "scripts/assert-no-committed-pulumi-secrets.py",
         "scripts/assert-environment-gated.py",

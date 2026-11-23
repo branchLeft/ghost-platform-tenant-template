@@ -66,6 +66,11 @@ the substitution list — which files carry a placeholder is a property of this
 repo, and a duplicate list in another repository's workflow goes stale the first
 time a placeholder is added to a new file, silently.
 
+The names, the files that carry them and the values they become are one table,
+`scripts/placeholder_table.py`; the generator and the check both read it, so a
+placeholder is added there, and the table below must match it
+(`scripts/test_assert_placeholders_substituted.py` fails when it does not).
+
 The script refuses if any placeholder survives anywhere in the tree, and
 `scripts/test_generate_tenant_repo.py` runs the whole generation against a copy
 of this repo's own tracked files on every push — so a placeholder added to an
@@ -350,7 +355,7 @@ result.
 This repo's own source — the template scaffolding, its Pulumi program and its
 scripts — is source-available under the [PolyForm Shield License
 1.0.0](LICENSE). Neither `LICENSE` nor `package.json`'s `license` field is
-named in `TEMPLATE_ONLY_PATHS` or `SUBSTITUTED_FILES`, so `gh repo create
+named in `TEMPLATE_ONLY_PATHS` or `scripts/placeholder_table.py`, so `gh repo create
 --template` — which is what provisions a tenant repo, not this repo's own
 generator script — copies both, unchanged, into every repo generated from this
 template. A generated tenant repo therefore inherits the Shield licence via both files, byte for byte.
