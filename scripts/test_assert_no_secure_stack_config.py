@@ -7,7 +7,6 @@ value is an obvious stand-in; no real credential is written here.
 """
 
 import contextlib
-import importlib.util
 import io
 import json
 import pathlib
@@ -16,19 +15,11 @@ import sys
 import tempfile
 import unittest
 
+from _testsupport import load_script
+
 SCRIPT = pathlib.Path(__file__).resolve().parent / "assert-no-secure-stack-config.py"
 
-
-def _load_module():
-    """Import the script by path: its filename has hyphens."""
-    spec = importlib.util.spec_from_file_location("assert_no_secure_stack_config", SCRIPT)
-    module = importlib.util.module_from_spec(spec)
-    sys.modules[spec.name] = module
-    spec.loader.exec_module(module)
-    return module
-
-
-guard = _load_module()
+guard = load_script("assert-no-secure-stack-config.py", "assert_no_secure_stack_config")
 
 
 def lines_flagged(text: str) -> list[int]:
