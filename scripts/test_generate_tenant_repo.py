@@ -380,6 +380,16 @@ class Generate(unittest.TestCase):
                 module.generate(root, "acme-blog")
             self.assertIn("tsconfig.json", str(caught.exception))
 
+    def test_a_known_placeholder_in_an_unlisted_file_still_fails_after_the_move(self) -> None:
+        # The table is now imported, not copied: a known name in a file the table
+        # does not list must still be refused, not substituted by coincidence.
+        with tempfile.TemporaryDirectory() as tmp:
+            root = copy_repo(pathlib.Path(tmp))
+            (root / "NOTES.txt").write_text("__TENANT_PULUMI_PROJECT__\n", encoding="utf-8")
+            with self.assertRaises(module.GenerateError) as caught:
+                module.generate(root, "acme-blog")
+            self.assertIn("NOTES.txt", str(caught.exception))
+
     def test_a_listed_file_that_moved_refuses_rather_than_skipping(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             root = copy_repo(pathlib.Path(tmp))

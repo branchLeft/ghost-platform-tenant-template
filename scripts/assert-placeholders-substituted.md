@@ -46,5 +46,6 @@ Exit status 0 if the relevant check passes, 1 if it does not.
 The interesting test is not that the script finds a placeholder in a file it
 was handed -- it is `test_default_files_covers_every_placeholder_in_the_tree`,
 which is the only thing standing between a future edit and a placeholder that
-travels into a generated tenant repo unchecked. `DEFAULT_FILES` is a hand-kept
-list, and a file dropped from it stops being covered silently.
+travels into a generated tenant repo unchecked. `DEFAULT_FILES` is derived from
+the placeholder table in `placeholder_table.py`, and a placeholder left out of
+that table stops being covered silently.

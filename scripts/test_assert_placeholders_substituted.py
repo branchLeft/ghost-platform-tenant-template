@@ -12,6 +12,7 @@ import re
 import tempfile
 import unittest
 
+import placeholder_table
 from _testsupport import REPO, load_script, tracked_files
 
 module = load_script("assert-placeholders-substituted.py", "assert_placeholders_substituted")
@@ -216,6 +217,27 @@ class DefaultFiles(unittest.TestCase):
             "check does not cover; add them to DEFAULT_FILES and to README.md's "
             "placeholder table, and make sure the provisioning flow substitutes "
             "them",
+        )
+
+
+class ReadmeTable(unittest.TestCase):
+    ROW = re.compile(r"^\|\s*`(__[A-Z][A-Z0-9_]*__)`\s*\|\s*([^|]*)\|")
+    FILE = re.compile(r"`([^`]+)`")
+
+    def test_readme_table_lists_exactly_the_tables_names_and_files(self) -> None:
+        # A placeholder added to placeholder_table.py must be added to README.md's
+        # table in the same edit, and a file moved there must move in the table too.
+        listed: dict[str, set[str]] = {}
+        for line in (REPO / "README.md").read_text(encoding="utf-8").splitlines():
+            match = self.ROW.match(line)
+            if match:
+                listed[match.group(1)] = set(self.FILE.findall(match.group(2)))
+        expected = {p.token: set(p.files) for p in placeholder_table.PLACEHOLDERS}
+        self.assertEqual(
+            listed,
+            expected,
+            "README.md's placeholder table disagrees with scripts/placeholder_table.py; "
+            "change the two together",
         )
 
 
