@@ -1,60 +1,44 @@
-# What this file holds for the owner. There is no catch-all: a path listed here
-# is one whose change can do harm that no later check would catch, and every
-# other path merges on a signed commit, green checks and the reviewer App's
-# approval. GitHub applies the LAST matching pattern, so a line with no owner
-# releases what an earlier line took.
+# The owner is a required reviewer only for two things:
+#   (a) guardrails: anything that, if silently weakened, would stop an agent
+#       guardrail or a required check protecting us. Here that is the rules and
+#       the owner's instructions, the committed-secret and environment gates
+#       that plan and deploy need, the tests those required checks run, this
+#       file and its proof test, and (through the shared /.github/ line) the
+#       workflows and actions that run them.
+#   (b) human-facing docs: the README files and the licence text.
+# Everything else (the generator, the Pulumi program, package and install
+# files, image pins, engineering docs) merges on a signed commit, green checks
+# and the reviewer App's approval. There is no catch-all.
 #
-# scripts/test_codeowners.py holds a fixed table of sample paths for every class
-# below and fails when one of them changes owner.
+# GitHub applies the LAST matching pattern, so a line with no owner releases
+# what an earlier line took. scripts/test_codeowners.py holds a fixed table of
+# sample paths for every class below and fails when one of them changes owner.
 
-# The rules themselves, and the owner's own instructions.
+# Guardrails: the rules themselves, and the owner's own instructions.
 CLAUDE.md                @branchLeft/branchleft-admin
 /AUTHORISATIONS.md       @branchLeft/branchleft-admin
 /.claude/                @branchLeft/branchleft-admin
 /tools/floors.tsv        @branchLeft/branchleft-admin
 
-# The scripts the plan and deploy jobs run with secrets in scope, and the tests
-# that gate them. That includes the committed-secret guard and its test (a
-# required check that plan and deploy need) and test_generate_tenant_repo.py
-# (it runs in both required checks), and the generator (see below). Only the
-# documents beside them are released, below.
-/scripts/                @branchLeft/branchleft-admin
+# Guardrails: the gate scripts the required checks and the plan and deploy
+# jobs run, and the tests of them. The committed-secret guard and its test are
+# the required 'Committed-secret guard' check; the render test proves the stack
+# records no secret. This file's proof test is here too.
+/scripts/assert-*.py              @branchLeft/branchleft-admin
+/scripts/placeholder_table.py     @branchLeft/branchleft-admin
+/scripts/_testsupport.py          @branchLeft/branchleft-admin
+/scripts/test_assert_*.py         @branchLeft/branchleft-admin
+/scripts/test_secret_checks.py    @branchLeft/branchleft-admin
+/scripts/test_plan_job.py         @branchLeft/branchleft-admin
+/scripts/test_verify_attestations_job.py  @branchLeft/branchleft-admin
+/scripts/test_generate_tenant_repo.py     @branchLeft/branchleft-admin
+/scripts/test_codeowners.py       @branchLeft/branchleft-admin
+/test/render.test.ts              @branchLeft/branchleft-admin
 
-# The test of the test:render gate, which runs in the required Type check.
-/test/                   @branchLeft/branchleft-admin
-
-# What decides the program Pulumi runs, and what runs while it is installed,
-# in the jobs that hold the state credentials, the passphrase and the deploy key.
-# package.json: `main` picks the program, lifecycle hooks run on install.
-# pnpm-workspace.yaml: the list of install scripts allowed to run.
-# tsconfig.json: its ts-node block runs code inside the Pulumi process.
-# .pnpmfile.cjs and .pnpmfile.mjs: pnpm loads them on its own at install time,
-# so a file added later would run in the jobs that hold secrets.
-# known_hosts: what the deploy job's SSH trusts.
-/package.json            @branchLeft/branchleft-admin
-/pnpm-workspace.yaml     @branchLeft/branchleft-admin
-/.npmrc                  @branchLeft/branchleft-admin
-/.pnpmfile.cjs           @branchLeft/branchleft-admin
-/.pnpmfile.mjs           @branchLeft/branchleft-admin
-/known_hosts             @branchLeft/branchleft-admin
-# The image pin is not here: `image-pin.txt` holds it alone, with no ciphertext,
-# and has no line below, so a digest bump needs no code-owner review.
-/Pulumi.yaml             @branchLeft/branchleft-admin
-/Pulumi.*.yaml           @branchLeft/branchleft-admin
-/index.ts                @branchLeft/branchleft-admin
-/config.ts               @branchLeft/branchleft-admin
-/tsconfig.json           @branchLeft/branchleft-admin
-
-# The owner's words: licence text.
+# Human-facing docs: the README files and the licence text.
+/README.md               @branchLeft/branchleft-admin
+/README.tenant.md        @branchLeft/branchleft-admin
 /LICENSE                 @branchLeft/branchleft-admin
-
-# The generator stays owned: the platform's provision-tenant workflow runs it in
-# a job that holds the tenant state keys and the provisioning App key, and it
-# writes the secret-bearing CI workflow into every new tenant repository.
-/scripts/generate-tenant-repo.py @branchLeft/branchleft-admin
-
-# Released from /scripts/ above: the documents beside the scripts.
-/scripts/*.md
 
 # SYNC-1 suffix: shared with every repo, and these must stay the final lines
 # (GitHub applies the LAST matching pattern, so anything after or between them
