@@ -8,9 +8,9 @@
 #       with the local actions they call.
 #   (b) human-facing docs: the README files and the licence text.
 # Everything else (the generator, the Pulumi program, package and install
-# files, image pins, engineering docs, the lockfile generator workflow and the
-# Dependabot settings) merges on a signed commit, green checks and the reviewer
-# App's approval. There is no catch-all.
+# files, image pins, engineering docs and the Dependabot settings) merges on a
+# signed commit, green checks and the reviewer App's approval. There is no
+# catch-all.
 #
 # GitHub applies the LAST matching pattern, so a line with no owner releases
 # what an earlier line took. scripts/test_codeowners.py holds a fixed table of
@@ -24,8 +24,10 @@ CLAUDE.md                @branchLeft/branchleft-admin
 
 # Guardrails: infra-ci.yml holds both required checks and the plan and deploy
 # jobs; its local actions run inside them. standards.yml and docs-lint.yml come
-# from the shared lines at the end.
+# from the shared lines at the end. generate-pnpm-lockfile.yml holds contents: write
+# and refuses to push to main, so it stays owned too.
 /.github/workflows/infra-ci.yml  @branchLeft/branchleft-admin
+/.github/workflows/generate-pnpm-lockfile.yml  @branchLeft/branchleft-admin
 /.github/actions/                @branchLeft/branchleft-admin
 
 # Guardrails: the gate scripts the required checks and the plan and deploy

@@ -164,6 +164,9 @@ OWNED: dict[str, tuple[str, ...]] = {
         ".github/workflows/standards.yml",
         ".github/workflows/docs-lint.yml",
         ".github/actions/example/action.yml",
+        # Holds contents: write and refuses to push to main: a weakened guard
+        # would let it commit anywhere.
+        ".github/workflows/generate-pnpm-lockfile.yml",
     ),
     "8 human-facing docs and the owner's words": (
         "README.md",
@@ -207,8 +210,7 @@ RELEASED: dict[str, tuple[str, ...]] = {
         "config.ts",
         "tsconfig.json",
     ),
-    "workflows nothing requires, and update settings": (
-        ".github/workflows/generate-pnpm-lockfile.yml",
+    "prose about a workflow, and update settings": (
         ".github/workflows/generate-pnpm-lockfile.md",
         ".github/dependabot.yml",
     ),
@@ -317,6 +319,71 @@ class CodeownersFile(unittest.TestCase):
             if rule.owners:
                 with self.subTest(pattern=rule.pattern):
                     self.assertEqual(rule.owners, (TEAM,))
+
+
+def hold_reasons(text: str, is_action: bool) -> list[str]:
+    """Why a workflow or action file stays owned, read from its own text.
+
+    A file stays owned when it names a secret other than GITHUB_TOKEN, carries
+    an environment, grants any write permission, has no explicit permissions
+    block, or declares secrets on workflow_call.
+    """
+    out: list[str] = []
+    if (
+        re.search(r"(?<![\w-])secrets\.(?!GITHUB_TOKEN\b)[A-Za-z_]", text)
+        or re.search(r"(?<![\w-])secrets\[", text)
+        or re.search(r"secrets:\s*inherit", text)
+    ):
+        out.append("secrets")
+    if re.search(r"^\s+environment:", text, re.M):
+        out.append("environment")
+    if re.search(r"^\s+[a-z-]+:\s*write\s*(#.*)?$", text, re.M) or re.search(
+        r"permissions:\s*write-all", text
+    ):
+        out.append("write permission")
+    if re.search(r"workflow_call:", text) and re.search(r"^\s{4}secrets:\s*$", text, re.M):
+        out.append("workflow_call secrets")
+    if not is_action and not re.search(r"^permissions:", text, re.M):
+        start = re.search(r"^jobs:\s*$", text, re.M)
+        body = text[start.end() :] if start else ""
+        pattern = r"^  (?=[A-Za-z0-9_.-]+:\s*(?:#.*)?$)"
+        jobs = re.split(pattern, body, flags=re.M)[1:]
+        if not jobs or any(not re.search(r"^    permissions:", job, re.M) for job in jobs):
+            out.append("no permissions block")
+    return out
+
+
+def automation_files(root: Path) -> list[Path]:
+    found = [*(root / ".github" / "workflows").glob("*.y*ml")]
+    found += [*(root / ".github" / "actions").glob("*/action.y*ml")]
+    return sorted(found)
+
+
+class WorkflowsHeldByTheRule(unittest.TestCase):
+    """Every workflow or action that matches the hold rule must be owned."""
+
+    def test_each_matching_file_is_owned(self) -> None:
+        rules = load_rules()
+        self.assertTrue(automation_files(REPO))
+        for file in automation_files(REPO):
+            rel = file.relative_to(REPO).as_posix()
+            reasons = hold_reasons(file.read_text(encoding="utf-8"), "/actions/" in rel)
+            if reasons:
+                with self.subTest(path=rel, reasons=reasons):
+                    self.assertEqual(owners_of(rules, rel), (TEAM,))
+
+    def test_the_rule_reads_the_cases_it_names(self) -> None:
+        cases = {
+            "a secret": ("env:\n  T: ${{ secrets.TOKEN }}\n", "secrets"),
+            "an environment": ("jobs:\n  a:\n    environment: prod\n", "environment"),
+            "a write": ("permissions:\n  contents: write\n", "write permission"),
+            "no block": ("on: push\njobs:\n  a:\n    runs-on: x\n", "no permissions block"),
+        }
+        for name, (text, reason) in cases.items():
+            with self.subTest(case=name):
+                self.assertIn(reason, hold_reasons(text, False))
+        plain = "env:\n  T: ${{ secrets.GITHUB_TOKEN }}\npermissions: {}\n"
+        self.assertEqual(hold_reasons(plain, False), [])
 
 
 def count_owned() -> tuple[int, int]:
