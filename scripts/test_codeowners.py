@@ -136,33 +136,68 @@ OWNED: dict[str, tuple[str, ...]] = {
         ".docs-lint.yml",
         ".standards-db-tooling",
     ),
-    "1 and 2 scripts and tests the secret-bearing jobs depend on": (
-        "scripts/image-changed.py",
-        "scripts/summarise-plan.py",
+    "1 gate scripts and tests the required checks and secret-bearing jobs run": (
         "scripts/assert-placeholders-substituted.py",
         "scripts/placeholder_table.py",
+        "scripts/_testsupport.py",
         "scripts/assert-plan-environment-main-only.py",
         "scripts/assert-no-committed-pulumi-secrets.py",
+        "scripts/assert-no-secure-stack-config.py",
         "scripts/assert-environment-gated.py",
-        "scripts/test_image_changed.py",
-        "scripts/test_summarise_plan.py",
         "scripts/test_plan_job.py",
         "scripts/test_secret_checks.py",
-        "scripts/test_generate_pnpm_lockfile.py",
+        "scripts/test_verify_attestations_job.py",
         "scripts/test_codeowners.py",
-        "scripts/testdata/image-changed/runs-empty.json",
         # The required 'Committed-secret guard' check: plan and deploy need it,
         # so its exit code decides whether a deploy happens.
         "scripts/assert-no-inline-credential.py",
         "scripts/test_assert_no_inline_credential.py",
+        "scripts/test_assert_no_committed_pulumi_secrets.py",
         # Runs in both required checks; guards against a drifted copy failing open.
         "scripts/test_generate_tenant_repo.py",
-        # Run by the platform's provision-tenant workflow in a job that holds the
-        # tenant state keys and the provisioning App key.
-        "scripts/generate-tenant-repo.py",
     ),
-    "1 the test of the test:render gate": ("test/render.test.ts",),
-    "2 what runs, and what Pulumi runs, where secrets are in scope": (
+    "1 the test that the stack records no secret, run by the required Type check": (
+        "test/render.test.ts",
+    ),
+    "3 workflows and actions": (
+        ".github/workflows/infra-ci.yml",
+        ".github/workflows/standards.yml",
+        ".github/actions/example/action.yml",
+        ".github/dependabot.yml",
+        # Under /.github/, which the shared lines force to be the last: owned
+        # although it is a document.
+        ".github/workflows/generate-pnpm-lockfile.md",
+    ),
+    "8 human-facing docs and the owner's words": (
+        "README.md",
+        "README.tenant.md",
+        "LICENSE",
+    ),
+}
+
+# Paths no one is asked to review: engineering documents, app and infra code,
+# lockfiles and version pins (the agent review takes those).
+RELEASED: dict[str, tuple[str, ...]] = {
+    "documents": (
+        "RUNBOOK-bootstrap.md",
+        "config.md",
+        "index.md",
+        "scripts/image-changed.md",
+        "scripts/assert-no-inline-credential.md",
+    ),
+    "scripts that gate nothing, their tests and data": (
+        "scripts/generate-tenant-repo.py",
+        "scripts/generate-tenant-repo.md",
+        "scripts/image-changed.py",
+        "scripts/summarise-plan.py",
+        "scripts/test_image_changed.py",
+        "scripts/test_summarise_plan.py",
+        "scripts/test_generate_pnpm_lockfile.py",
+        "scripts/test_no_cloud_run_text.py",
+        "scripts/tenant-names.json",
+        "scripts/testdata/image-changed/runs-empty.json",
+    ),
+    "package, install and Pulumi program files": (
         "package.json",
         "pnpm-workspace.yaml",
         ".npmrc",
@@ -174,30 +209,6 @@ OWNED: dict[str, tuple[str, ...]] = {
         "index.ts",
         "config.ts",
         "tsconfig.json",
-    ),
-    "3 workflows and actions": (
-        ".github/workflows/infra-ci.yml",
-        ".github/workflows/standards.yml",
-        ".github/actions/example/action.yml",
-        ".github/dependabot.yml",
-        # Under /.github/, which the shared lines force to be the last: owned
-        # although it is a document.
-        ".github/workflows/generate-pnpm-lockfile.md",
-    ),
-    "8 the owner's words": ("LICENSE",),
-}
-
-# Paths no one is asked to review: documents, and lockfiles and version pins
-# (the deeper agent review takes those).
-RELEASED: dict[str, tuple[str, ...]] = {
-    "documents": (
-        "README.md",
-        "README.tenant.md",
-        "RUNBOOK-bootstrap.md",
-        "config.md",
-        "index.md",
-        "scripts/image-changed.md",
-        "scripts/assert-no-inline-credential.md",
     ),
     "lockfiles and version pins": ("pnpm-lock.yaml", ".nvmrc"),
     "the image pin, which holds no ciphertext": ("image-pin.txt",),
