@@ -159,14 +159,11 @@ OWNED: dict[str, tuple[str, ...]] = {
     "1 the test that the stack records no secret, run by the required Type check": (
         "test/render.test.ts",
     ),
-    "3 workflows and actions": (
+    "3 workflows that enforce a required check or gate a deploy, and their actions": (
         ".github/workflows/infra-ci.yml",
         ".github/workflows/standards.yml",
+        ".github/workflows/docs-lint.yml",
         ".github/actions/example/action.yml",
-        ".github/dependabot.yml",
-        # Under /.github/, which the shared lines force to be the last: owned
-        # although it is a document.
-        ".github/workflows/generate-pnpm-lockfile.md",
     ),
     "8 human-facing docs and the owner's words": (
         "README.md",
@@ -209,6 +206,11 @@ RELEASED: dict[str, tuple[str, ...]] = {
         "index.ts",
         "config.ts",
         "tsconfig.json",
+    ),
+    "workflows nothing requires, and update settings": (
+        ".github/workflows/generate-pnpm-lockfile.yml",
+        ".github/workflows/generate-pnpm-lockfile.md",
+        ".github/dependabot.yml",
     ),
     "lockfiles and version pins": ("pnpm-lock.yaml", ".nvmrc"),
     "the image pin, which holds no ciphertext": ("image-pin.txt",),
