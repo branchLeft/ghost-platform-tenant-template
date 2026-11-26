@@ -1,6 +1,4 @@
-"""Tests for the deploy job's environment-gate step and the script it runs.
-The step is cut out of the deploy job and its `run:` body runs under bash with a
-stub `gh`, so the asserted step is CI's own. See assert-environment-gated.md."""
+"""Tests for the deploy job's environment-gate step and its script."""
 
 from __future__ import annotations
 
@@ -18,8 +16,7 @@ ROOT = SCRIPTS.parent
 WORKFLOW = ROOT / ".github" / "workflows" / "infra-ci.yml"
 GUARD = SCRIPTS / "assert-environment-gated.py"
 
-# Copied from branchLeft/ghost-platform infra/scripts/ at the commit named in
-# assert-environment-gated.md. A change here is a deliberate re-copy.
+# Copied from ghost-platform; a change here is a re-copy.
 PINNED_SHA256 = "eddf46b90ed320cb340ead535b43cbbf1ba2f73318673678db1bde14ca17fe9c"
 
 APP_ID = 5090756
@@ -49,8 +46,7 @@ UNREADABLE = "UNREADABLE"  # the stub `gh` exits 1: an API error, a 403, no netw
 GARBAGE = "GARBAGE"  # the stub `gh` exits 0 and prints something that is not JSON
 
 STUB_GH = """#!/bin/bash
-# Stands in for `gh`. Logs every call; any call that is not one of the two
-# reads the step is meant to make exits 99.
+# Stub gh: logs calls, exits 99 on any other read.
 echo "$*" >> "$STUB_LOG"
 [ "$1" = "api" ] || exit 99
 case "$2" in
