@@ -3,12 +3,14 @@
 #       guardrail or a required check protecting us. Here that is the rules and
 #       the owner's instructions, the committed-secret and environment gates
 #       that plan and deploy need, the tests those required checks run, this
-#       file and its proof test, and (through the shared /.github/ line) the
-#       workflows and actions that run them.
+#       file and its proof test, and the workflows that run the required checks
+#       and the plan and deploy jobs (infra-ci.yml, standards.yml, docs-lint.yml)
+#       with the local actions they call.
 #   (b) human-facing docs: the README files and the licence text.
 # Everything else (the generator, the Pulumi program, package and install
-# files, image pins, engineering docs) merges on a signed commit, green checks
-# and the reviewer App's approval. There is no catch-all.
+# files, image pins, engineering docs and the Dependabot settings) merges on a
+# signed commit, green checks and the reviewer App's approval. There is no
+# catch-all.
 #
 # GitHub applies the LAST matching pattern, so a line with no owner releases
 # what an earlier line took. scripts/test_codeowners.py holds a fixed table of
@@ -19,6 +21,14 @@ CLAUDE.md                @branchLeft/branchleft-admin
 /AUTHORISATIONS.md       @branchLeft/branchleft-admin
 /.claude/                @branchLeft/branchleft-admin
 /tools/floors.tsv        @branchLeft/branchleft-admin
+
+# Guardrails: infra-ci.yml holds both required checks and the plan and deploy
+# jobs; its local actions run inside them. standards.yml and docs-lint.yml come
+# from the shared lines at the end. generate-pnpm-lockfile.yml holds contents: write
+# and refuses to push to main, so it stays owned too.
+/.github/workflows/infra-ci.yml  @branchLeft/branchleft-admin
+/.github/workflows/generate-pnpm-lockfile.yml  @branchLeft/branchleft-admin
+/.github/actions/                @branchLeft/branchleft-admin
 
 # Guardrails: the gate scripts the required checks and the plan and deploy
 # jobs run, and the tests of them. The committed-secret guard and its test are
@@ -47,4 +57,6 @@ CLAUDE.md                @branchLeft/branchleft-admin
 /.standards.mode         @branchLeft/branchleft-admin
 /.docs-lint*             @branchLeft/branchleft-admin
 /.standards-db-tooling   @branchLeft/branchleft-admin
-/.github/                @branchLeft/branchleft-admin
+/.github/CODEOWNERS      @branchLeft/branchleft-admin
+/.github/workflows/standards.yml  @branchLeft/branchleft-admin
+/.github/workflows/docs-lint.yml  @branchLeft/branchleft-admin
