@@ -58,8 +58,7 @@ case "$(cat "$src")" in
   UNREADABLE) echo "gh: HTTP 500" >&2; exit 1 ;;
   GARBAGE) echo "<html>not json</html>"; exit 0 ;;
   *) cat "$src" ;;
-esac
-"""
+esac"""
 
 
 def _deploy_job_lines() -> list[str]:
