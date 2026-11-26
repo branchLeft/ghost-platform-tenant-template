@@ -50,11 +50,6 @@ CLAUDE.md                @branchLeft/branchleft-admin
 /README.tenant.md        @branchLeft/branchleft-admin
 /LICENSE                 @branchLeft/branchleft-admin
 
-# Owned .github files. The SYNC-1 suffix below covers all of .github/.
-/.github/CODEOWNERS      @branchLeft/branchleft-admin
-/.github/workflows/standards.yml  @branchLeft/branchleft-admin
-/.github/workflows/docs-lint.yml  @branchLeft/branchleft-admin
-
 # SYNC-1 suffix: shared with every repo, and these must stay the final lines
 # (GitHub applies the LAST matching pattern, so anything after or between them
 # can silently take ownership). A repo adds its own patterns above, never here.
@@ -62,4 +57,6 @@ CLAUDE.md                @branchLeft/branchleft-admin
 /.standards.mode         @branchLeft/branchleft-admin
 /.docs-lint*             @branchLeft/branchleft-admin
 /.standards-db-tooling   @branchLeft/branchleft-admin
-/.github/                @branchLeft/branchleft-admin
+/.github/CODEOWNERS      @branchLeft/branchleft-admin
+/.github/workflows/standards.yml  @branchLeft/branchleft-admin
+/.github/workflows/docs-lint.yml  @branchLeft/branchleft-admin
