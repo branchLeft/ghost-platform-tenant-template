@@ -1,14 +1,6 @@
-"""The one table of template placeholders.
+"""The one table of template placeholders; add a placeholder here and nowhere else.
 
-Each placeholder's name, the value it becomes in a generated tenant repo, and
-the files that carry it while this repo is still the template. The generator
-(`generate-tenant-repo.py`) substitutes from this table and the check
-(`assert-placeholders-substituted.py`) reads it, so a placeholder is added here
-and nowhere else. `test_assert_placeholders_substituted.py` fails when
-README.md's placeholder table disagrees with it.
-
-Shipped in a generated tenant repo (not in TEMPLATE_ONLY_PATHS): the tenant's
-own CI runs `assert-placeholders-substituted.py`, which imports this module.
+See [placeholder_table.md](placeholder_table.md) for its consumers.
 """
 
 from __future__ import annotations
