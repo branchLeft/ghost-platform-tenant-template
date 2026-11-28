@@ -1,11 +1,7 @@
 #!/usr/bin/env python3
 """Tests for image-changed.py: the failure that matters is a `false` over a new image.
 
-The script is run for real (`python3 -I`, as the plan job runs it) against a
-local HTTP server that answers with the recorded-shape JSON in
-testdata/image-changed/, so the request it builds, the token it sends and every
-way an answer can be wrong are all exercised, and nothing leaves this machine.
-See image-changed.md."""
+The script runs for real against a local HTTP server; see image-changed.md."""
 
 from __future__ import annotations
 
@@ -83,10 +79,8 @@ def listing(entries: list[dict], total: int | None = None) -> tuple[int, bytes]:
 class FakeApi:
     """The three reads the script makes, answered from fixtures; logs every request.
 
-    `success` and `recent` are the two workflow-run listings (the one filtered to
-    `status=success` and the unfiltered one), `contents` maps a commit sha to the
-    answer for the pin file at that commit, and `redirect_contents` answers
-    the contents read with a redirect."""
+    `success` and `recent` are the run listings; `contents` maps a sha to the pin file there;
+    `redirect_contents` answers the contents read with a redirect."""
 
     def __init__(self, success, recent, contents, redirect_contents=False, config_name=CONFIG, pending=None):
         self.requests: list[dict[str, str]] = []

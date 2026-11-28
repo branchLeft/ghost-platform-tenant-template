@@ -118,3 +118,39 @@ still carries an unsubstituted placeholder — and both jobs in the generated
 every generated repo, `deploy` never runs because it `needs: [typecheck]`, and
 no tenant ever deploys. Asserting on files is what missed it; running what the
 generated repo's CI runs is what catches it.
+
+## Taken names (moved from `generate-tenant-repo.py`, CMT-3)
+
+Every name that is already taken -- an app host's own stacks and each
+existing tenant -- is in the tenant name register, `registers/tenant-names.json`
+in branchLeft/ghost-platform, the one home for that list. This script keeps no
+list of its own: it reads `tenant-names.json` beside it, a verbatim copy of the
+register, and `test_generate_tenant_repo.py` fails when the copy lags the
+register's published version. A tenant taking a taken name would overwrite
+that stack's directory, secrets file and systemd unit (or collide with an
+existing tenant's repository), so a registered name is refused whatever its
+kind -- tenant zero's included, which is not provisioned through here.
+
+## Removal order and placement (moved from `generate-tenant-repo.py`, CMT-3)
+
+Run once, from the root of the clone: generate-tenant-repo.py --slug blog
+Exit 0 on success, 1 on any refusal, 2 on usage error. This script's removal
+order is reversed, and it lives here rather than in the provisioning workflow.
+
+## Slug rules (moved from `generate-tenant-repo.py`, CMT-3)
+
+Mirrors `validateTenantSlug` in @branchleft/ghost-platform-tenant: the slug
+becomes a Compose project, systemd instance, directory, MySQL identifier and
+two volume names, so a value valid in one and not another is a tenant that
+provisions and then cannot start. The trailing character must be a letter or
+digit because the slug is also an S3-compatible media bucket name, and
+bucket naming requires that at both ends.
+
+## Slug length cap (moved from `generate-tenant-repo.py`, CMT-3)
+
+MySQL caps an account name at 32 characters, and a tenant's database and its
+dedicated user share one name of `ghost_<slug>` -- so the slug has 26 to work
+with. Every other limit it meets is looser. The component is the authority;
+`test_generate_tenant_repo.py` asserts this copy still equals its
+`MAX_TENANT_SLUG_LENGTH`, because a copy that drifts upward fails open: a repo
+would be created for a slug whose stack then refuses at preview.

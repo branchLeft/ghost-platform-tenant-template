@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
 """Print a tenant stack's `pulumi preview --json` plan, safely, or refuse it.
 
-Usage: summarise-plan.py PREVIEW_JSON | --self-test
-Rules and the line another tool reads: summarise-plan.md
+Usage: summarise-plan.py PREVIEW_JSON | --self-test. Rules: summarise-plan.md
 """
 import json
 import re

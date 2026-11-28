@@ -1,8 +1,5 @@
 """No tenant-repo document describes the retired Cloud Run model.
-
-A generated tenant repo carries these documents, so a stale line in one reaches
-every tenant. The workflows are out of scope: they name the retired model in
-their own guards, which refuse it.
+A stale line in a generated tenant repo reaches every tenant. Workflows are out of scope.
 """
 
 from __future__ import annotations

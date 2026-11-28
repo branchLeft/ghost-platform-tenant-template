@@ -136,3 +136,15 @@ gives `false`. It also asserts that no step but the plan save and the parser
 names the saved plan, which holds secrets-provider ciphertext.
 `test_assert_environment_gated.py` fails if any job declaring the `production`
 environment lacks the has_changes operand in its `if:`.
+
+## Run listings and the test harness (moved from `image-changed.py` and `test_image_changed.py`, CMT-3)
+
+Every entry is held to the filter the request asked for (`status`, when one
+was asked: a run status, or `success` for a completed success), so a listing
+that ignored the filter is refused rather than read. `total` is the count
+GitHub says match, which can exceed the entries returned.
+
+The tests run the script for real (`python3 -I`, as the plan job runs it)
+against a local HTTP server that answers with the recorded-shape JSON in
+testdata/image-changed/, so the request it builds, the token it sends and every
+way an answer can be wrong are all exercised, and nothing leaves this machine.

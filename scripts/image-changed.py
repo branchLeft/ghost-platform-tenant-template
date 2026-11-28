@@ -89,12 +89,7 @@ class Listing(NamedTuple):
 
 
 def _runs(raw: bytes, reason: str, status: str | None = None) -> Listing:
-    """The runs of a workflow-run listing; any entry this does not understand is Unclear.
-
-    Every entry is held to the filter the request asked for (`status`, when one
-    was asked: a run status, or `success` for a completed success), so a listing
-    that ignored the filter is refused rather than read. `total` is the count
-    GitHub says match, which can exceed the entries returned."""
+    """The runs of a workflow-run listing; an entry this does not understand is Unclear (image-changed.md)."""
     try:
         doc = json.loads(raw.decode("utf-8"))
     except (ValueError, RecursionError) as error:  # a UnicodeDecodeError is a ValueError
@@ -191,11 +186,9 @@ def _decide(config_path: str, workflow: str, environ: dict[str, str], fetch: Fet
     if previous != current:
         return Verdict(True, "pin-differs", baseline.id)
 
-    # A deploy that failed or was stopped after the baseline can leave the host
-    # between a pin write and its restart, so the host may hold the pin of such a
-    # run, not the baseline's. Every finished run after the baseline that is not
-    # a success must carry the current pin too. The unfiltered window must reach
-    # back to the baseline, or a run between could be out of sight.
+    # A failed or stopped deploy after the baseline can leave the host holding its
+    # pin, not the baseline's, so every finished non-success run after the baseline
+    # must carry the current pin too. The unfiltered window must reach the baseline.
     _require(baseline.id in {run.id for run in recent}, "history-window")
     between = [
         run
