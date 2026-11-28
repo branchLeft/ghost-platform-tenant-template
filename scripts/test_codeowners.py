@@ -326,9 +326,15 @@ def hold_reasons(text: str, is_action: bool) -> list[str]:
 
     A file stays owned when it names a secret other than GITHUB_TOKEN, carries
     an environment, grants any write permission, has no explicit permissions
-    block, or declares secrets on workflow_call.
+    block, declares secrets on workflow_call, or triggers on pull_request_target
+    (which runs with the base repository's token on code from outside pull
+    requests). Full-line comments are ignored so a note naming the trigger holds
+    nothing.
     """
     out: list[str] = []
+    live = "\n".join(line for line in text.splitlines() if not line.lstrip().startswith("#"))
+    if re.search(r"(?<![\w-])pull_request_target(?![\w-])", live):
+        out.append("pull_request_target")
     if (
         re.search(r"(?<![\w-])secrets\.(?!GITHUB_TOKEN\b)[A-Za-z_]", text)
         or re.search(r"(?<![\w-])secrets\[", text)
@@ -384,6 +390,20 @@ class WorkflowsHeldByTheRule(unittest.TestCase):
                 self.assertIn(reason, hold_reasons(text, False))
         plain = "env:\n  T: ${{ secrets.GITHUB_TOKEN }}\npermissions: {}\n"
         self.assertEqual(hold_reasons(plain, False), [])
+
+    def test_a_pull_request_target_trigger_is_held(self) -> None:
+        # No secret, no write, explicit read-only permissions: still held, because
+        # pull_request_target runs with the base repository's token on fork code.
+        block = "permissions:\n  contents: read\njobs:\n  a:\n    permissions:\n      contents: read\n"
+        for trigger in (
+            "on: pull_request_target\n",
+            "on:\n  pull_request_target:\n    types: [opened]\n",
+            "on: [pull_request_target]\n",
+        ):
+            with self.subTest(trigger=trigger):
+                self.assertIn("pull_request_target", hold_reasons(trigger + block, False))
+        commented = "# never `pull_request_target`: see the note above\n" + block
+        self.assertEqual(hold_reasons("on: pull_request\n" + commented, False), [])
 
 
 def count_owned() -> tuple[int, int]:
