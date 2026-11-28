@@ -1,10 +1,7 @@
 #!/usr/bin/env python3
 """Turn a fresh clone of a template-generated repo into one tenant's repo.
-
-Run once, from the root of the clone: generate-tenant-repo.py --slug blog
-Exit 0 on success, 1 on any refusal, 2 on usage error. See
-generate-tenant-repo.md for why removal order is reversed and why this lives
-here rather than in the provisioning workflow.
+Run once from the clone's root: --slug blog. Exit 0 ok, 1 refusal, 2 usage.
+See generate-tenant-repo.md for the removal order and why this lives here.
 """
 
 from __future__ import annotations
@@ -20,31 +17,18 @@ import sys
 # Imported, not copied: a placeholder is added in placeholder_table.py only.
 from placeholder_table import PLACEHOLDER_PATTERN, SUBSTITUTED_FILES, substitutions
 
-# Mirrors `validateTenantSlug` in @branchleft/ghost-platform-tenant: the slug
-# becomes a Compose project, systemd instance, directory, MySQL identifier and
-# two volume names, so a value valid in one and not another is a tenant that
-# provisions and then cannot start. The trailing character must be a letter or
-# digit because the slug is also an S3-compatible media bucket name, and
-# bucket naming requires that at both ends. See generate-tenant-repo.md.
+# Mirrors `validateTenantSlug` in @branchleft/ghost-platform-tenant: a slug valid
+# there and not here provisions, then cannot start. It ends in a letter or digit
+# because it is also a media bucket name. See generate-tenant-repo.md.
 SLUG = re.compile(r"\A[a-z]([a-z0-9-]*[a-z0-9])?\Z")
 
-# MySQL caps an account name at 32 characters, and a tenant's database and its
-# dedicated user share one name of `ghost_<slug>` -- so the slug has 26 to work
-# with. Every other limit it meets is looser. The component is the authority;
-# `test_generate_tenant_repo.py` asserts this copy still equals its
-# `MAX_TENANT_SLUG_LENGTH`, because a copy that drifts upward fails open: a repo
-# would be created for a slug whose stack then refuses at preview.
+# MySQL caps an account name at 32 characters; a tenant's database and user share
+# `ghost_<slug>`, so the slug has 26 characters. The component is the authority:
+# `test_generate_tenant_repo.py` asserts this copy equals `MAX_TENANT_SLUG_LENGTH`.
 MAX_SLUG_LENGTH = 26
 
-# Every name that is already taken -- an app host's own stacks and each
-# existing tenant -- is in the tenant name register, `registers/tenant-names.json`
-# in branchLeft/ghost-platform, the one home for that list. This script keeps no
-# list of its own: it reads `tenant-names.json` beside it, a verbatim copy of the
-# register, and `test_generate_tenant_repo.py` fails when the copy lags the
-# register's published version. A tenant taking a taken name would overwrite
-# that stack's directory, secrets file and systemd unit (or collide with an
-# existing tenant's repository), so a registered name is refused whatever its
-# kind -- tenant zero's included, which is not provisioned through here.
+# Taken names come from `tenant-names.json` beside this file, a verbatim copy of
+# the register; see generate-tenant-repo.md for why a registered name is refused.
 REGISTER_FILE = pathlib.Path(__file__).resolve().parent / "tenant-names.json"
 REGISTER_KINDS = ("infrastructure", "tenant")
 
@@ -110,10 +94,7 @@ class GenerateError(Exception):
 
 def taken_names(register: pathlib.Path | None = None) -> dict[str, str]:
     """The register's names, each mapped to its kind.
-
-    Refuses a missing, unreadable or malformed register rather than reading it
-    as empty: an empty list would accept every name, which is the failure this
-    exists to prevent.
+    Refuses a missing, unreadable or malformed register: read as empty, it would accept every name.
     """
     path = REGISTER_FILE if register is None else register
     try:

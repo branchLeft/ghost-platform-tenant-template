@@ -1,9 +1,6 @@
 """Tests for generate-pnpm-lockfile.yml, update mode and the refusals both modes share.
-
-See ../.github/workflows/generate-pnpm-lockfile.md. The workflow is read as
-text (stdlib only). Each step's `run:` body is cut out and executed under bash
-with stub tools, and the update-mode gate is cut out of its heredoc and run as
-the runner runs it, so what is asserted is the step CI runs, not a copy.
+Each step's `run:` body runs under bash with stub tools, as CI runs it. See
+../.github/workflows/generate-pnpm-lockfile.md.
 """
 
 from __future__ import annotations
@@ -505,9 +502,7 @@ class TheSharedRefusals(unittest.TestCase):
 
 class ThePlantedModules(unittest.TestCase):
     """The working directory is the branch's checkout, so nothing in it may be importable.
-
-    Each case commits `json.py`, `yaml.py` and `re.py` (and Ruby's `json.rb` and `psych.rb`) at the
-    checkout root, each writing a marker file when loaded, and runs the real step.
+    Each case commits json.py, yaml.py, re.py (and json.rb, psych.rb) at the root; each writes a marker when loaded.
     """
 
     def setUp(self) -> None:
@@ -625,9 +620,7 @@ class TheUpdateSteps(unittest.TestCase):
         link: str | None = None,
     ) -> tuple[subprocess.CompletedProcess[str], pathlib.Path]:
         """Runs the prepare step and, only if it passed, the resolve step, as the runner does.
-
-        The stub `pnpm` records its arguments and the workspace file it was handed. `link` names a
-        file to replace with a symlink to a file outside the checkout.
+        The stub `pnpm` records its arguments and the workspace file; `link` names a file to symlink outside.
         """
         repo = self.dir / "repo"
         repo.mkdir(exist_ok=True)

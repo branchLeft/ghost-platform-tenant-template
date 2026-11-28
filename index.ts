@@ -64,12 +64,9 @@ function hostnameOf(url: string): TenantStackDescriptor['hostname'] {
   return { kind: 'theirs', fqdn: host, verifiedAt: hostnameVerifiedAt as Instant };
 }
 
-// The fixed halves of a paying tenant's descriptor: every value here is the
-// only one a `tenant` kind may carry or the platform default, so none is a
-// config key. `as unknown as` because the render core brands its string and
-// number fields; `validateTenantStack()` inside the component is what proves
-// them. No `ownerEmail` and no credential: the stack holds no secret value, and
-// the host renders the secrets file.
+// The fixed halves of a paying tenant's descriptor, none of them a config key.
+// `as unknown as` because the render core brands its string and number fields;
+// `validateTenantStack()` proves them. No `ownerEmail`, no credential: the host renders secrets.
 const descriptor = {
   version: 1,
   kind: 'tenant',
@@ -123,13 +120,7 @@ const tenant = new GhostTenant(slug, {
     : { maxUserConnections: databaseMaxUserConnections }),
 });
 
-/**
- * The key names `/etc/branchleft/<slug>.env` needs, as the render core's
- * template: `KEY=` lines with empty values, never a value. Not a secret. The
- * host fills it, root-owned `0600`, with `app/provision/render_tenant_secrets.py`
- * from `branchLeft/ghost-platform`; this stack never holds the values. See
- * config.md.
- */
+/** The key names the host's secrets env file needs, never values; see index.md. */
 export const secretsEnvTemplate = tenant.secretsEnvTemplate;
 
 /** The names in `secretsEnvTemplate`, in its order. */
@@ -169,12 +160,9 @@ export const imageEnvPath = tenant.imageEnvPath;
 export const databaseName = tenant.databaseName;
 export const databaseUser = tenant.databaseUser;
 
-/** This tenant's own Object Storage bucket, and the base URL Ghost writes into
- * every published post. Nothing here creates either: the bucket, its versioning
- * and the policy that fences it to this tenant's key are made by an operator
- * before this stack first applies, per `RUNBOOK-bootstrap.md`. Exported so that
- * what was created can be compared against what the container is configured
- * with — a mismatch is uploads failing after a deploy that reported success. */
+/** This tenant's own Object Storage bucket, and the base URL Ghost writes into posts.
+ * Nothing here creates either: an operator makes them before first apply, per `RUNBOOK-bootstrap.md`.
+ * Exported so a mismatch with the container's config, which fails uploads, is visible. */
 export const mediaBucket = tenant.mediaBucket;
 export const mediaPublicBaseUrl = tenant.mediaPublicBaseUrl;
 

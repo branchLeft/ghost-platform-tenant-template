@@ -110,3 +110,17 @@ The pair is created in the Hetzner Cloud Console — there is no API that mints
 one — and the bucket policy naming it as a principal is applied by the same
 operator in the same sitting. A key with no policy fencing it is valid for
 every bucket in its project.
+
+## The zones (moved from `config.ts`, CMT-3)
+
+The zones every hostname and sending domain is checked against: `demoZone`,
+`platformZone`, `ownedDomains` and `demoMailDomain`, the render core's
+`ZoneConfig`. 7.0.0 dropped `mailSpoolBaseUrl`: Ghost reaches the host's
+mail spool by its service name on the tenant's own mail network. Platform-wide facts, identical across
+tenants; `imagesWithBreakGlassAdapter` is optional.
+
+## The slug (moved from `config.ts`, CMT-3)
+
+This tenant's slug: the Compose project, the systemd instance, the directory
+under `/opt/branchleft`, the MySQL database and account name, and both volume
+names. Equal to the Pulumi stack name.
