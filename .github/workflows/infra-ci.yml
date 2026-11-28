@@ -120,6 +120,11 @@ jobs:
       - name: Check formatting
         run: pnpm exec prettier --check . --ignore-path .gitignore --ignore-path .prettierignore --ignore-path node_modules/@branchleft/prettier-config/prettierignore
 
+      # The shared ESLint config (LINT-1, LINT-2): the same `lint` script the
+      # pre-commit hooks and a contributor run, so CI and local agree.
+      - name: Lint
+        run: pnpm run lint
+
       # Skipped in the template repo itself, where an unsubstituted placeholder
       # is the correct, permanent state of `main` -- this step exists for repos
       # generated *from* the template. `!= true` (not `== false`) so an
